@@ -10,18 +10,20 @@ public:
     static std::shared_ptr<Expression> Parse(std::string ss);
     static std::shared_ptr<Expression> Parse(std::istream& ss);
 
-    virtual void WriteJSON(std::ostream& _out) {}
-    virtual void WriteExpr(std::ostream& _out) {}
-    virtual void WriteLatEx(std::ostream& _out) {}
+    virtual void WriteJSON(std::ostream& _out) const {}
+    virtual void WriteExpr(std::ostream& _out) const {}
+    virtual void WriteLatEx(std::ostream& _out) const {}
+    virtual void Simplify() {}
 };
 
 class Binary : public Expression{
 public:
     Binary(std::string const& _typeStr, std::istream& _ss);
 
-    void WriteJSON(std::ostream& _out) override;
-    void WriteExpr(std::ostream& _out) override;
-    void WriteLatEx(std::ostream& _out) override;
+    void WriteJSON(std::ostream& _out) const override;
+    void WriteExpr(std::ostream& _out) const override;
+    void WriteLatEx(std::ostream& _out) const override;
+    void Simplify() override;
 
     enum class Type{
         ADD,
@@ -41,9 +43,11 @@ class Unary : public Expression{
 public:
     Unary(std::string const& _typeStr, std::istream& _ss);
     
-    void WriteJSON(std::ostream& _out) override;
-    void WriteExpr(std::ostream& _out) override;
-    void WriteLatEx(std::ostream& _out) override;
+    void WriteJSON(std::ostream& _out) const override;
+    void WriteExpr(std::ostream& _out) const override;
+    void WriteLatEx(std::ostream& _out) const override;
+    void Simplify() override;
+
 protected:
     std::string _type;
     std::shared_ptr<Expression> _expr;
@@ -53,9 +57,10 @@ class Value : public Expression{
 public:
     Value(std::string const& _typeStr);
 
-    void WriteJSON(std::ostream& _out) override;
-    void WriteExpr(std::ostream& _out) override;
-    void WriteLatEx(std::ostream& _out) override;
+    void WriteJSON(std::ostream& _out) const override;
+    void WriteExpr(std::ostream& _out) const override;
+    void WriteLatEx(std::ostream& _out) const override;
+    void Simplify() override;
 
     enum class Type{
         VALUE,

@@ -14,15 +14,27 @@ int main (int argc, char **argv)
   auto expr = Expression::Parse(_res);
   expr->WriteJSON(std::cout);
   std::cout << "\n";
+  expr->WriteExpr(std::cout);
+  std::cout << "\n";
+  expr->WriteLatEx(std::cout);
+  std::cout << "\n";
   evaluate("integrate(1/(1+x^2), x);", _res, _err);
   std::cout << _res << '\n';
   expr = Expression::Parse(_res);
   expr->WriteJSON(std::cout);
   std::cout << "\n";
+  expr->WriteExpr(std::cout);
+  std::cout << "\n";
+  expr->WriteLatEx(std::cout);
+  std::cout << "\n";
   evaluate("integrate(x/(1+x^2), x);", _res, _err);
   std::cout << _res << '\n';
   expr = Expression::Parse(_res);
   expr->WriteJSON(std::cout);
+  std::cout << "\n";
+  expr->WriteExpr(std::cout);
+  std::cout << "\n";
+  expr->WriteLatEx(std::cout);
   std::cout << "\n";
 
   free_ecl();

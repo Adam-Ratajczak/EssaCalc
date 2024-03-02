@@ -1,7 +1,17 @@
 #include "Expression.hpp"
+#include <cctype>
 #include <memory>
 #include <sstream>
 #include <string>
+
+std::string to_lower(std::string const& _str){
+    std::string _result;
+    for(auto& c : _str){
+        _result += std::tolower(c);
+    }
+
+    return _result;
+}
 
 std::string get_type(std::istream& _ss){
     char c;
@@ -61,22 +71,30 @@ std::shared_ptr<Expression> Expression::Parse(std::istream& _ss){
 
 Unary::Unary(std::string const& _typeStr, std::istream& _ss){
     _type = _typeStr.substr(2);
-    _type = _type.substr(0, _type.find(" SIMP)"));
+    _type = to_lower(_type.substr(0, _type.find(" SIMP)")));
     _expr = Expression::Parse(_ss);
 }
 
-void Unary::WriteJSON(std::ostream& _out){
+void Unary::WriteJSON(std::ostream& _out) const{
     _out << "{\"func\":\"" << _type << "\",\"arg\":";
     _expr->WriteJSON(_out);
     _out << "}";
 }
 
-void Unary::WriteExpr(std::ostream& _out){
-
+void Unary::WriteExpr(std::ostream& _out) const{
+    _out << _type << "(";
+    _expr->WriteExpr(_out);
+    _out << ")";
 }
 
-void Unary::WriteLatEx(std::ostream& _out){
+void Unary::WriteLatEx(std::ostream& _out) const{
+    _out << "\\" << _type << "(";
+    _expr->WriteLatEx(_out);
+    _out << ")";
+}
 
+void Unary::Simplify(){
+    _expr->Simplify();
 }
 
 Binary::Binary(std::string const& _typeStr, std::istream& _ss){
@@ -97,26 +115,26 @@ Binary::Binary(std::string const& _typeStr, std::istream& _ss){
     _expr2 = Expression::Parse(_ss);
 }
 
-void Binary::WriteJSON(std::ostream& _out){
+void Binary::WriteJSON(std::ostream& _out) const{
     std::string type;
     switch (_type) {
     case Type::ADD:
-        type = "ADD";
+        type = "add";
       break;
     case Type::SUB:
-        type = "SUB";
+        type = "sub";
       break;
     case Type::MUL:
-        type = "MUL";
+        type = "mul";
       break;
     case Type::DIV:
-        type = "DIV";
+        type = "div";
       break;
     case Type::POW:
-        type = "POW";
+        type = "pow";
       break;
     case Type::UNDEFINED:
-        type = "NUL";
+        type = "nil";
       break;
     }
     _out << "{\"op\":\"" << type << "\",\"arg1\":";
@@ -126,47 +144,123 @@ void Binary::WriteJSON(std::ostream& _out){
     _out << "}";
 }
 
-void Binary::WriteExpr(std::ostream& _out){
-
+void Binary::WriteExpr(std::ostream& _out) const{
+    std::string op;
+    switch (_type) {
+    case Type::ADD:
+        op = "+";
+      break;
+    case Type::SUB:
+        op = "-";
+      break;
+    case Type::MUL:
+        op = "*";
+      break;
+    case Type::DIV:
+        op = "/";
+      break;
+    case Type::POW:
+        op = "^";
+      break;
+    case Type::UNDEFINED:
+        op = " ";
+      break;
+    }
+    _out << "(";
+    _expr1->WriteExpr(_out);
+    _out << op;
+    _expr2->WriteExpr(_out);
+    _out << ")";
 }
 
-void Binary::WriteLatEx(std::ostream& _out){
+void Binary::WriteLatEx(std::ostream& _out) const{
+    _out << "{(";
+    switch (_type) {
+    case Type::ADD:
+        _expr1->WriteLatEx(_out);
+        _out << "+";
+        _expr2->WriteLatEx(_out);
+      break;
+    case Type::SUB:
+        _expr1->WriteLatEx(_out);
+        _out << "-";
+        _expr2->WriteLatEx(_out);
+      break;
+    case Type::MUL:
+        _expr1->WriteLatEx(_out);
+        _out << "\\cdot";
+        _expr2->WriteLatEx(_out);
+      break;
+    case Type::DIV:
+        _out << "\\frac{";
+        _expr1->WriteLatEx(_out);
+        _out << "}{";
+        _expr2->WriteLatEx(_out);
+        _out << "}";
+      break;
+    case Type::POW:
+        _expr1->WriteLatEx(_out);
+        _out << "^";
+        _expr2->WriteLatEx(_out);
+      break;
+    case Type::UNDEFINED:
+        _expr1->WriteLatEx(_out);
+        _out << " ";
+        _expr2->WriteLatEx(_out);
+      break;
+    }
+    _out << ")}";
+}
 
+void Binary::Simplify(){
+    
 }
 
 Value::Value(std::string const& _typeStr){
     if(_typeStr.front() == '%'){
         _type = Type::CONSTANT;
-        _val = _typeStr.substr(1);
+        _val = to_lower(_typeStr.substr(1));
     }else if(_typeStr.front() == '$'){
         _type = Type::VARIABLE;
-        _val = _typeStr.substr(1);
+        _val = to_lower(_typeStr.substr(1));
     }else{
         _type = Type::VALUE;
-        _val = _typeStr;
+        _val = to_lower(_typeStr);
     }
 }
 
-void Value::WriteJSON(std::ostream& _out){
+void Value::WriteJSON(std::ostream& _out) const{
     std::string type;
     switch (_type) {
     case Type::VALUE:
-        type = "VAL";
+        type = "val";
       break;
     case Type::VARIABLE:
-        type = "VAR";
+        type = "var";
       break;
     case Type::CONSTANT:
-        type = "CON";
+        type = "const";
       break;
     }
     _out << "{\"type\":\"" << type << "\",\"value\":\"" << _val << "\"}";
 }
 
-void Value::WriteExpr(std::ostream& _out){
-
+void Value::WriteExpr(std::ostream& _out) const{
+    if(_type == Type::CONSTANT){
+        _out << "%" << _val;
+    }else{
+        _out << _val;
+    }
 }
 
-void Value::WriteLatEx(std::ostream& _out){
+void Value::WriteLatEx(std::ostream& _out) const{
+    if(_type == Type::CONSTANT){
+        _out << "\\" << _val;
+    }else{
+        _out << _val;
+    }
+}
 
+void Value::Simplify(){
+    
 }
