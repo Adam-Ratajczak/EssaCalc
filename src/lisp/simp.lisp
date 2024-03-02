@@ -893,7 +893,8 @@
 
 (defun exptb (a b)
   (let ((result
-	 (cond ((equal a %e-val)
+	;;  (cond ((equal a %e-val)
+	 (cond ((equal a nil)
 		;; Make B a float so we'll get double-precision result.
 		(exp (float b)))
 	       ((or (floatp a) (not (minusp b)))

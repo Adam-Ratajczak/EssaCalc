@@ -108,8 +108,11 @@
                     (setq expr (let ((*prompt-on-read-hang* nil)) (mread *in-stream* nil)))
                     (consp expr))
             do 
-		(setq result (princ-to-string (funcall meval-fcn (third expr))))
-		(return-from MAXIMA::|api-eval| result)
+
+		(catch 'macsyma-quit
+			(setq result (princ-to-string (funcall meval-fcn (third expr))))
+			(return-from MAXIMA::|api-eval| result))
+		(return-from MAXIMA::|api-eval| "Error")
 	))
     in-stream-string-rep))
 
