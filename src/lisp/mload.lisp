@@ -110,7 +110,7 @@
             do 
 
 		(catch 'macsyma-quit
-			(setq result (princ-to-string (funcall meval-fcn (third expr))))
+			(setq result (princ-to-string (simplify (funcall meval-fcn (third expr)))))
 			(return-from MAXIMA::|api-eval| result))
 		(return-from MAXIMA::|api-eval| "Error")
 	))
