@@ -1,24 +1,28 @@
 #pragma once
 
-#include <istream>
 #include <memory>
 #include <ostream>
 #include <string>
 
+namespace Essa::Math {
+
 class Expression{
 public:
+    Expression() = default;
     static std::shared_ptr<Expression> Parse(std::string ss);
-    static std::shared_ptr<Expression> Parse(std::istream& ss);
 
-    virtual void WriteJSON(std::ostream& _out) const {}
-    virtual void WriteExpr(std::ostream& _out) const {}
-    virtual void WriteLatEx(std::ostream& _out) const {}
-    virtual void Simplify() {}
+    virtual void WriteJSON(std::ostream& _out) const = 0;
+    virtual void WriteExpr(std::ostream& _out) const = 0;
+    virtual void WriteLatEx(std::ostream& _out) const = 0;
+    virtual void Simplify() = 0;
+
+    std::shared_ptr<Expression> IndefIntegral(std::string _var);
+    std::shared_ptr<Expression> Derivative(std::string _var);
 };
 
-class Binary : public Expression{
+class Binary : virtual public Expression{
 public:
-    Binary(std::string const& _typeStr, std::istream& _ss);
+    Binary() = default;
 
     void WriteJSON(std::ostream& _out) const override;
     void WriteExpr(std::ostream& _out) const override;
@@ -39,23 +43,49 @@ protected:
     std::shared_ptr<Expression> _expr2;
 };
 
-class Unary : public Expression{
+class Unary : virtual public Expression{
 public:
-    Unary(std::string const& _typeStr, std::istream& _ss);
+    Unary() = default;
     
     void WriteJSON(std::ostream& _out) const override;
     void WriteExpr(std::ostream& _out) const override;
     void WriteLatEx(std::ostream& _out) const override;
     void Simplify() override;
 
+    enum class Type{
+        SIN,
+        COS,
+        TAN,
+        COT,
+        SEC,
+        CSC,
+        ASIN,
+        ACOS,
+        ATAN,
+        ACOT,
+        ASEC,
+        ACSC,
+
+        LOG2,
+        LOG10,
+        LN,
+
+        SQRT,
+        CBRT,
+
+        EXP,
+
+        ERF
+    };
 protected:
     std::string _type;
+    // Type _type;
     std::shared_ptr<Expression> _expr;
 };
 
-class Value : public Expression{
+class Value : virtual public Expression{
 public:
-    Value(std::string const& _typeStr);
+    Value() = default;
 
     void WriteJSON(std::ostream& _out) const override;
     void WriteExpr(std::ostream& _out) const override;
@@ -71,3 +101,5 @@ protected:
     Type _type;
     std::string _val;
 };
+
+}
