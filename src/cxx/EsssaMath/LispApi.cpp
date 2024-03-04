@@ -161,60 +161,63 @@ void LispValue::ParseLispObject(std::string const& _typeStr, std::istream& _ss){
 }
 
 std::shared_ptr<Expression> evaluate(std::string _exp) {
-    _exp = "\"" + _exp + "\"";
-    std::wstring _str;
-    
-    cl_object arg1 = c_string_to_object(_exp.c_str());
-    cl_object name = ecl_make_symbol("api-eval", "MAXIMA");
-    cl_object output = cl_funcall(2, name, arg1);
-
-    static_assert(sizeof(ecl_character)==sizeof(wchar_t),"sizes must be the same");
+    try{
+        std::string exp = "\"" + _exp + ", simp;\"";
         
-    _str = reinterpret_cast<wchar_t*>(output->string.self);
-    _str = _str.substr(0, _str.find_last_of(L")") + 1);
+        cl_object arg1 = c_string_to_object(exp.c_str());
+        cl_object name = ecl_make_symbol("api-eval", "MAXIMA");
+        cl_object output = cl_funcall(2, name, arg1);
 
-    using convert_typeX = std::codecvt_utf8<wchar_t>;
-    std::wstring_convert<convert_typeX, wchar_t> converterX;
+        static_assert(sizeof(ecl_character)==sizeof(wchar_t),"sizes must be the same");
+            
+        std::wstring _str = reinterpret_cast<wchar_t*>(output->string.self);
+        _str = _str.substr(0, _str.find_last_of(L")") + 1);
 
-    std::string _res = converterX.to_bytes(_str);
+        using convert_typeX = std::codecvt_utf8<wchar_t>;
+        std::wstring_convert<convert_typeX, wchar_t> converterX;
 
-    std::string::size_type _pos = _res.find("\n ");
-    while(_pos != std::string::npos){
-        _res = _res.substr(0, _pos) + _res.substr(_pos + 2);
-        _pos = _res.find("\n ");
-    }
+        std::string _res = converterX.to_bytes(_str);
 
-    _pos = _res.find("  ");
-    while(_pos != std::string::npos){
-        _res = _res.substr(0, _pos) + _res.substr(_pos + 1);
+        std::string::size_type _pos = _res.find("\n ");
+        while(_pos != std::string::npos){
+            _res = _res.substr(0, _pos) + _res.substr(_pos + 2);
+            _pos = _res.find("\n ");
+        }
+
         _pos = _res.find("  ");
-    }
+        while(_pos != std::string::npos){
+            _res = _res.substr(0, _pos) + _res.substr(_pos + 1);
+            _pos = _res.find("  ");
+        }
 
-    _pos = _res.find(" SIMP");
-    while(_pos != std::string::npos){
-        _res = _res.substr(0, _pos) + _res.substr(_pos + 5);
         _pos = _res.find(" SIMP");
-    }
+        while(_pos != std::string::npos){
+            _res = _res.substr(0, _pos) + _res.substr(_pos + 5);
+            _pos = _res.find(" SIMP");
+        }
 
-    return LispExpression::ParseLispObject(_res);
+        return LispExpression::ParseLispObject(_res);
+    }catch(std::range_error&){
+        return evaluate(_exp);
+    }
 }
 
 std::shared_ptr<Expression> Expression::Parse(std::string _str){
-    return evaluate(_str + ";");
+    return evaluate(_str);
 }
 
 std::shared_ptr<Expression> Expression::IndefIntegral(std::string _var){
     std::stringstream ss;
     WriteExpr(ss);
 
-    return evaluate("integrate(" + ss.str() + "," + _var + ");");
+    return evaluate("integrate(" + ss.str() + "," + _var + ")");
 }
 
 std::shared_ptr<Expression> Expression::Derivative(std::string _var){
     std::stringstream ss;
     WriteExpr(ss);
 
-    return evaluate("derivative(" + ss.str() + "," + _var + ");");
+    return evaluate("derivative(" + ss.str() + "," + _var + ")");
 }
 
 }

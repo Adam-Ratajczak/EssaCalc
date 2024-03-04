@@ -1,7 +1,15 @@
 #include "Expression.hpp"
+#include <sstream>
 #include <string>
 
 namespace Essa::Math{
+    std::string Expression::ToString() const{
+        std::stringstream ss;
+        WriteExpr(ss);
+
+        return ss.str();
+    }
+
     void Unary::WriteJSON(std::ostream& _out) const{
         _out << "{\"func\":\"" << _type << "\",\"arg\":";
         _expr->WriteJSON(_out);
@@ -54,7 +62,6 @@ namespace Essa::Math{
         _expr2->WriteJSON(_out);
         _out << "}";
     }
-
 
     bool Binary::CheckSignificance(Type _op1, Type _op2){
         switch (_op1) {

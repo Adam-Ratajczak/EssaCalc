@@ -19,6 +19,8 @@ public:
     std::shared_ptr<Expression> IndefIntegral(std::string _var);
     std::shared_ptr<Expression> Derivative(std::string _var);
 
+    std::string ToString() const;
+
     friend std::ostream& operator<< (std::ostream& stream, const Expression& _expr){
         _expr.WriteExpr(stream);
 
