@@ -169,10 +169,17 @@ std::shared_ptr<Expression> evaluate(std::string _exp) {
 
     _str = _str.substr(0, _str.find_last_of(L")") + 1);
     std::string _res = converterX.to_bytes(_str);
-    std::string::size_type _pos = _res.find("\n");
+
+    std::string::size_type _pos = _res.find("\n ");
+    while(_pos != std::string::npos){
+        _res = _res.substr(0, _pos) + _res.substr(_pos + 2);
+        _pos = _res.find("\n ");
+    }
+
+    _pos = _res.find("  ");
     while(_pos != std::string::npos){
         _res = _res.substr(0, _pos) + _res.substr(_pos + 1);
-        _pos = _res.find("\n");
+        _pos = _res.find("  ");
     }
 
     _pos = _res.find(" SIMP");
