@@ -2,6 +2,7 @@
 #include <iostream>
 #include <locale>
 #include <memory>
+#include <stdexcept>
 #include <stdio.h>
 #include <ecl/ecl.h>
 #include <stdlib.h>
@@ -80,7 +81,10 @@ std::shared_ptr<Expression> LispExpression::ParseLispObject(std::string _str){
     std::stringstream ss;
     ss.write(_str.c_str(), _str.size());
 
-    return LispExpression::ParseLispObject(ss);
+    auto _expr = LispExpression::ParseLispObject(ss);
+    _expr->Simplify();
+
+    return _expr;
 }
 
 std::shared_ptr<Expression> LispExpression::ParseLispObject(std::istream& _ss){
@@ -134,6 +138,7 @@ void LispBinary::ParseLispObject(std::string const& _typeStr, std::istream& _ss)
         _type = Type::POW;
     }else{
         _type = Type::UNDEFINED;
+        throw std::runtime_error("Unknown operator!");
     }
     char c;
     _ss.read(&c, 1);
@@ -157,17 +162,20 @@ void LispValue::ParseLispObject(std::string const& _typeStr, std::istream& _ss){
 
 std::shared_ptr<Expression> evaluate(std::string _exp) {
     _exp = "\"" + _exp + "\"";
+    std::wstring _str;
+    
     cl_object arg1 = c_string_to_object(_exp.c_str());
     cl_object name = ecl_make_symbol("api-eval", "MAXIMA");
     cl_object output = cl_funcall(2, name, arg1);
 
     static_assert(sizeof(ecl_character)==sizeof(wchar_t),"sizes must be the same");
-    
-    std::wstring _str = reinterpret_cast<wchar_t*>(output->string.self);
+        
+    _str = reinterpret_cast<wchar_t*>(output->string.self);
+    _str = _str.substr(0, _str.find_last_of(L")") + 1);
+
     using convert_typeX = std::codecvt_utf8<wchar_t>;
     std::wstring_convert<convert_typeX, wchar_t> converterX;
 
-    _str = _str.substr(0, _str.find_last_of(L")") + 1);
     std::string _res = converterX.to_bytes(_str);
 
     std::string::size_type _pos = _res.find("\n ");
@@ -188,9 +196,7 @@ std::shared_ptr<Expression> evaluate(std::string _exp) {
         _pos = _res.find(" SIMP");
     }
 
-    auto _expr =  LispExpression::ParseLispObject(_res);
-    _expr->Simplify();
-    return _expr;
+    return LispExpression::ParseLispObject(_res);
 }
 
 std::shared_ptr<Expression> Expression::Parse(std::string _str){

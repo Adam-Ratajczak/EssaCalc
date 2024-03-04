@@ -61,13 +61,13 @@ namespace Essa::Math{
         case Type::UNDEFINED:
             return true;
         case Type::POW:
-            return _op2 != Type::POW; 
+            return _op2 == Type::ADD || _op2 == Type::SUB || _op2 == Type::MUL || _op2 == Type::DIV; 
         case Type::MUL:
         case Type::DIV:
-            return _op2 < Type::MUL; 
+            return _op2 == Type::ADD || _op2 == Type::SUB;
         case Type::ADD:
         case Type::SUB:
-            return _op2 > Type::SUB;
+            return false;
           break;
         }
 
