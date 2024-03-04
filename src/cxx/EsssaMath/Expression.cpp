@@ -9,6 +9,8 @@ namespace Essa::Math{
     }
 
     void Unary::WriteExpr(std::ostream& _out) const{
+        if(_negative)
+            _out << "-";
         _out << _type << "(";
         _expr->WriteExpr(_out);
         _out << ")";
@@ -53,6 +55,25 @@ namespace Essa::Math{
         _out << "}";
     }
 
+
+    bool Binary::CheckSignificance(Type _op1, Type _op2){
+        switch (_op1) {
+        case Type::UNDEFINED:
+            return true;
+        case Type::POW:
+            return _op2 != Type::POW; 
+        case Type::MUL:
+        case Type::DIV:
+            return _op2 < Type::MUL; 
+        case Type::ADD:
+        case Type::SUB:
+            return _op2 > Type::SUB;
+          break;
+        }
+
+        return false;
+    }
+
     void Binary::WriteExpr(std::ostream& _out) const{
         std::string op;
         switch (_type) {
@@ -75,11 +96,42 @@ namespace Essa::Math{
             op = " ";
         break;
         }
-        _out << "(";
+
+        if(_negative){
+            _out << "-";
+            if(_type == Type::ADD || _type == Type::ADD){
+                _out << "(";
+            }
+        }
+
+        bool _needBraces = false;
+        if(Binary* e = dynamic_cast<Binary*>(_expr1.get())){
+            _needBraces = CheckSignificance(_type, e->_type);
+        }
+        _needBraces |= _expr1->_negative;
+        
+        if(_needBraces)
+            _out << "(";
         _expr1->WriteExpr(_out);
+        if(_needBraces)
+            _out << ")";
         _out << op;
+        _needBraces = false;
+        if(Binary* e = dynamic_cast<Binary*>(_expr2.get())){
+            _needBraces = CheckSignificance(_type, e->_type);
+        }
+
+        _needBraces |= _expr2->_negative;
+        if(_needBraces)
+            _out << "(";
         _expr2->WriteExpr(_out);
-        _out << ")";
+        if(_needBraces)
+            _out << ")";
+
+
+        if(_negative && (_type == Type::ADD || _type == Type::ADD)){
+            _out << ")";
+        }
     }
 
     void Binary::WriteLatEx(std::ostream& _out) const{
@@ -122,7 +174,15 @@ namespace Essa::Math{
     }
 
     void Binary::Simplify(){
-        
+        if(_type == Type::ADD && _expr2->_negative){
+            _type = Type::SUB;
+        }else if(_type == Type::SUB && !_expr2->_negative){
+            _type = Type::ADD;
+        }
+        _expr2->_negative = false;
+
+        _expr1->Simplify();
+        _expr2->Simplify();
     }
 
     void Value::WriteJSON(std::ostream& _out) const{
@@ -142,10 +202,12 @@ namespace Essa::Math{
     }
 
     void Value::WriteExpr(std::ostream& _out) const{
+        if(_negative)
+            _out << "-";
         if(_type == Type::CONSTANT){
-            _out << "%(" << _val << ")";
+            _out << "%" << _val;
         }else{
-            _out << "(" << _val << ")";
+            _out << _val;
         }
     }
 

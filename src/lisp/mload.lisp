@@ -87,37 +87,6 @@
             do (funcall meval-fcn (third expr)))
       in-stream-string-rep)))
 
-(defun MAXIMA::|api-eval| (eval-string)
-  (let* (($load_pathname nil)
-         (noevalargs nil)
-         (in-stream (make-string-input-stream eval-string))
-         (stream-truename (get-stream-truename in-stream))
-         (in-stream-string-rep
-          (if stream-truename
-              (setq $load_pathname (cl:namestring stream-truename))
-              (format nil "~A" in-stream)))
-         (meval-fcn (symbol-function 'meval))
-         (expr nil))
-    (declare (special *prompt-on-read-hang*))
-    (when $loadprint
-      (format t (intl:gettext "~&read and interpret ~A~&") in-stream-string-rep))
-    (cleanup)
-    (let ((*in-stream* in-stream))  ; Bind MAXIMA::IN-STREAM to *IN-STREAM*
-      (newline *in-stream*)
-      (loop while (and
-                    (setq expr (let ((*prompt-on-read-hang* nil)) (mread *in-stream* nil)))
-                    (consp expr))
-            do 
-
-		(catch 'macsyma-quit
-			(setq result (princ-to-string (simplify (funcall meval-fcn (third expr)))))
-			(return-from MAXIMA::|api-eval| result))
-		(return-from MAXIMA::|api-eval| "Error")
-	))
-    in-stream-string-rep))
-
-
-
 ;;returns appropriate error or existing pathname.
 ;; the second argument is a maxima list of variables
 ;; each of which contains a list of paths.   This is

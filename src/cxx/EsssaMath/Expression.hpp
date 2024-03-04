@@ -18,6 +18,8 @@ public:
 
     std::shared_ptr<Expression> IndefIntegral(std::string _var);
     std::shared_ptr<Expression> Derivative(std::string _var);
+
+    bool _negative = false;
 };
 
 class Binary : virtual public Expression{
@@ -29,6 +31,7 @@ public:
     void WriteLatEx(std::ostream& _out) const override;
     void Simplify() override;
 
+
     enum class Type{
         ADD,
         SUB,
@@ -37,6 +40,8 @@ public:
         POW,
         UNDEFINED
     };
+
+    static bool CheckSignificance(Type _op1, Type _op2);
 protected:
     Type _type;
     std::shared_ptr<Expression> _expr1;

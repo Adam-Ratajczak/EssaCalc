@@ -598,6 +598,37 @@
       (delete-temp-files)
     )))
 
+(defun cl-user::|api-eval| (eval-string)
+  (in-package :maxima)
+	(unwind-protect
+	(catch 'to-lisp
+  (let* (($load_pathname nil)
+         (noevalargs nil)
+         (in-stream (make-string-input-stream eval-string))
+         (stream-truename (get-stream-truename in-stream))
+         (in-stream-string-rep
+          (if stream-truename
+              (setq $load_pathname (cl:namestring stream-truename))
+              (format nil "~A" in-stream)))
+         (meval-fcn (symbol-function 'meval))
+         (expr nil))
+    (declare (special *prompt-on-read-hang*))
+    (when $loadprint
+      (format t (intl:gettext "~&read and interpret ~A~&") in-stream-string-rep))
+    (cleanup)
+    (let ((*in-stream* in-stream))  ; Bind MAXIMA::IN-STREAM to *IN-STREAM*
+      (newline *in-stream*)
+      (loop while (and
+                    (setq expr (let ((*prompt-on-read-hang* nil)) (mread *in-stream* nil)))
+                    (consp expr))
+            do 
+			(setq form (funcall meval-fcn (third expr)))
+			(setq form (nformat-check form))
+			(setq result (princ-to-string form))
+			(return-from cl-user::|api-eval| result)
+	))
+    in-stream-string-rep))))
+
 ;; If the user specified an init file, use it.  If not, use the
 ;; default init file in the userdir directory, but only if it
 ;; exists.  A user-specified init file is searched in the search
@@ -667,8 +698,8 @@
   (set-locale-subdir)
   (adjust-character-encoding)
   (set-pathnames)
-  (catch 'return-from-debugger
-    (cl-info::load-primary-index))
+;;   (catch 'return-from-debugger
+;;     (cl-info::load-primary-index))
   (when (boundp '*maxima-prefix*)
     (push (pathname (concatenate 'string *maxima-prefix*
                                  (if *maxima-layout-autotools*
@@ -729,6 +760,7 @@
 		 custom:*default-file-encoding*))))
 
 (import 'cl-user::run)
+(import 'cl-user::|api-eval|)
 
 (defmfun $to_lisp ()
   (format t "~&Type (to-maxima) to restart, ($quit) to quit Maxima.~%")

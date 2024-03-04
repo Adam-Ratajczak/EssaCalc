@@ -22,36 +22,16 @@ std::string to_lower(std::string const& _str){
 
 std::string get_type(std::istream& _ss){
     char c;
-    while(!_ss.eof()){
-        _ss.read(&c, 1);
-        if(c != ' ' && c != ')'){
-            break;
-        }
-    }
 
     std::string result;
-    if(c == '('){
-        while(!_ss.eof()){
-            _ss.read(&c, 1);
+    while(!_ss.eof()){
+        _ss.read(&c, 1);
 
-            if(c == ')'){
-                result += c;
-                break;
-            }else{
-                result += c;
-            }
+        if(c == ' ' || c == ')'){
+            break;
         }
-    }else{
+
         result += c;
-        while(!_ss.eof()){
-            _ss.read(&c, 1);
-
-            if(c == ' ' || c == ')'){
-                break;
-            }else{
-                result += c;
-            }
-        }
     }
 
     return result;
@@ -66,6 +46,8 @@ namespace Essa::Math {
 void init_math(int argc, char **argv){
     cl_boot(argc, argv);
     ecl_init_module(NULL, init_lib_MAXIMA);
+
+    cl_eval(c_string_to_object("(initialize-runtime-globals)"));
 }
 
 void free_math(){
@@ -102,8 +84,19 @@ std::shared_ptr<Expression> LispExpression::ParseLispObject(std::string _str){
 }
 
 std::shared_ptr<Expression> LispExpression::ParseLispObject(std::istream& _ss){
+    char c;
     std::string _type = get_type(_ss);
     std::shared_ptr<LispExpression> _expr;
+
+    if(_type.empty()) return std::make_shared<LispValue>();
+
+    if(_type.find("MMINUS") != std::string::npos){
+        _ss.read(&c, 1);
+        auto _object =  LispExpression::ParseLispObject(_ss);
+        _object->_negative = true;
+
+        return _object;
+    }
 
     if(_type.find("(%") != std::string::npos){
         _expr = std::make_shared<LispUnary>();
@@ -111,6 +104,7 @@ std::shared_ptr<Expression> LispExpression::ParseLispObject(std::istream& _ss){
         _expr = std::make_shared<LispBinary>();
     }else{
         _expr = std::make_shared<LispValue>();
+        _type = _type;
     }
 
     _expr->ParseLispObject(_type, _ss);
@@ -118,27 +112,34 @@ std::shared_ptr<Expression> LispExpression::ParseLispObject(std::istream& _ss){
 }
 
 void LispUnary::ParseLispObject(std::string const& _typeStr, std::istream& _ss){
-    _type = _typeStr.substr(2);
-    _type = to_lower(_type.substr(0, _type.find(" SIMP)")));
+    char c;
+    _ss.read(&c, 1);
+    _type = _typeStr.substr(3);
+    _type = to_lower(_type);
     _expr = LispExpression::ParseLispObject(_ss);
+    _ss.read(&c, 1);
 }
 
 void LispBinary::ParseLispObject(std::string const& _typeStr, std::istream& _ss){
     std::string type = _typeStr.substr(1);
-    type = type.substr(0, type.find(" SIMP)"));
-    if(type == "MPLUS"){
+    if(type.find("MPLUS") != std::string::npos){
         _type = Type::ADD;
-    }else if(type == "MTIMES"){
+    }else if(type.find("MMINUS") != std::string::npos){
+        _type = Type::SUB;
+    }else if(type.find("MTIMES") != std::string::npos){
         _type = Type::MUL;
-    }else if(type == "RAT"){
+    }else if(type.find("MQUOTIENT") != std::string::npos){
         _type = Type::DIV;
-    }else if(type == "MEXPT"){
+    }else if(type.find("MEXPT") != std::string::npos){
         _type = Type::POW;
     }else{
         _type = Type::UNDEFINED;
     }
+    char c;
+    _ss.read(&c, 1);
     _expr1 = LispExpression::ParseLispObject(_ss);
     _expr2 = LispExpression::ParseLispObject(_ss);
+    _ss.read(&c, 1);
 }
 
 void LispValue::ParseLispObject(std::string const& _typeStr, std::istream& _ss){
@@ -174,7 +175,15 @@ std::shared_ptr<Expression> evaluate(std::string _exp) {
         _pos = _res.find("\n");
     }
 
-    return LispExpression::ParseLispObject(_res);
+    _pos = _res.find(" SIMP");
+    while(_pos != std::string::npos){
+        _res = _res.substr(0, _pos) + _res.substr(_pos + 5);
+        _pos = _res.find(" SIMP");
+    }
+
+    auto _expr =  LispExpression::ParseLispObject(_res);
+    _expr->Simplify();
+    return _expr;
 }
 
 std::shared_ptr<Expression> Expression::Parse(std::string _str){
