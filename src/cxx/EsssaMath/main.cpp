@@ -1,46 +1,36 @@
-#include <iostream>
+#include <cstdio>
 #include <string>
-
-#include "fparser.hpp"
-
 #include <iostream>
-#include <string>
+
+#include "exprtk.hpp"
+
+template <typename T>
+void trig_function()
+{
+   typedef Essa::Math::symbol_table<T> symbol_table_t;
+   typedef Essa::Math::expression<T>   expression_t;
+   typedef Essa::Math::parser<T>       parser_t;
+
+   const std::string expression_string =
+                     "clamp(-1.0,sin(2 * pi * x) + cos(x / 2 * pi),+1.0)";
+
+   T x;
+
+   symbol_table_t symbol_table;
+   symbol_table.add_variable("x",x);
+   symbol_table.add_constants();
+
+   expression_t expression;
+   expression.register_symbol_table(symbol_table);
+
+   parser_t parser;
+   parser.compile(expression_string,expression);
+   std::cout << parser.error() << "\n";
+}
 
 int main()
 {
-    std::string function;
-    double minx, maxx, step;
-    FunctionParser fparser;
-
-    fparser.AddConstant("pi", 3.1415926535897932);
-
-    while(true)
-    {
-        std::cout << "f(x) = ";
-        std::getline(std::cin, function);
-        if(std::cin.fail()) return 0;
-
-        int res = fparser.Parse(function, "x");
-        if(res < 0) break;
-
-        std::cout << std::string(res+7, ' ') << "^\n"
-                  << fparser.ErrorMsg() << "\n\n";
-    }
-
-    std::cout << "min x: ";
-    std::cin >> minx;
-    std::cout << "max x: ";
-    std::cin >> maxx;
-    std::cout << "step: ";
-    std::cin >> step;
-    if(std::cin.fail()) return 0;
-
-    double vals[] = { 0,1 };
-    for(vals[0] = minx; vals[0] <= maxx; vals[0] += step)
-    {
-        std::cout << "f(" << vals[0] << ") = " << fparser.Eval(vals)
-                  << std::endl;
-    }
+   trig_function<double>();
 
     return 0;
 }
