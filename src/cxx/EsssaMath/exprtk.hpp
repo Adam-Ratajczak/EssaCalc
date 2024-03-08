@@ -42,7 +42,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <deque>
-#include <exception>
 #include <functional>
 #include <iterator>
 #include <limits>
@@ -463,15 +462,10 @@ namespace Essa::Math
 
       static const std::string base_function_list[] =
                                   {
-                                    "abs", "acos",  "acosh", "asin",  "asinh", "atan",  "atanh",
-                                    "atan2",  "avg",  "ceil",  "clamp",  "cos",  "cosh",  "cot",
-                                    "csc",  "equal",  "erf",  "erfc",  "exp",  "expm1", "floor",
-                                    "frac", "hypot", "iclamp",  "like", "log", "log10",  "log2",
-                                    "logn", "log1p", "mand", "max", "min", "mod", "mor",  "mul",
-                                    "ncdf",  "pow",  "root",  "round",  "roundn",  "sec", "sgn",
-                                    "sin", "sinc", "sinh", "sqrt", "sum", "swap", "tan", "tanh",
-                                    "trunc",  "not_equal",  "inrange",  "deg2grad",   "deg2rad",
-                                    "rad2deg", "grad2deg"
+                                    "abs",  "acos",  "acosh",  "asin",  "asinh", "atan", "atan2", "cos", 
+                                    "cosh",   "cot",   "csc",  "default","erf",  "exp", "log",  "log10", 
+                                    "log2",  "logn",  "pow", "root", "round", "roundn", "sec","sin", 
+                                    "sinh", "sqrt",  "tan",  "tanh"
                                   };
 
       static const std::size_t base_function_list_size = sizeof(base_function_list) / sizeof(std::string);
@@ -16985,9 +16979,7 @@ namespace Essa::Math
          register_op("log10"     , e_log10   , 1)
          register_op("log2"      , e_log2    , 1)
          register_op("log1p"     , e_log1p   , 1)
-         register_op("round"     , e_round   , 1)
          register_op("sin"       , e_sin     , 1)
-         register_op("sinc"      , e_sinc    , 1)
          register_op("sinh"      , e_sinh    , 1)
          register_op("sec"       , e_sec     , 1)
          register_op("csc"       , e_csc     , 1)
@@ -16995,31 +16987,11 @@ namespace Essa::Math
          register_op("tan"       , e_tan     , 1)
          register_op("tanh"      , e_tanh    , 1)
          register_op("cot"       , e_cot     , 1)
-         register_op("rad2deg"   , e_r2d     , 1)
-         register_op("deg2rad"   , e_d2r     , 1)
-         register_op("deg2grad"  , e_d2g     , 1)
-         register_op("grad2deg"  , e_g2d     , 1)
-         register_op("sgn"       , e_sgn     , 1)
-         register_op("not"       , e_notl    , 1)
          register_op("erf"       , e_erf     , 1)
-         register_op("erfc"      , e_erfc    , 1)
-         register_op("ncdf"      , e_ncdf    , 1)
-         register_op("frac"      , e_frac    , 1)
-         register_op("trunc"     , e_trunc   , 1)
          register_op("atan2"     , e_atan2   , 2)
-         register_op("mod"       , e_mod     , 2)
          register_op("logn"      , e_logn    , 2)
          register_op("pow"       , e_pow     , 2)
          register_op("root"      , e_root    , 2)
-         register_op("roundn"    , e_roundn  , 2)
-         register_op("equal"     , e_equal   , 2)
-         register_op("not_equal" , e_nequal  , 2)
-         register_op("hypot"     , e_hypot   , 2)
-         register_op("shr"       , e_shr     , 2)
-         register_op("shl"       , e_shl     , 2)
-         register_op("clamp"     , e_clamp   , 3)
-         register_op("iclamp"    , e_iclamp  , 3)
-         register_op("inrange"   , e_inrange , 3)
          #undef register_op
       }
 
@@ -21599,6 +21571,11 @@ namespace Essa::Math
          expression_generator_.set_sf3m(sf3_map_);
          expression_generator_.set_sf4m(sf4_map_);
          expression_generator_.set_strength_reduction_state(settings_.strength_reduction_enabled());
+
+        settings_.disable_all_assignment_ops();
+        settings_.disable_all_control_structures();
+        settings_.disable_all_inequality_ops();
+        settings_.disable_all_logic_ops();
       }
 
      ~parser() {}

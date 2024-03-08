@@ -1,8 +1,7 @@
-#include <cstdio>
 #include <string>
 #include <iostream>
 
-#include "exprtk.hpp"
+#include "EssaMath.hpp"
 
 template <typename T>
 void trig_function()
@@ -11,8 +10,7 @@ void trig_function()
    typedef Essa::Math::expression<T>   expression_t;
    typedef Essa::Math::parser<T>       parser_t;
 
-   const std::string expression_string =
-                     "clamp(-1.0,sin(2 * pi * x) + cos(x / 2 * pi),+1.0)";
+   const std::string expression_string = "sin(2 * pi * x) + cos(x / 2 * pi)";
 
    T x;
 

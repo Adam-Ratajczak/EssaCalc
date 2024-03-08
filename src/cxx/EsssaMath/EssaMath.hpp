@@ -1,3 +1,4 @@
+#include "exprtk.hpp"
 
 namespace Essa::Math{
     

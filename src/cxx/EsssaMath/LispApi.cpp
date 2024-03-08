@@ -11,6 +11,7 @@
 #include <sstream>
 
 #include "Expression.hpp"
+#include "exprtk.hpp"
 
 std::string to_lower(std::string const& _str){
     std::string _result;
