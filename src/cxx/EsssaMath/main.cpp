@@ -1,36 +1,46 @@
 #include <iostream>
 #include <string>
 
-#include "Expression.hpp"
-#include "EssaMath.hpp"
+#include "fparser.hpp"
 
-using namespace Essa::Math;
+#include <iostream>
+#include <string>
 
-int main (int argc, char **argv)
+int main()
 {
-  init_math(argc, argv);
+    std::string function;
+    double minx, maxx, step;
+    FunctionParser fparser;
 
-  auto expr1 = Expression::Parse("x/(x+1)");
-  std::cout << "Function: " << *expr1 << "\n";
-  auto expr1_der = expr1->Derivative("x");
-  std::cout << "Derivative: " << *expr1_der << "\n";
-  auto expr1_int = expr1->IndefIntegral("x");
-  std::cout << "Integrate: " << *expr1_int << "\n";
+    fparser.AddConstant("pi", 3.1415926535897932);
 
-  auto expr2 = Expression::Parse("1/(1+x^2)");
-  std::cout << "Function: " << *expr2 << "\n";
-  auto expr2_der = expr2->Derivative("x");
-  std::cout << "Derivative: " << *expr2_der << "\n";
-  auto expr2_int = expr2->IndefIntegral("x");
-  std::cout << "Integrate: " << *expr2_int << "\n";
+    while(true)
+    {
+        std::cout << "f(x) = ";
+        std::getline(std::cin, function);
+        if(std::cin.fail()) return 0;
 
-  auto expr3 = Expression::Parse("x/(1+x^2)");
-  std::cout << "Function: " << *expr3 << "\n";
-  auto expr3_der = expr3->Derivative("x");
-  std::cout << "Derivative: " << *expr3_der << "\n";
-  auto expr3_int = expr3->IndefIntegral("x");
-  std::cout << "Integrate: " << *expr3_int << "\n";
+        int res = fparser.Parse(function, "x");
+        if(res < 0) break;
 
-  free_math();
-  return 0;
+        std::cout << std::string(res+7, ' ') << "^\n"
+                  << fparser.ErrorMsg() << "\n\n";
+    }
+
+    std::cout << "min x: ";
+    std::cin >> minx;
+    std::cout << "max x: ";
+    std::cin >> maxx;
+    std::cout << "step: ";
+    std::cin >> step;
+    if(std::cin.fail()) return 0;
+
+    double vals[] = { 0,1 };
+    for(vals[0] = minx; vals[0] <= maxx; vals[0] += step)
+    {
+        std::cout << "f(" << vals[0] << ") = " << fparser.Eval(vals)
+                  << std::endl;
+    }
+
+    return 0;
 }
