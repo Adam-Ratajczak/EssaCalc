@@ -1,98 +1,387 @@
 #pragma once
+#include "SymbolTable.hpp"
 
-#include <memory>
-#include <ostream>
-#include <string>
+namespace Essa::Math{
+   template <typename T>
+   class function_compositor;
 
-namespace Essa::Math {
+   template <typename T>
+   class expression
+   {
+   private:
 
-class Expression{
-    friend class Binary;
-    friend class Unary;
-    friend class Value;
+      typedef details::expression_node<T>*  expression_ptr;
+      typedef details::vector_holder<T>*    vector_holder_ptr;
+      typedef std::vector<symbol_table<T> > symtab_list_t;
 
-    friend class LispExpression;
-public:
-    Expression() = default;
-    static std::shared_ptr<Expression> Parse(std::string ss);
+      struct control_block
+      {
+         enum data_type
+         {
+            e_unknown  ,
+            e_expr     ,
+            e_vecholder,
+            e_data     ,
+            e_vecdata  ,
+            e_string
+         };
 
-    std::shared_ptr<Expression> IndefIntegral(std::string _var);
-    std::shared_ptr<Expression> Derivative(std::string _var);
+         struct data_pack
+         {
+            data_pack()
+            : pointer(0)
+            , type(e_unknown)
+            , size(0)
+            {}
 
-    std::string ToString() const;
+            data_pack(void* ptr, const data_type dt, const std::size_t sz = 0)
+            : pointer(ptr)
+            , type(dt)
+            , size(sz)
+            {}
 
-    friend std::ostream& operator<< (std::ostream& stream, const Expression& _expr){
-        _expr.WriteExpr(stream);
+            void*       pointer;
+            data_type   type;
+            std::size_t size;
+         };
 
-        return stream;
-    }
+         typedef std::vector<data_pack> local_data_list_t;
+         typedef results_context<T>     results_context_t;
+         typedef control_block*         cntrl_blck_ptr_t;
 
-protected:
-    virtual void WriteJSON(std::ostream& _out) const = 0;
-    virtual void WriteExpr(std::ostream& _out) const = 0;
-    virtual void WriteLatEx(std::ostream& _out) const = 0;
-    virtual void Simplify() = 0;
-    bool _negative = false;
-};
+         control_block()
+         : ref_count(0)
+         , expr     (0)
+         , results  (0)
+         , retinv_null(false)
+         , return_invoked(&retinv_null)
+         {}
 
-class Binary : virtual public Expression{
-public:
-    Binary() = default;
+         explicit control_block(expression_ptr e)
+         : ref_count(1)
+         , expr     (e)
+         , results  (0)
+         , retinv_null(false)
+         , return_invoked(&retinv_null)
+         {}
 
-    enum class Type{
-        ADD = 0,
-        SUB = 1,
-        MUL = 2,
-        DIV = 3,
-        POW = 4,
-        UNDEFINED = 5
-    };
+        ~control_block()
+         {
+            if (expr && details::branch_deletable(expr))
+            {
+               destroy_node(expr);
+            }
 
-    static bool CheckSignificance(Type _op1, Type _op2);
-protected:
-    Type _type;
-    std::shared_ptr<Expression> _expr1;
-    std::shared_ptr<Expression> _expr2;
+            if (!local_data_list.empty())
+            {
+               for (std::size_t i = 0; i < local_data_list.size(); ++i)
+               {
+                  switch (local_data_list[i].type)
+                  {
+                     case e_expr      : delete reinterpret_cast<expression_ptr>(local_data_list[i].pointer);
+                                        break;
 
-    void WriteJSON(std::ostream& _out) const override;
-    void WriteExpr(std::ostream& _out) const override;
-    void WriteLatEx(std::ostream& _out) const override;
-    void Simplify() override;
-};
+                     case e_vecholder : delete reinterpret_cast<vector_holder_ptr>(local_data_list[i].pointer);
+                                        break;
 
-class Unary : virtual public Expression{
-public:
-    Unary() = default;
-    
-protected:
-    std::string _type;
-    // Type _type;
-    std::shared_ptr<Expression> _expr;
+                     case e_data      : delete reinterpret_cast<T*>(local_data_list[i].pointer);
+                                        break;
 
-    void WriteJSON(std::ostream& _out) const override;
-    void WriteExpr(std::ostream& _out) const override;
-    void WriteLatEx(std::ostream& _out) const override;
-    void Simplify() override;
-};
+                     case e_vecdata   : delete [] reinterpret_cast<T*>(local_data_list[i].pointer);
+                                        break;
 
-class Value : virtual public Expression{
-public:
-    Value() = default;
+                     case e_string    : delete reinterpret_cast<std::string*>(local_data_list[i].pointer);
+                                        break;
 
+                     default          : break;
+                  }
+               }
+            }
 
-    enum class Type{
-        VALUE,
-        VARIABLE,
-        CONSTANT
-    };
-protected:
-    Type _type;
-    std::string _val;
+            if (results)
+            {
+               delete results;
+            }
+         }
 
-    void WriteJSON(std::ostream& _out) const override;
-    void WriteExpr(std::ostream& _out) const override;
-    void WriteLatEx(std::ostream& _out) const override;
-    void Simplify() override;
-};
+         static inline cntrl_blck_ptr_t create(expression_ptr e)
+         {
+            return new control_block(e);
+         }
 
+         static inline void destroy(cntrl_blck_ptr_t& cntrl_blck)
+         {
+            if (cntrl_blck)
+            {
+               if (
+                    (0 !=   cntrl_blck->ref_count) &&
+                    (0 == --cntrl_blck->ref_count)
+                  )
+               {
+                  delete cntrl_blck;
+               }
+
+               cntrl_blck = 0;
+            }
+         }
+
+         std::size_t ref_count;
+         expression_ptr expr;
+         local_data_list_t local_data_list;
+         results_context_t* results;
+         bool  retinv_null;
+         bool* return_invoked;
+
+         friend class function_compositor<T>;
+      };
+
+   public:
+
+      expression()
+      : control_block_(0)
+      {
+         set_expression(new details::null_node<T>());
+      }
+
+      expression(const expression<T>& e)
+      : control_block_    (e.control_block_    )
+      , symbol_table_list_(e.symbol_table_list_)
+      {
+         control_block_->ref_count++;
+      }
+
+      explicit expression(const symbol_table<T>& symbol_table)
+      : control_block_(0)
+      {
+         set_expression(new details::null_node<T>());
+         symbol_table_list_.push_back(symbol_table);
+      }
+
+      inline expression<T>& operator=(const expression<T>& e)
+      {
+         if (this != &e)
+         {
+            if (control_block_)
+            {
+               if (
+                    (0 !=   control_block_->ref_count) &&
+                    (0 == --control_block_->ref_count)
+                  )
+               {
+                  delete control_block_;
+               }
+
+               control_block_ = 0;
+            }
+
+            control_block_ = e.control_block_;
+            control_block_->ref_count++;
+            symbol_table_list_ = e.symbol_table_list_;
+         }
+
+         return *this;
+      }
+
+      inline bool operator==(const expression<T>& e) const
+      {
+         return (this == &e);
+      }
+
+      inline bool operator!() const
+      {
+         return (
+                  (0 == control_block_      ) ||
+                  (0 == control_block_->expr)
+                );
+      }
+
+      inline expression<T>& release()
+      {
+         Essa::Math::details::dump_ptr("expression::release", this);
+         control_block::destroy(control_block_);
+
+         return (*this);
+      }
+
+     ~expression()
+      {
+         control_block::destroy(control_block_);
+      }
+
+      inline T value() const
+      {
+         assert(control_block_      );
+         assert(control_block_->expr);
+
+         return control_block_->expr->value();
+      }
+
+      inline T operator() () const
+      {
+         return value();
+      }
+
+      inline operator T() const
+      {
+         return value();
+      }
+
+      inline operator bool() const
+      {
+         return details::is_true(value());
+      }
+
+      inline void register_symbol_table(symbol_table<T>& st)
+      {
+         for (std::size_t i = 0; i < symbol_table_list_.size(); ++i)
+         {
+            if (&st == &symbol_table_list_[i])
+            {
+               return;
+            }
+         }
+
+         symbol_table_list_.push_back(st);
+      }
+
+      inline const symbol_table<T>& get_symbol_table(const std::size_t& index = 0) const
+      {
+         return symbol_table_list_[index];
+      }
+
+      inline symbol_table<T>& get_symbol_table(const std::size_t& index = 0)
+      {
+         return symbol_table_list_[index];
+      }
+
+      typedef results_context<T> results_context_t;
+
+      inline const results_context_t& results() const
+      {
+         if (control_block_->results)
+            return (*control_block_->results);
+         else
+         {
+            static const results_context_t null_results;
+            return null_results;
+         }
+      }
+
+      inline bool return_invoked() const
+      {
+         return (*control_block_->return_invoked);
+      }
+
+   private:
+
+      inline symtab_list_t get_symbol_table_list() const
+      {
+         return symbol_table_list_;
+      }
+
+      inline void set_expression(const expression_ptr expr)
+      {
+         if (expr)
+         {
+            if (control_block_)
+            {
+               if (0 == --control_block_->ref_count)
+               {
+                  delete control_block_;
+               }
+            }
+
+            control_block_ = control_block::create(expr);
+         }
+      }
+
+      inline void register_local_var(expression_ptr expr)
+      {
+         if (expr)
+         {
+            if (control_block_)
+            {
+               control_block_->
+                  local_data_list.push_back(
+                     typename expression<T>::control_block::
+                        data_pack(reinterpret_cast<void*>(expr),
+                                  control_block::e_expr));
+            }
+         }
+      }
+
+      inline void register_local_var(vector_holder_ptr vec_holder)
+      {
+         if (vec_holder)
+         {
+            if (control_block_)
+            {
+               control_block_->
+                  local_data_list.push_back(
+                     typename expression<T>::control_block::
+                        data_pack(reinterpret_cast<void*>(vec_holder),
+                                  control_block::e_vecholder));
+            }
+         }
+      }
+
+      inline void register_local_data(void* data, const std::size_t& size = 0, const std::size_t data_mode = 0)
+      {
+         if (data)
+         {
+            if (control_block_)
+            {
+               typename control_block::data_type dt = control_block::e_data;
+
+               switch (data_mode)
+               {
+                  case 0 : dt = control_block::e_data;    break;
+                  case 1 : dt = control_block::e_vecdata; break;
+                  case 2 : dt = control_block::e_string;  break;
+               }
+
+               control_block_->
+                  local_data_list.push_back(
+                     typename expression<T>::control_block::
+                        data_pack(reinterpret_cast<void*>(data), dt, size));
+            }
+         }
+      }
+
+      inline const typename control_block::local_data_list_t& local_data_list()
+      {
+         if (control_block_)
+         {
+            return control_block_->local_data_list;
+         }
+         else
+         {
+            static typename control_block::local_data_list_t null_local_data_list;
+            return null_local_data_list;
+         }
+      }
+
+      inline void register_return_results(results_context_t* rc)
+      {
+         if (control_block_ && rc)
+         {
+            control_block_->results = rc;
+         }
+      }
+
+      inline void set_retinvk(bool* retinvk_ptr)
+      {
+         if (control_block_)
+         {
+            control_block_->return_invoked = retinvk_ptr;
+         }
+      }
+
+      control_block* control_block_;
+      symtab_list_t  symbol_table_list_;
+
+      friend class parser<T>;
+      friend class expression_helper<T>;
+      friend class function_compositor<T>;
+   }; // class expression
 }
