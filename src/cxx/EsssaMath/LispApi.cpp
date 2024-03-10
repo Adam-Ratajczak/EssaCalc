@@ -1,7 +1,6 @@
 #include <codecvt>
 #include <iostream>
 #include <locale>
-#include <memory>
 #include <stdexcept>
 #include <stdio.h>
 #include <ecl/ecl.h>
@@ -9,8 +8,6 @@
 #include <string.h>
 #include <string>
 #include <sstream>
-
-#include "exprtk.hpp"
 
 std::string to_lower(std::string const& _str){
     std::string _result;
