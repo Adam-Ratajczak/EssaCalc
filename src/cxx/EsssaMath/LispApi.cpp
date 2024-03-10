@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include <sstream>
 
 std::string to_lower(std::string const& _str){
     std::string _result;
@@ -41,20 +40,9 @@ extern "C"{
 
 namespace Essa::Math {
 
-void init_math(int argc, char **argv){
-    cl_boot(argc, argv);
-    ecl_init_module(NULL, init_lib_MAXIMA);
-
-    cl_eval(c_string_to_object("(initialize-runtime-globals)"));
-}
-
-void free_math(){
-    cl_shutdown();
-}
-
-std::string evaluate(std::string _exp) {
+std::string evaluate(const std::string& _exp) {
     try{
-        std::string exp = "\"" + _exp + ", simp;\"";
+        std::string exp = "\"" + _exp + ";\"";
         
         cl_object arg1 = c_string_to_object(exp.c_str());
         cl_object name = ecl_make_symbol("api-eval", "MAXIMA");
@@ -92,6 +80,25 @@ std::string evaluate(std::string _exp) {
     }catch(std::range_error&){
         return evaluate(_exp);
     }
+}
+
+void load(const std::string& path){
+    std::string exp = "\"" + path + "\"";
+        
+    cl_object arg1 = c_string_to_object(exp.c_str());
+    cl_object name = ecl_make_symbol("api-load", "MAXIMA");
+    cl_object output = cl_funcall(2, name, arg1);
+}
+
+void init_math(int argc, char **argv){
+    cl_boot(argc, argv);
+    ecl_init_module(NULL, init_lib_MAXIMA);
+
+    cl_eval(c_string_to_object("(initialize-runtime-globals)"));
+}
+
+void free_math(){
+    cl_shutdown();
 }
 
 }
