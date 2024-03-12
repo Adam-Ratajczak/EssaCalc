@@ -32,13 +32,10 @@
 #pragma once
 
 #include <algorithm>
-#include <cassert>
 #include <cctype>
-#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <deque>
 #include <functional>
 #include <iterator>
 #include <limits>
@@ -459,10 +456,19 @@ namespace Essa::Math
 
       static const std::string base_function_list[] =
                                   {
-                                    "abs",  "acos",  "acosh",  "asin",  "asinh", "atan", "atan2", "cos", 
-                                    "cosh",   "cot",   "csc",  "default","erf",  "exp", "log",  "log10", 
-                                    "log2",  "logn",  "pow", "root", "round", "roundn", "sec","sin", 
-                                    "sinh", "sqrt",  "tan",  "tanh"
+                                    "abs",  "acos",  "acosh",  "and",  "asin",  "asinh", "atan",
+                                    "atanh", "atan2", "avg",  "break", "case", "ceil",  "clamp",
+                                    "continue",   "cos",   "cosh",   "cot",   "csc",  "default",
+                                    "deg2grad",  "deg2rad",   "equal",  "erf",   "erfc",  "exp",
+                                    "expm1",  "false",   "floor",  "for",   "frac",  "grad2deg",
+                                    "hypot", "iclamp", "if",  "else", "ilike", "in",  "inrange",
+                                    "like",  "log",  "log10", "log2",  "logn",  "log1p", "mand",
+                                    "max", "min",  "mod", "mor",  "mul", "ncdf",  "nand", "nor",
+                                    "not",   "not_equal",   "null",   "or",   "pow",  "rad2deg",
+                                    "repeat", "return", "root", "round", "roundn", "sec", "sgn",
+                                    "shl", "shr", "sin", "sinc", "sinh", "sqrt",  "sum", "swap",
+                                    "switch", "tan",  "tanh", "true",  "trunc", "until",  "var",
+                                    "while", "xnor", "xor", "&", "|"
                                   };
 
       static const std::size_t base_function_list_size = sizeof(base_function_list) / sizeof(std::string);

@@ -32,6 +32,7 @@
 #pragma once
 
 #include "Defines.hpp"
+#include <cmath>
 
 namespace Essa::Math{
    namespace details{

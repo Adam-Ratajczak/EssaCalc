@@ -51,29 +51,22 @@ std::string evaluate(const std::string& _exp) {
         static_assert(sizeof(ecl_character)==sizeof(wchar_t),"sizes must be the same");
             
         std::wstring _str = reinterpret_cast<wchar_t*>(output->string.self);
-        _str = _str.substr(0, _str.find_last_of(L")") + 1);
 
         using convert_typeX = std::codecvt_utf8<wchar_t>;
         std::wstring_convert<convert_typeX, wchar_t> converterX;
 
         std::string _res = converterX.to_bytes(_str);
 
-        std::string::size_type _pos = _res.find("\n ");
-        while(_pos != std::string::npos){
-            _res = _res.substr(0, _pos) + _res.substr(_pos + 2);
-            _pos = _res.find("\n ");
-        }
-
-        _pos = _res.find("  ");
-        while(_pos != std::string::npos){
-            _res = _res.substr(0, _pos) + _res.substr(_pos + 1);
-            _pos = _res.find("  ");
-        }
-
-        _pos = _res.find(" SIMP");
+        auto _pos = _res.find(" SIMP");
         while(_pos != std::string::npos){
             _res = _res.substr(0, _pos) + _res.substr(_pos + 5);
             _pos = _res.find(" SIMP");
+        }
+
+        _pos = _res.find(" RATSIMP");
+        while(_pos != std::string::npos){
+            _res = _res.substr(0, _pos) + _res.substr(_pos + 8);
+            _pos = _res.find(" RATSIMP");
         }
 
         return _res;

@@ -32,6 +32,8 @@
 #pragma once
 
 #include "Numeric.hpp"
+#include <deque>
+#include <iostream>
 
 namespace Essa::Math{
    namespace details
@@ -112,34 +114,99 @@ namespace Essa::Math{
       {
          switch (opr)
          {
-            case e_add    : return  "+"  ;
-            case e_sub    : return  "-"  ;
-            case e_mul    : return  "*"  ;
-            case e_div    : return  "/"  ;
-            case e_mod    : return  "%"  ;
-            case e_pow    : return  "^"  ;
-            case e_assign : return ":="  ;
-            case e_addass : return "+="  ;
-            case e_subass : return "-="  ;
-            case e_mulass : return "*="  ;
-            case e_divass : return "/="  ;
-            case e_modass : return "%="  ;
-            case e_lt     : return  "<"  ;
-            case e_lte    : return "<="  ;
-            case e_eq     : return "=="  ;
-            case e_equal  : return  "="  ;
-            case e_ne     : return "!="  ;
-            case e_nequal : return "<>"  ;
-            case e_gte    : return ">="  ;
-            case e_gt     : return  ">"  ;
-            case e_and    : return "and" ;
-            case e_or     : return "or"  ;
-            case e_xor    : return "xor" ;
-            case e_nand   : return "nand";
-            case e_nor    : return "nor" ;
-            case e_xnor   : return "xnor";
-            default       : return "N/A" ;
-         }
+            case e_add     : return "%s+%s"  ;
+            case e_sub     : return "%s-%s"  ;
+            case e_mul     : return  "%s*%s"  ;
+            case e_div     : return  "%s/%s"  ;
+            case e_mod     : return  "%smod%s"  ;
+            case e_pow     : return  "%s^%s"  ;
+            case e_assign  : return "%s:=%s"  ;
+            case e_addass  : return "%s+=%s"  ;
+            case e_subass  : return "%s-=%s"  ;
+            case e_mulass  : return "%s*=%s"  ;
+            case e_divass  : return "%s/=%s"  ;
+            case e_modass  : return "%s%=%s"  ;
+            case e_lt      : return  "%s<%s"  ;
+            case e_lte     : return "%s<=%s"  ;
+            case e_eq      : return "%s==%s"  ;
+            case e_equal   : return  "%s=%s"  ;
+            case e_ne      : return "%s!=%s"  ;
+            case e_nequal  : return "%s<>%s"  ;
+            case e_gte     : return "%s>=%s"  ;
+            case e_gt      : return  "%s>%s"  ;
+            case e_and     : return "%s&%s" ;
+            case e_or      : return "%s|%s"  ;
+            case e_xor     : return "%sxor%s" ;
+            case e_nand    : return "~(%s&%s)";
+            case e_nor     : return "~(%s|%s)" ;
+            case e_xnor    : return "!(%sxor%s)";
+            case e_atan2   : return "atan(%s)";
+            case e_min     : return "min(%s)";
+            case e_max     : return "max(%s)";
+            case e_avg     : return "avg(%s)";
+            case e_sum     : return "sum(%s)";
+            case e_prod    : return "prod(%s)";
+            case e_mand    : return "mand(%s)";
+            case e_mor     : return "mor(%s)";
+            case e_scand   : return "scand(%s)";
+            case e_scor    : return "scor(%s)";
+            case e_shr     : return "%s>>%s";
+            case e_shl     : return "%s<<%s";
+            case e_abs     : return "abs(%s)";
+            case e_acos    : return "acos(%s)";
+            case e_acosh   : return "acosh(%s)";
+            case e_asin    : return "asin(%s)";
+            case e_asinh   : return "asinh(%s)";
+            case e_atan    : return "atan(%s)";
+            case e_atanh   : return "atanh(%s)";
+            case e_ceil    : return "ceil(%s)";
+            case e_cos     : return "cos(%s)";
+            case e_cosh    : return "cosh(%s)";
+            case e_exp     : return "exp(%s)";
+            case e_expm1   : return "exp(%s-1)";
+            case e_floor   : return "floor(%s)";
+            case e_log     : return "log(%s)";
+            case e_log10   : return "log(%s)/log(10)";
+            case e_log2    : return "log(%s)/log(2)";
+            case e_log1p   : return "log(1/(%s))";
+            case e_logn    : return "log(%s)/log(%s)";
+            case e_neg     : return "~(%s)";
+            case e_pos     : return "pos(%s)";
+            case e_round   : return "round(%s)";
+            case e_roundn  : return "round(%s,%s)";
+            case e_root    : return "(%s)^(1/(%s))";
+            case e_sqrt    : return "sqrt(%s)";
+            case e_sin     : return "sin(%s)";
+            case e_sinc    : return "sinc(%s)";
+            case e_sinh    : return "sinh(%s)";
+            case e_sec     : return "sec(%s)";
+            case e_csc     : return "csc(%s)";
+            case e_tan     : return "tan(%s)";
+            case e_tanh    : return "tanh(%s)";
+            case e_cot     : return "cot(%s)";
+            case e_clamp   : return "clamp(%s,%s,%s)";
+            case e_iclamp  : return "iclamp(%s,%s,%s)";
+            case e_inrange : return "inrange(%s,%s,%s)";
+            case e_sgn     : return "sgn(%s)";
+            case e_r2d     : return "r2d(%s)";
+            case e_d2r     : return "d2r(%s)";
+            case e_d2g     : return "d2r(%s)";
+            case e_g2d     : return "g2d(%s)";
+            case e_hypot   : return "hypot(%s,%s)";
+            case e_notl    : return "notl(%s)";
+            case e_erf     : return "erf(%s)";
+            case e_erfc    : return "erfc(%s)";
+            case e_ncdf    : return "ncdf(%s)";
+            case e_frac    : return "frac(%s)";
+            case e_trunc   : return "trunc(%s)";
+            case e_in      : return "in(%s,%s,%s)";
+            case e_like    : return "like(%s)";
+            case e_ilike   : return "ilike(%s)";
+            case e_multi   : return "multi(%s,%s,%s)";
+            case e_smulti  : return "smulti(%s,%s,%s)";
+            case e_swap    : return "swap(%s,%s)";
+            default        : return "N/A";
+            }
       }
 
       struct base_operation_t
@@ -621,6 +688,10 @@ namespace Essa::Math{
          inline virtual node_type type() const
          {
             return e_none;
+         }
+
+         inline virtual std::string ToString() const {
+            return "(expression_node)";
          }
       }; // class expression_node
 

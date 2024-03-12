@@ -31,8 +31,12 @@
 
 #pragma once
 
+#include "Defines.hpp"
 #include "ParserHelpers.hpp"
 #include "OperatorHelpers.hpp"
+#include <cstdio>
+#include <string>
+#include <cassert>
 
 namespace Essa::Math{
    namespace details
@@ -251,6 +255,10 @@ namespace Essa::Math{
          {
             return expression_node<T>::e_null;
          }
+
+         inline std::string ToString() const exprtk_override{
+            return "(null_node)";
+         }
       };
 
       template <typename T, std::size_t N>
@@ -302,7 +310,6 @@ namespace Essa::Math{
       class null_eq_node exprtk_final : public expression_node<T>
       {
       public:
-
          typedef expression_node<T>* expression_ptr;
          typedef std::pair<expression_ptr,bool> branch_t;
 
@@ -345,6 +352,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(null_eq_node)";
+         }
       private:
 
          bool equality_;
@@ -375,6 +385,9 @@ namespace Essa::Math{
             return reinterpret_cast<expression_node<T>*>(0);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(literal_node)";
+         }
       private:
 
          literal_node(const literal_node<T>&) exprtk_delete;
@@ -479,6 +492,9 @@ namespace Essa::Math{
             return rp_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(string_literal_node)";
+         }
       private:
 
          string_literal_node(const string_literal_node<T>&) exprtk_delete;
@@ -540,6 +556,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(unary_node)";
+         }
       private:
 
          operator_type operation_;
@@ -603,6 +622,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::template compute_node_depth<2>(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(binary_node)";
+         }
       private:
 
          operator_type operation_;
@@ -663,6 +685,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::template compute_node_depth<2>(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(binary_ext_node)";
+         }
       protected:
 
          branch_t branch_[2];
@@ -726,6 +751,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::template compute_node_depth<3>(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(trinary_node)";
+         }
       protected:
 
          operator_type operation_;
@@ -770,6 +798,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::template compute_node_depth<4>(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(quaternary_node)";
+         }
       protected:
 
          operator_type operation_;
@@ -823,6 +854,9 @@ namespace Essa::Math{
                (condition_, consequent_, alternative_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(conditional_node)";
+         }
       private:
 
          branch_t condition_;
@@ -874,6 +908,9 @@ namespace Essa::Math{
                compute_node_depth(condition_, consequent_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(cons_conditional_node)";
+         }
       private:
 
          branch_t condition_;
@@ -936,6 +973,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(return_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(break_node)";
+         }
       private:
 
          branch_t return_;
@@ -957,6 +997,10 @@ namespace Essa::Math{
          inline typename expression_node<T>::node_type type() const exprtk_override
          {
             return expression_node<T>::e_break;
+         }
+
+         inline std::string ToString() const exprtk_override{
+            return "(continue_node)";
          }
       };
       #endif
@@ -1049,6 +1093,10 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(condition_, loop_body_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(while_loop_node)";
+         }
+
       protected:
 
          branch_t condition_;
@@ -1137,6 +1185,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(condition_, loop_body_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(repeat_until_loop_node)";
+         }
       protected:
 
          branch_t condition_;
@@ -1176,6 +1227,10 @@ namespace Essa::Math{
             while (is_false(parent_t::condition_.first) && loop_runtime_checker::check());
 
             return result;
+         }
+
+         inline std::string ToString() const exprtk_override{
+            return "(repeat_until_loop_rtc_node)";
          }
       };
 
@@ -1246,6 +1301,10 @@ namespace Essa::Math{
                (initialiser_, condition_, incrementor_, loop_body_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(for_loop_node)";
+         }
+
       protected:
 
          branch_t initialiser_;
@@ -1303,6 +1362,10 @@ namespace Essa::Math{
 
             return result;
          }
+
+         inline std::string ToString() const exprtk_override{
+            return "(for_loop_rtc_node)";
+         }
       };
 
       #ifndef exprtk_disable_break_continue
@@ -1341,6 +1404,10 @@ namespace Essa::Math{
             }
 
             return result;
+         }
+
+         inline std::string ToString() const exprtk_override{
+            return "(while_loop_bc_node)";
          }
       };
 
@@ -1386,6 +1453,10 @@ namespace Essa::Math{
 
             return result;
          }
+
+         inline std::string ToString() const exprtk_override{
+            return "(while_loop_bc_rtc_node)";
+         }
       };
 
       template <typename T>
@@ -1424,6 +1495,10 @@ namespace Essa::Math{
             while (is_false(parent_t::condition_.first));
 
             return result;
+         }
+
+         inline std::string ToString() const exprtk_override{
+            return "(repeat_until_loop_bc_node)";
          }
       };
 
@@ -1469,6 +1544,10 @@ namespace Essa::Math{
             while (is_false(parent_t::condition_.first) && loop_runtime_checker::check());
 
             return result;
+         }
+
+         inline std::string ToString() const exprtk_override{
+            return "(repeat_until_loop_bc_rtc_node)";
          }
       };
 
@@ -1533,6 +1612,10 @@ namespace Essa::Math{
             }
 
             return result;
+         }
+
+         inline std::string ToString() const exprtk_override{
+            return "(for_loop_bc_node)";
          }
       };
 
@@ -1603,6 +1686,10 @@ namespace Essa::Math{
             }
 
             return result;
+         }
+
+         inline std::string ToString() const exprtk_override{
+            return "(for_loop_bc_rtc_node)";
          }
       };
       #endif
@@ -1676,6 +1763,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(arg_list_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(switch_node)";
+         }
       protected:
 
          std::vector<branch_t> arg_list_;
@@ -1771,6 +1861,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(arg_list_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(multi_switch_node)";
+         }
       private:
 
          std::vector<branch_t> arg_list_;
@@ -1829,6 +1922,9 @@ namespace Essa::Math{
             return expression_node<T>::e_variable;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(variable_node)";
+         }
       private:
 
          T* value_;
@@ -2091,6 +2187,9 @@ namespace Essa::Math{
             return (*vector_holder_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vector_node)";
+         }
       private:
 
          vector_holder_t* vector_holder_;
@@ -2151,6 +2250,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(index_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vector_elem_node)";
+         }
       private:
 
          vector_holder_ptr vec_holder_;
@@ -2266,6 +2368,9 @@ namespace Essa::Math{
             return (*vector_holder_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(rebasevector_celem_node)";
+         }
       private:
 
          const std::size_t index_;
@@ -2335,6 +2440,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(initialiser_list_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vector_assignment_node)";
+         }
       private:
 
          vector_assignment_node(const vector_assignment_node<T>&) exprtk_delete;
@@ -2370,6 +2478,9 @@ namespace Essa::Math{
             return expression_node<T>::e_swap;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(swap_node)";
+         }
       private:
 
          variable_node_ptr var0_;
@@ -2514,6 +2625,9 @@ namespace Essa::Math{
             return vds_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(swap_vecvec_node)";
+         }
       private:
 
          vector_node<T>* vec0_node_ptr_;
@@ -2611,6 +2725,9 @@ namespace Essa::Math{
             rp_.cache.second = rp_.n1_c.second;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(stringvar_node)";
+         }
       private:
 
          std::string* value_;
@@ -2697,6 +2814,9 @@ namespace Essa::Math{
             return expression_node<T>::e_stringvarrng;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(string_range_node)";
+         }
       private:
 
          std::string* value_;
@@ -2766,6 +2886,9 @@ namespace Essa::Math{
             return expression_node<T>::e_cstringvarrng;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(const_string_range_node)";
+         }
       private:
 
          const_string_range_node(const const_string_range_node<T>&) exprtk_delete;
@@ -2903,6 +3026,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(generic_string_range_node)";
+         }
       private:
 
          bool                initialised_;
@@ -3049,6 +3175,9 @@ namespace Essa::Math{
             return expression_node<T>::e_strconcat;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(string_concat_node)";
+         }
       private:
 
          bool                initialised_;
@@ -3145,6 +3274,9 @@ namespace Essa::Math{
             return expression_node<T>::e_strswap;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(swap_string_node)";
+         }
       private:
 
          bool initialised_;
@@ -3301,6 +3433,9 @@ namespace Essa::Math{
             return expression_node<T>::e_strswap;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(swap_genstrings_node)";
+         }
       private:
 
          swap_genstrings_node(const swap_genstrings_node<T>&) exprtk_delete;
@@ -3338,6 +3473,9 @@ namespace Essa::Math{
             return expression_node<T>::e_stringvarsize;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(stringvar_size_node)";
+         }
       private:
 
          std::string* value_;
@@ -3397,6 +3535,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(string_size_node)";
+         }
       private:
 
          branch_t           branch_;
@@ -3529,6 +3670,9 @@ namespace Essa::Math{
             return expression_node<T>::e_strass;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_string_node)";
+         }
       private:
 
          bool            initialised_;
@@ -3669,6 +3813,9 @@ namespace Essa::Math{
             return expression_node<T>::e_strass;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_string_range_node)";
+         }
       private:
 
          bool             initialised_;
@@ -3829,6 +3976,9 @@ namespace Essa::Math{
             return expression_node<T>::e_strcondition;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(conditional_string_node)";
+         }
       private:
 
          bool initialised_;
@@ -3957,6 +4107,9 @@ namespace Essa::Math{
             return expression_node<T>::e_strccondition;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(cons_conditional_str_node)";
+         }
       private:
 
          bool initialised_;
@@ -4087,6 +4240,9 @@ namespace Essa::Math{
                expression_node<T>::ndb_t::compute_node_depth(arg_list_  ));
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(str_vararg_node)";
+         }
       private:
 
          bool                  initialised_;
@@ -4347,6 +4503,10 @@ namespace Essa::Math{
 
             return SpecialFunction::process(x, y, z);
          }
+
+         inline std::string ToString() const exprtk_override{
+            return "(sf3_node)";
+         }
       };
 
       template <typename T, typename SpecialFunction>
@@ -4378,6 +4538,10 @@ namespace Essa::Math{
 
             return SpecialFunction::process(x, y, z, w);
          }
+
+         inline std::string ToString() const exprtk_override{
+            return "(sf4_node)";
+         }
       };
 
       template <typename T, typename SpecialFunction>
@@ -4403,6 +4567,9 @@ namespace Essa::Math{
             return expression_node<T>::e_trinary;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(sf3_var_node)";
+         }
       private:
 
          sf3_var_node(const sf3_var_node<T,SpecialFunction>&) exprtk_delete;
@@ -4437,6 +4604,9 @@ namespace Essa::Math{
             return expression_node<T>::e_trinary;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(sf4_var_node)";
+         }
       private:
 
          sf4_var_node(const sf4_var_node<T,SpecialFunction>&) exprtk_delete;
@@ -4496,6 +4666,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(arg_list_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vararg_node)";
+         }
       private:
 
          std::vector<branch_t> arg_list_;
@@ -4542,6 +4715,9 @@ namespace Essa::Math{
             return expression_node<T>::e_vararg;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vararg_varnode)";
+         }
       private:
 
          std::vector<const T*> arg_list_;
@@ -4597,6 +4773,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(v_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vectorize_node)";
+         }
       private:
 
          vector_interface<T>* ivec_ptr_;
@@ -4678,6 +4857,9 @@ namespace Essa::Math{
                return std::numeric_limits<T>::quiet_NaN();
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_vec_elem_node)";
+         }
       private:
 
          vector_elem_node<T>* vec_node_ptr_;
@@ -4719,6 +4901,9 @@ namespace Essa::Math{
                return std::numeric_limits<T>::quiet_NaN();
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_rebasevec_elem_node)";
+         }
       private:
 
          rebasevector_elem_node<T>* rbvec_node_ptr_;
@@ -4759,6 +4944,9 @@ namespace Essa::Math{
                return std::numeric_limits<T>::quiet_NaN();
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_rebasevec_celem_node)";
+         }
       private:
 
          rebasevector_celem_node<T>* rbvec_node_ptr_;
@@ -4880,6 +5068,9 @@ namespace Essa::Math{
             return vds_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_vec_node)";
+         }
       private:
 
          vector_node<T>* vec_node_ptr_;
@@ -5037,6 +5228,9 @@ namespace Essa::Math{
             return vds_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_vecvec_node)";
+         }
       private:
 
          vector_node<T>* vec0_node_ptr_;
@@ -5081,6 +5275,9 @@ namespace Essa::Math{
                return std::numeric_limits<T>::quiet_NaN();
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_op_node)";
+         }
       private:
 
          variable_node<T>* var_node_ptr_;
@@ -5121,6 +5318,9 @@ namespace Essa::Math{
                return std::numeric_limits<T>::quiet_NaN();
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_vec_elem_op_node)";
+         }
       private:
 
          vector_elem_node<T>* vec_node_ptr_;
@@ -5161,6 +5361,9 @@ namespace Essa::Math{
                return std::numeric_limits<T>::quiet_NaN();
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_rebasevec_elem_op_node)";
+         }
       private:
 
          rebasevector_elem_node<T>* rbvec_node_ptr_;
@@ -5201,6 +5404,9 @@ namespace Essa::Math{
                return std::numeric_limits<T>::quiet_NaN();
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_rebasevec_celem_op_node)";
+         }
       private:
 
          rebasevector_celem_node<T>* rbvec_node_ptr_;
@@ -5327,6 +5533,9 @@ namespace Essa::Math{
             return true;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_vec_op_node)";
+         }
       private:
 
          vector_node<T>* vec_node_ptr_;
@@ -5484,6 +5693,9 @@ namespace Essa::Math{
             return true;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(assignment_vecvec_op_node)";
+         }
       private:
 
          vector_node<T>* vec0_node_ptr_;
@@ -5674,6 +5886,9 @@ namespace Essa::Math{
             return vds_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vec_binop_vecvec_node)";
+         }
       private:
 
          vector_node_ptr   vec0_node_ptr_;
@@ -5837,6 +6052,9 @@ namespace Essa::Math{
             return vds_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vec_binop_vecval_node)";
+         }
       private:
 
          vector_node_ptr   vec0_node_ptr_;
@@ -5998,6 +6216,9 @@ namespace Essa::Math{
             return vds_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vec_binop_valvec_node)";
+         }
       private:
 
          vector_node_ptr   vec1_node_ptr_;
@@ -6155,6 +6376,9 @@ namespace Essa::Math{
             return vds_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vec_binop_valvec_node)";
+         }
       private:
 
          vector_node_ptr   vec0_node_ptr_;
@@ -6309,6 +6533,9 @@ namespace Essa::Math{
                (condition_, consequent_, alternative_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(conditional_vector_node)";
+         }
       private:
 
          branch_t condition_;
@@ -6349,6 +6576,10 @@ namespace Essa::Math{
                         (T(0),branch(1)->value())
                    ) ? T(1) : T(0);
          }
+
+         inline std::string ToString() const exprtk_override{
+            return "(scand_node)";
+         }
       };
 
       template <typename T>
@@ -6376,6 +6607,10 @@ namespace Essa::Math{
                      std::not_equal_to<T>()
                         (T(0),branch(1)->value())
                    ) ? T(1) : T(0);
+         }
+
+         inline std::string ToString() const exprtk_override{
+            return "(scor_node)";
          }
       };
 
@@ -6670,6 +6905,9 @@ namespace Essa::Math{
             { return f(v[0]); }
          };
 
+         inline std::string ToString() const exprtk_override{
+            return "(function_N_node)";
+         }
       private:
 
          ifunction*  function_;
@@ -6707,6 +6945,9 @@ namespace Essa::Math{
             return expression_node<T>::e_function;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(function_N_node)";
+         }
       private:
 
          ifunction* function_;
@@ -6764,6 +7005,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(arg_list_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vararg_function_node)";
+         }
       private:
 
          inline void populate_value_list() const
@@ -6930,6 +7174,9 @@ namespace Essa::Math{
             return expression_node<T>::e_genfunction;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(generic_function_node)";
+         }
       protected:
 
          inline virtual bool populate_value_list() const
@@ -7060,6 +7307,9 @@ namespace Essa::Math{
             return range_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(string_function_node)";
+         }
       protected:
 
          mutable range_t     range_;
@@ -7106,6 +7356,9 @@ namespace Essa::Math{
             return expression_node<T>::e_genfunction;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(multimode_genfunction_node)";
+         }
       private:
 
          std::size_t param_seq_index_;
@@ -7157,6 +7410,9 @@ namespace Essa::Math{
             return expression_node<T>::e_strfunction;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(multimode_strfunction_node)";
+         }
       private:
 
          const std::size_t param_seq_index_;
@@ -7222,6 +7478,9 @@ namespace Essa::Math{
             return expression_node<T>::e_return;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(return_node)";
+         }
       private:
 
          results_context_t* results_context_;
@@ -7281,6 +7540,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(body_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(return_envelope_node)";
+         }
       private:
 
          results_context_t* results_context_;
@@ -7513,6 +7775,9 @@ namespace Essa::Math{
             return v_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(unary_variable_node)";
+         }
       private:
 
          unary_variable_node(const unary_variable_node<T,Operation>&) exprtk_delete;
@@ -7576,6 +7841,9 @@ namespace Essa::Math{
             return f_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(uvouv_node)";
+         }
       private:
 
          uvouv_node(const uvouv_node<T>&) exprtk_delete;
@@ -7637,6 +7905,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(unary_branch_node)";
+         }
       private:
 
          unary_branch_node(const unary_branch_node<T,Operation>&) exprtk_delete;
@@ -7933,6 +8204,9 @@ namespace Essa::Math{
                         (p0, p1, p2);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(T0oT1)";
+         }
       private:
 
          T0oT1(const T0oT1<T,T0,T1>&) exprtk_delete;
@@ -8021,6 +8295,9 @@ namespace Essa::Math{
                          (p0, p1, p2, p3, p4);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(T0oT1oT2)";
+         }
       private:
 
          T0oT1oT2(const node_type&) exprtk_delete;
@@ -8118,6 +8395,9 @@ namespace Essa::Math{
                          (p0, p1, p2, p3, p4, p5, p6);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(T0oT1oT2oT3)";
+         }
       private:
 
          T0oT1oT2oT3(const node_type&) exprtk_delete;
@@ -8203,6 +8483,9 @@ namespace Essa::Math{
                         (p0, p1, p2, p3);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(T0oT1oT2_sf3)";
+         }
       private:
 
          T0oT1oT2_sf3(const node_type&) exprtk_delete;
@@ -8291,6 +8574,9 @@ namespace Essa::Math{
                         (p0, p1, p2);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(T0oT1oT2_sf3ext)";
+         }
       private:
 
          T0oT1oT2_sf3ext(const node_type&) exprtk_delete;
@@ -8392,6 +8678,9 @@ namespace Essa::Math{
                         (p0, p1, p2, p3, p4);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(T0oT1oT2oT3_sf4)";
+         }
       private:
 
          T0oT1oT2oT3_sf4(const node_type&) exprtk_delete;
@@ -8468,6 +8757,9 @@ namespace Essa::Math{
                         (p0, p1, p2, p3);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(T0oT1oT2oT3_sf4ext)";
+         }
       private:
 
          T0oT1oT2oT3_sf4ext(const node_type&) exprtk_delete;
@@ -8562,6 +8854,9 @@ namespace Essa::Math{
             return v1_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vov_node)";
+         }
       protected:
 
          const T& v0_;
@@ -8612,6 +8907,9 @@ namespace Essa::Math{
             return v_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(cov_node)";
+         }
       protected:
 
          const T  c_;
@@ -8657,6 +8955,9 @@ namespace Essa::Math{
             return v_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(voc_node)";
+         }
       protected:
 
          const T& v_;
@@ -8710,6 +9011,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(vob_node)";
+         }
       private:
 
          vob_node(const vob_node<T,Operation>&) exprtk_delete;
@@ -8761,6 +9065,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(bov_node)";
+         }
       private:
 
          bov_node(const bov_node<T,Operation>&) exprtk_delete;
@@ -8828,6 +9135,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(cob_node)";
+         }
       private:
 
          cob_node(const cob_node<T,Operation>&) exprtk_delete;
@@ -8895,6 +9205,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(boc_node)";
+         }
       private:
 
          boc_node(const boc_node<T,Operation>&) exprtk_delete;
@@ -8944,6 +9257,9 @@ namespace Essa::Math{
             return s1_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(sos_node)";
+         }
       protected:
 
          SType0 s0_;
@@ -9007,6 +9323,9 @@ namespace Essa::Math{
             return s1_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(str_xrox_node)";
+         }
       protected:
 
          SType0    s0_;
@@ -9071,6 +9390,9 @@ namespace Essa::Math{
             return s1_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(str_xoxr_node)";
+         }
       protected:
 
          SType0    s0_;
@@ -9147,6 +9469,9 @@ namespace Essa::Math{
             return s1_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(str_xroxr_node)";
+         }
       protected:
 
          SType0    s0_;
@@ -9255,6 +9580,9 @@ namespace Essa::Math{
             return Operation::type();
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(str_sogens_node)";
+         }
       private:
 
          str_sogens_node(const str_sogens_node<T,Operation>&) exprtk_delete;
@@ -9312,6 +9640,9 @@ namespace Essa::Math{
             return s2_;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(sosos_node)";
+         }
       protected:
 
          SType0 s0_;
@@ -9347,6 +9678,9 @@ namespace Essa::Math{
             return expression_node<T>::e_ipow;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(ipow_node)";
+         }
       private:
 
          ipow_node(const ipow_node<T,PowOp>&) exprtk_delete;
@@ -9390,6 +9724,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(bipow_node)";
+         }
       private:
 
          bipow_node(const bipow_node<T,PowOp>&) exprtk_delete;
@@ -9420,6 +9757,9 @@ namespace Essa::Math{
             return expression_node<T>::e_ipowinv;
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(ipowinv_node)";
+         }
       private:
 
          ipowinv_node(const ipowinv_node<T,PowOp>&) exprtk_delete;
@@ -9463,6 +9803,9 @@ namespace Essa::Math{
             return expression_node<T>::ndb_t::compute_node_depth(branch_);
          }
 
+         inline std::string ToString() const exprtk_override{
+            return "(bipowninv_node)";
+         }
       private:
 
          bipowninv_node(const bipowninv_node<T,PowOp>&) exprtk_delete;

@@ -32,6 +32,7 @@
 #pragma once
 
 #include "Generator.hpp"
+#include <cassert>
 
 namespace Essa::Math{
    namespace lexer{

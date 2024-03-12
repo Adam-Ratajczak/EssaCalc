@@ -31,7 +31,10 @@
 
 #pragma once
 
+#include "ExpressionNodes.hpp"
+#include "OperatorHelpers.hpp"
 #include "SymbolTable.hpp"
+#include <iostream>
 
 namespace Essa::Math{
    template <typename T>
@@ -214,6 +217,15 @@ namespace Essa::Math{
          return *this;
       }
 
+      inline std::string ToString() const{
+         assert(control_block_      );
+         assert(control_block_->expr);
+
+         auto& typ = typeid(control_block_->expr);
+
+         return control_block_->expr->ToString();
+      }
+
       inline bool operator==(const expression<T>& e) const
       {
          return (this == &e);
@@ -303,6 +315,7 @@ namespace Essa::Math{
       {
          return (*control_block_->return_invoked);
       }
+      
 
    private:
 
