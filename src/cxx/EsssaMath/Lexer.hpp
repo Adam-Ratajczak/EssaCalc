@@ -34,6 +34,9 @@
 #include "Defines.hpp"
 #include "Numeric.hpp"
 
+#define exprtk_disable_enhanced_features
+#define exprtk_disable_cardinal_pow_optimisation
+
 namespace Essa::Math{
    namespace details{
       template <typename Iterator, typename T>
@@ -443,8 +446,7 @@ namespace Essa::Math{
             e_rsqrbracket = ']', e_lsqrbracket = '[', e_rcrlbracket = '}',
             e_lcrlbracket = '{', e_comma       = ',', e_add         = '+',
             e_sub         = '-', e_div         = '/', e_mul         = '*',
-            e_mod         = '%', e_pow         = '^', e_colon       = ':',
-            e_ternary     = '?'
+            e_pow         = '^', e_colon       = ':', e_ternary     = '?'
          };
 
          token()
@@ -574,7 +576,6 @@ namespace Essa::Math{
                case e_sub         : return "-";
                case e_div         : return "/";
                case e_mul         : return "*";
-               case e_mod         : return "%";
                case e_pow         : return "^";
                case e_colon       : return ":";
                case e_ternary     : return "?";

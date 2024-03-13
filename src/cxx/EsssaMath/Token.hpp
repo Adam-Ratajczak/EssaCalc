@@ -34,6 +34,9 @@
 #include "Generator.hpp"
 #include <cassert>
 
+#define exprtk_disable_enhanced_features
+#define exprtk_disable_cardinal_pow_optimisation
+
 namespace Essa::Math{
    namespace lexer{
       class helper_interface
@@ -528,15 +531,6 @@ namespace Essa::Math{
 
                   return true;
                }
-               // '% =' --> '%='
-               else if ((t0.type == lexer::token::e_mod) && (t1.type == lexer::token::e_eq))
-               {
-                  t.type     = lexer::token::e_modass;
-                  t.value    = "%=";
-                  t.position = t0.position;
-
-                  return true;
-               }
                // '> =' --> '>='
                else if ((t0.type == lexer::token::e_gt) && (t1.type == lexer::token::e_eq))
                {
@@ -898,7 +892,6 @@ namespace Essa::Math{
                add_invalid_set1(lexer::token::e_sub    );
                add_invalid_set1(lexer::token::e_div    );
                add_invalid_set1(lexer::token::e_mul    );
-               add_invalid_set1(lexer::token::e_mod    );
                add_invalid_set1(lexer::token::e_pow    );
                add_invalid_set1(lexer::token::e_colon  );
                add_invalid_set1(lexer::token::e_ternary);
@@ -969,7 +962,6 @@ namespace Essa::Math{
                add_invalid(t, lexer::token::e_comma );
                add_invalid(t, lexer::token::e_div   );
                add_invalid(t, lexer::token::e_mul   );
-               add_invalid(t, lexer::token::e_mod   );
                add_invalid(t, lexer::token::e_pow   );
                add_invalid(t, lexer::token::e_colon );
             }
@@ -1060,15 +1052,12 @@ namespace Essa::Math{
                add_invalid(lexer::token::e_sub    , lexer::token::e_sub    , lexer::token::e_sub   );
                add_invalid(lexer::token::e_div    , lexer::token::e_div    , lexer::token::e_div   );
                add_invalid(lexer::token::e_mul    , lexer::token::e_mul    , lexer::token::e_mul   );
-               add_invalid(lexer::token::e_mod    , lexer::token::e_mod    , lexer::token::e_mod   );
                add_invalid(lexer::token::e_pow    , lexer::token::e_pow    , lexer::token::e_pow   );
 
                add_invalid(lexer::token::e_add    , lexer::token::e_sub    , lexer::token::e_add   );
                add_invalid(lexer::token::e_sub    , lexer::token::e_add    , lexer::token::e_sub   );
                add_invalid(lexer::token::e_div    , lexer::token::e_mul    , lexer::token::e_div   );
                add_invalid(lexer::token::e_mul    , lexer::token::e_div    , lexer::token::e_mul   );
-               add_invalid(lexer::token::e_mod    , lexer::token::e_pow    , lexer::token::e_mod   );
-               add_invalid(lexer::token::e_pow    , lexer::token::e_mod    , lexer::token::e_pow   );
             }
 
             bool result()

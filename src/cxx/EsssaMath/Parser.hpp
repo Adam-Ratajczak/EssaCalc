@@ -44,6 +44,9 @@
 #include "SymbolTable.hpp"
 #include "Expression.hpp"
 
+#define exprtk_disable_enhanced_features
+#define exprtk_disable_cardinal_pow_optimisation
+
 namespace Essa::Math{
    namespace parser_error
    {
@@ -2171,7 +2174,7 @@ namespace Essa::Math{
                case details::e_sub : return "-";
                case details::e_mul : return "*";
                case details::e_div : return "/";
-               case details::e_mod : return "%";
+               case details::e_mod : return "mod";
                default             : return "" ;
             }
          }
@@ -2914,7 +2917,6 @@ namespace Essa::Math{
                case token_t::e_sub    : current_state.set(e_level07, e_level08, details::e_sub   ); break;
                case token_t::e_div    : current_state.set(e_level10, e_level11, details::e_div   ); break;
                case token_t::e_mul    : current_state.set(e_level10, e_level11, details::e_mul   ); break;
-               case token_t::e_mod    : current_state.set(e_level10, e_level11, details::e_mod   ); break;
                case token_t::e_pow    : current_state.set(e_level12, e_level12, details::e_pow   ); break;
                default                : if (token_t::e_symbol == current_token().type)
                                         {
@@ -4500,7 +4502,8 @@ namespace Essa::Math{
                      nse.type      = scope_element::e_variable;
                      nse.depth     = state_.scope_depth;
                      nse.data      = new T(T(0));
-                     nse.var_node  = node_allocator_.allocate<variable_node_t>(*reinterpret_cast<T*>(nse.data));
+                     std::cout << "1: " << nse.name << "\n";
+                     nse.var_node  = node_allocator_.allocate<variable_node_t>(*reinterpret_cast<T*>(nse.data), nse.name);
 
                      if (!sem_.add_element(nse))
                      {
@@ -7178,7 +7181,8 @@ namespace Essa::Math{
             nse.type      = scope_element::e_variable;
             nse.depth     = state_.scope_depth;
             nse.data      = new T(T(0));
-            nse.var_node  = node_allocator_.allocate<variable_node_t>(*reinterpret_cast<T*>(nse.data));
+                     std::cout << "2: " << nse.name << "\n";
+            nse.var_node  = node_allocator_.allocate<variable_node_t>(*reinterpret_cast<T*>(nse.data), nse.name);
 
             if (!sem_.add_element(nse))
             {
@@ -7272,7 +7276,8 @@ namespace Essa::Math{
             nse.depth     = state_.scope_depth;
             nse.ip_index  = sem_.next_ip_index();
             nse.data      = new T(T(0));
-            nse.var_node  = node_allocator_.allocate<variable_node_t>(*reinterpret_cast<T*>(nse.data));
+                     std::cout << "3: " << nse.name << "\n";
+            nse.var_node  = node_allocator_.allocate<variable_node_t>(*reinterpret_cast<T*>(nse.data), nse.name);
 
             if (!sem_.add_element(nse))
             {
@@ -8729,7 +8734,7 @@ namespace Essa::Math{
                case details::e_sub  : return "-"      ;
                case details::e_mul  : return "*"      ;
                case details::e_div  : return "/"      ;
-               case details::e_mod  : return "%"      ;
+               case details::e_mod  : return "mod"      ;
                case details::e_pow  : return "^"      ;
                case details::e_lt   : return "<"      ;
                case details::e_lte  : return "<="     ;
@@ -9158,8 +9163,6 @@ namespace Essa::Math{
                return result;
             }
             else
-            #endif
-
             {
                /*
                   Possible reductions:
@@ -9203,17 +9206,16 @@ namespace Essa::Math{
             {
                return synthesize_boc_expression::process((*this), operation, branch);
             }
-            #ifndef exprtk_disable_enhanced_features
             else if (cov_optimisable(operation, branch))
             {
                return synthesize_cov_expression::process((*this), operation, branch);
             }
-            #endif
             else if (binext_optimisable(operation, branch))
             {
                return synthesize_binary_ext_expression::process((*this), operation, branch);
             }
             else
+            #endif
                return synthesize_expression<binary_node_t,2>(operation, branch);
          }
 
@@ -10551,7 +10553,8 @@ namespace Essa::Math{
                   nse.index     = i;
                   nse.depth     = parser_->state_.scope_depth;
                   nse.data      = 0;
-                  nse.var_node  = node_allocator_->allocate<variable_node_t>((*(*vector_base)[i]));
+                     std::cout << "4: " << nse.name << "\n";
+                  nse.var_node  = node_allocator_->allocate<variable_node_t>((*(*vector_base)[i]), nse.name);
 
                   if (!parser_->sem_.add_element(nse))
                   {
@@ -10582,6 +10585,7 @@ namespace Essa::Math{
          template <std::size_t N, typename NodePtr>
          inline bool is_constant_foldable(NodePtr (&b)[N]) const
          {
+            #ifndef exprtk_disable_enhanced_features
             for (std::size_t i = 0; i < N; ++i)
             {
                if (0 == b[i])
@@ -10591,6 +10595,9 @@ namespace Essa::Math{
             }
 
             return true;
+            #else
+            return false;
+            #endif
          }
 
          template <typename NodePtr,
@@ -10598,6 +10605,7 @@ namespace Essa::Math{
                    template <typename, typename> class Sequence>
          inline bool is_constant_foldable(const Sequence<NodePtr,Allocator>& b) const
          {
+            #ifndef exprtk_disable_enhanced_features
             for (std::size_t i = 0; i < b.size(); ++i)
             {
                if (0 == b[i])
@@ -10607,6 +10615,9 @@ namespace Essa::Math{
             }
 
             return true;
+            #else
+            return false;
+            #endif
          }
 
          void lodge_assignment(symbol_type cst, expression_node_ptr node)

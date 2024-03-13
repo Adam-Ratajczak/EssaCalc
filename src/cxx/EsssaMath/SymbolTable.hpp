@@ -34,6 +34,8 @@
 #include "Functions.hpp"
 #include "ExpressionNodes.hpp"
 
+#define exprtk_disable_enhanced_features
+
 namespace Essa::Math{
 #ifndef exprtk_disable_string_capabilities
    template <typename T>
@@ -473,7 +475,7 @@ namespace Essa::Math{
             {
                static inline std::pair<bool,variable_node_t*> make(T& t, const bool is_constant = false)
                {
-                  return std::make_pair(is_constant, new variable_node_t(t));
+                  return std::make_pair(is_constant, new variable_node_t(t, ""));
                }
 
                #ifndef exprtk_disable_string_capabilities
@@ -1378,6 +1380,7 @@ namespace Essa::Math{
       inline bool add_constants()
       {
          return add_pi      () &&
+                add_e       () &&
                 add_epsilon () &&
                 add_infinity() ;
       }
@@ -1386,7 +1389,14 @@ namespace Essa::Math{
       {
          const typename details::numeric::details::number_type<T>::type num_type;
          static const T local_pi = details::numeric::details::const_pi_impl<T>(num_type);
-         return add_constant("pi",local_pi);
+         return add_constant("%pi",local_pi);
+      }
+
+      inline bool add_e()
+      {
+         const typename details::numeric::details::number_type<T>::type num_type;
+         static const T local_e = details::numeric::details::const_e_impl<T>(num_type);
+         return add_constant("%e",local_e);
       }
 
       inline bool add_epsilon()

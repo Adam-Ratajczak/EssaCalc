@@ -33,6 +33,9 @@
 
 #include "ExpressionNodes.hpp"
 
+#define exprtk_disable_enhanced_features
+#define exprtk_disable_cardinal_pow_optimisation
+
 namespace Essa::Math{
    namespace details
    {                                                       
@@ -117,6 +120,15 @@ namespace Essa::Math{
          {
             expression_node<typename node_type::value_type>*
             result = (new node_type(t1));
+            result->node_depth();
+            return result;
+         }
+
+         template <typename node_type, typename T1, typename T2>
+         inline expression_node<typename node_type::value_type>* allocate(T1& t1, T2 t2) const
+         {
+            expression_node<typename node_type::value_type>*
+            result = (new node_type(t1, t2));
             result->node_depth();
             return result;
          }

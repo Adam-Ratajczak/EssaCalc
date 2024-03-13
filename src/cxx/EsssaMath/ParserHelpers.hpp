@@ -33,6 +33,9 @@
 
 #include "Generator.hpp"
 
+#define exprtk_disable_enhanced_features
+#define exprtk_disable_cardinal_pow_optimisation
+
 namespace Essa::Math{
    namespace lexer{
       class parser_helper

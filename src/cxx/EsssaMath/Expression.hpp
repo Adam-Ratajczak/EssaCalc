@@ -36,6 +36,9 @@
 #include "SymbolTable.hpp"
 #include <iostream>
 
+#define exprtk_disable_enhanced_features
+#define exprtk_disable_cardinal_pow_optimisation
+
 namespace Essa::Math{
    template <typename T>
    class function_compositor;

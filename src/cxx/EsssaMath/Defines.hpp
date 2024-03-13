@@ -48,6 +48,8 @@
 #include <utility>
 #include <vector>
 
+#define exprtk_disable_enhanced_features
+#define exprtk_disable_cardinal_pow_optimisation
 
 namespace Essa::Math
 {
@@ -113,15 +115,14 @@ namespace Essa::Math
                 ('(' == c) || (')' == c) ||
                 ('[' == c) || (']' == c) ||
                 ('{' == c) || ('}' == c) ||
-                ('%' == c) || (':' == c) ||
-                ('?' == c) || ('&' == c) ||
-                ('|' == c) || (';' == c) ;
+                (':' == c) || ('?' == c) || 
+                ('&' == c) || ('|' == c) || (';' == c) ;
       }
 
       inline bool is_letter(const char_t c)
       {
          return (('a' <= c) && (c <= 'z')) ||
-                (('A' <= c) && (c <= 'Z')) ;
+                (('A' <= c) && (c <= 'Z')) || c == '%';
       }
 
       inline bool is_digit(const char_t c)
@@ -131,7 +132,7 @@ namespace Essa::Math
 
       inline bool is_letter_or_digit(const char_t c)
       {
-         return is_letter(c) || is_digit(c);
+         return is_letter(c) || is_digit(c) || c == '%';
       }
 
       inline bool is_left_bracket(const char_t c)
@@ -489,7 +490,7 @@ namespace Essa::Math
 
       static const std::string arithmetic_ops_list[] =
                                   {
-                                    "+", "-", "*", "/", "%", "^"
+                                    "+", "-", "*", "/", "mod", "^"
                                   };
 
       static const std::size_t arithmetic_ops_list_size = sizeof(arithmetic_ops_list) / sizeof(std::string);

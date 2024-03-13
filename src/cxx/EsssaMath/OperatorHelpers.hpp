@@ -35,6 +35,9 @@
 #include <deque>
 #include <iostream>
 
+#define exprtk_disable_enhanced_features
+#define exprtk_disable_cardinal_pow_optimisation
+
 namespace Essa::Math{
    namespace details
    {
@@ -208,6 +211,24 @@ namespace Essa::Math{
             default        : return "N/A";
             }
       }
+
+      inline bool check_significance(const operator_type _op1, const operator_type _op2){
+        switch (_op1) {
+        case e_pow:
+            return _op2 == e_add || _op2 == e_sub || _op2 == e_mul || _op2 == e_div; 
+        case e_mul:
+        case e_div:
+            return _op2 == e_add || _op2 == e_sub;
+        case e_add:
+        case e_sub:
+            return false;
+         default:
+            return true;
+          break;
+        }
+
+        return false;
+    }
 
       struct base_operation_t
       {

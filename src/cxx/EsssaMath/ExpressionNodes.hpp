@@ -38,6 +38,9 @@
 #include <string>
 #include <cassert>
 
+#define exprtk_disable_enhanced_features
+#define exprtk_disable_cardinal_pow_optimisation
+
 namespace Essa::Math{
    namespace details
    {
@@ -257,7 +260,7 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(null_node)";
+            return "0";
          }
       };
 
@@ -353,7 +356,7 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(null_eq_node)";
+            return branch_.first->ToString() + (equality_ ? "==" : "!=") + "0";
          }
       private:
 
@@ -386,7 +389,7 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(literal_node)";
+            return std::to_string(value_);
          }
       private:
 
@@ -493,7 +496,7 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(string_literal_node)";
+            return value_;
          }
       private:
 
@@ -557,7 +560,11 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(unary_node)";
+            char _buf[2048]{0};
+            std::string _name = to_str(operation_);
+            std::string _arg1 = branch_.first->ToString();
+            sprintf(_buf, _name.c_str(), _arg1.c_str());
+            return _buf;
          }
       private:
 
@@ -623,7 +630,25 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(binary_node)";
+            char _buf[2048]{0};
+            std::string _name = to_str(operation_);
+            bool sig = false;
+            
+            if(binary_node* _node = dynamic_cast<binary_node*>(branch_[0].first))
+               sig = check_significance(operation_, _node->operation());
+            else
+               sig = false;
+
+            std::string _arg1 = (sig ? "(" : "") + branch_[0].first->ToString() + (sig ? ")" : "");
+            
+            if(binary_node* _node = dynamic_cast<binary_node*>(branch_[1].first))
+               sig = check_significance(operation_, _node->operation());
+            else
+               sig = false;
+
+            std::string _arg2 = (sig ? "(" : "") + branch_[1].first->ToString() + (sig ? ")" : "");
+            sprintf(_buf, _name.c_str(), _arg1.c_str(), _arg2.c_str());
+            return _buf;
          }
       private:
 
@@ -660,7 +685,7 @@ namespace Essa::Math{
             return expression_node<T>::e_binary_ext;
          }
 
-         inline operator_type operation()
+         inline operator_type operation() const
          {
             return Operation::operation();
          }
@@ -686,7 +711,14 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(binary_ext_node)";
+            char _buf[2048]{0};
+            std::string _name = to_str(operation());
+            bool sig = check_significance(operation(), branch_[0].first->operation());
+            std::string _arg1 = (sig ? "(" : "") + branch_[0].first->ToString() + (sig ? ")" : "");
+            sig = check_significance(operation(), branch_[1].first->operation());
+            std::string _arg2 = (sig ? "(" : "") + branch_[1].first->ToString() + (sig ? ")" : "");
+            sprintf(_buf, _name.c_str(), _arg1.c_str(), _arg2.c_str());
+            return _buf;
          }
       protected:
 
@@ -752,7 +784,13 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(trinary_node)";
+            char _buf[2048]{0};
+            std::string _name = to_str(operation_);
+            std::string _arg1 = branch_[0].first->ToString();
+            std::string _arg2 = branch_[1].first->ToString();
+            std::string _arg3 = branch_[2].first->ToString();
+            sprintf(_buf, _name.c_str(), _arg1.c_str(), _arg2.c_str(), _arg3.c_str());
+            return _buf;
          }
       protected:
 
@@ -799,7 +837,14 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(quaternary_node)";
+            char _buf[2048]{0};
+            std::string _name = to_str(operation_);
+            std::string _arg1 = branch_[0].first->ToString();
+            std::string _arg2 = branch_[1].first->ToString();
+            std::string _arg3 = branch_[2].first->ToString();
+            std::string _arg4 = branch_[3].first->ToString();
+            sprintf(_buf, _name.c_str(), _arg1.c_str(), _arg2.c_str(), _arg3.c_str(), _arg4.c_str());
+            return _buf;
          }
       protected:
 
@@ -1893,8 +1938,8 @@ namespace Essa::Math{
          : value_(&null_value)
          {}
 
-         explicit variable_node(T& v)
-         : value_(&v)
+         explicit variable_node(T& v, std::string id)
+         : value_(&v), id_(id)
          {}
 
          inline bool operator <(const variable_node<T>& v) const
@@ -1923,11 +1968,12 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(variable_node)";
+            return id_.empty() ? std::to_string(*value_) : id_;
          }
       private:
 
          T* value_;
+         std::string id_;
       };
 
       template <typename T>
@@ -7880,7 +7926,7 @@ namespace Essa::Math{
             return Operation::type();
          }
 
-         inline operator_type operation()
+         inline operator_type operation() const
          {
             return Operation::operation();
          }
@@ -7906,7 +7952,11 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return "(unary_branch_node)";
+            char _buf[2048]{0};
+            std::string _name = to_str(operation());
+            std::string _arg1 = branch_.first->ToString();
+            sprintf(_buf, _name.c_str(), _arg1.c_str());
+            return _buf;
          }
       private:
 
