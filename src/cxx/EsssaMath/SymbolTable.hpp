@@ -34,10 +34,7 @@
 #include "Functions.hpp"
 #include "ExpressionNodes.hpp"
 
-#define exprtk_disable_enhanced_features
-
 namespace Essa::Math{
-#ifndef exprtk_disable_string_capabilities
    template <typename T>
    class stringvar_base
    {
@@ -72,7 +69,6 @@ namespace Essa::Math{
       std::string name_;
       stringvar_node_t* string_varnode_;
    };
-   #endif
 
    template <typename T> class parser;
    template <typename T> class expression_helper;
@@ -290,9 +286,7 @@ namespace Essa::Math{
          typedef ivararg_function<T>                 ivararg_function_t;
          typedef igeneric_function<T>                igeneric_function_t;
          typedef details::vector_holder<T>           vector_t;
-         #ifndef exprtk_disable_string_capabilities
          typedef typename details::stringvar_node<T> stringvar_node_t;
-         #endif
 
          typedef Type type_t;
          typedef type_t* type_ptr;
@@ -320,9 +314,7 @@ namespace Essa::Math{
 
             exprtk_define_process(variable_node_t )
             exprtk_define_process(vector_t        )
-            #ifndef exprtk_disable_string_capabilities
             exprtk_define_process(stringvar_node_t)
-            #endif
 
             #undef exprtk_define_process
 
@@ -478,12 +470,10 @@ namespace Essa::Math{
                   return std::make_pair(is_constant, new variable_node_t(t, ""));
                }
 
-               #ifndef exprtk_disable_string_capabilities
                static inline std::pair<bool,stringvar_node_t*> make(std::string& t, const bool is_constant = false)
                {
                   return std::make_pair(is_constant, new stringvar_node_t(t));
                }
-               #endif
 
                static inline std::pair<bool,function_t*> make(function_t& t, const bool is_constant = false)
                {
@@ -671,10 +661,8 @@ namespace Essa::Math{
       typedef typename details::variable_node<T>  variable_t;
       typedef typename details::vector_holder<T>  vector_holder_t;
       typedef variable_t*                         variable_ptr;
-      #ifndef exprtk_disable_string_capabilities
       typedef typename details::stringvar_node<T> stringvar_t;
       typedef stringvar_t*                        stringvar_ptr;
-      #endif
       typedef ifunction        <T>                function_t;
       typedef ivararg_function <T>                vararg_function_t;
       typedef igeneric_function<T>                generic_function_t;
@@ -696,9 +684,7 @@ namespace Essa::Math{
             type_store<generic_function_t, generic_function_t> string_function_store;
             type_store<generic_function_t, generic_function_t> overload_function_store;
             type_store<vector_holder_t   , vector_holder_t   > vector_store;
-            #ifndef exprtk_disable_string_capabilities
             type_store<stringvar_t       , std::string       > stringvar_store;
-            #endif
 
             st_data()
             {
@@ -854,9 +840,7 @@ namespace Essa::Math{
 
       inline void clear_strings()
       {
-         #ifndef exprtk_disable_string_capabilities
          local_data().stringvar_store.clear();
-         #endif
       }
 
       inline void clear_vectors()
@@ -887,7 +871,6 @@ namespace Essa::Math{
             return 0;
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline std::size_t stringvar_count() const
       {
          if (valid())
@@ -895,7 +878,6 @@ namespace Essa::Math{
          else
             return 0;
       }
-      #endif
 
       inline std::size_t function_count() const
       {
@@ -932,7 +914,6 @@ namespace Essa::Math{
                                                   reinterpret_cast<const void*>(&var_ref));
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline stringvar_ptr get_stringvar(const std::string& string_name) const
       {
          if (!valid())
@@ -960,7 +941,6 @@ namespace Essa::Math{
 
          return stringvar_base<T>(string_name,stringvar);
       }
-      #endif
 
       inline function_ptr get_function(const std::string& function_name) const
       {
@@ -1035,7 +1015,6 @@ namespace Essa::Math{
             return local_data().variable_store.type_ref(symbol_name);
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline std::string& stringvar_ref(const std::string& symbol_name)
       {
          static std::string null_stringvar;
@@ -1046,8 +1025,7 @@ namespace Essa::Math{
          else
             return local_data().stringvar_store.type_ref(symbol_name);
       }
-      #endif
-
+      
       inline bool is_constant_node(const std::string& symbol_name) const
       {
          if (!valid())
@@ -1058,7 +1036,6 @@ namespace Essa::Math{
             return local_data().variable_store.is_constant(symbol_name);
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline bool is_constant_string(const std::string& symbol_name) const
       {
          if (!valid())
@@ -1070,7 +1047,6 @@ namespace Essa::Math{
          else
             return local_data().stringvar_store.is_constant(symbol_name);
       }
-      #endif
 
       inline bool create_variable(const std::string& variable_name, const T& value = T(0))
       {
@@ -1087,7 +1063,6 @@ namespace Essa::Math{
          return add_variable(variable_name,t);
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline bool create_stringvar(const std::string& stringvar_name, const std::string& value = std::string(""))
       {
          if (!valid())
@@ -1102,7 +1077,6 @@ namespace Essa::Math{
 
          return add_stringvar(stringvar_name,s);
       }
-      #endif
 
       inline bool add_variable(const std::string& variable_name, T& t, const bool is_constant = false)
       {
@@ -1131,7 +1105,6 @@ namespace Essa::Math{
          return add_variable(constant_name, t, true);
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline bool add_stringvar(const std::string& stringvar_name, std::string& s, const bool is_constant = false)
       {
          if (!valid())
@@ -1143,7 +1116,6 @@ namespace Essa::Math{
          else
             return local_data().stringvar_store.add(stringvar_name, s, is_constant);
       }
-      #endif
 
       inline bool add_function(const std::string& function_name, function_t& function)
       {
@@ -1343,7 +1315,6 @@ namespace Essa::Math{
             return local_data().variable_store.remove(variable_name, delete_node);
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline bool remove_stringvar(const std::string& string_name)
       {
          if (!valid())
@@ -1351,7 +1322,6 @@ namespace Essa::Math{
          else
             return local_data().stringvar_store.remove(string_name);
       }
-      #endif
 
       inline bool remove_function(const std::string& function_name)
       {
@@ -1437,7 +1407,6 @@ namespace Essa::Math{
             return local_data().variable_store.get_list(vlist);
       }
 
-      #ifndef exprtk_disable_string_capabilities
       template <typename Allocator,
                 template <typename, typename> class Sequence>
       inline std::size_t get_stringvar_list(Sequence<std::pair<std::string,std::string>,Allocator>& svlist) const
@@ -1457,7 +1426,6 @@ namespace Essa::Math{
          else
             return local_data().stringvar_store.get_list(svlist);
       }
-      #endif
 
       template <typename Allocator,
                 template <typename, typename> class Sequence>
@@ -1480,10 +1448,8 @@ namespace Essa::Math{
             return false;
          else if (local_data().variable_store.symbol_exists(symbol_name))
             return true;
-         #ifndef exprtk_disable_string_capabilities
          else if (local_data().stringvar_store.symbol_exists(symbol_name))
             return true;
-         #endif
          else if (local_data().vector_store.symbol_exists(symbol_name))
             return true;
          else if (local_data().function_store.symbol_exists(symbol_name))
@@ -1502,7 +1468,6 @@ namespace Essa::Math{
             return local_data().variable_store.symbol_exists(variable_name);
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline bool is_stringvar(const std::string& stringvar_name) const
       {
          if (!valid())
@@ -1525,7 +1490,6 @@ namespace Essa::Math{
                   local_data().stringvar_store.is_constant  (symbol_name)
                 );
       }
-      #endif
 
       inline bool is_function(const std::string& function_name) const
       {
@@ -1561,7 +1525,6 @@ namespace Essa::Math{
          return local_data().vector_store.entity_name(ptr);
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline std::string get_stringvar_name(const expression_ptr& ptr) const
       {
          return local_data().stringvar_store.entity_name(ptr);
@@ -1571,7 +1534,6 @@ namespace Essa::Math{
       {
          return local_data().stringvar_store.entity_name(ptr);
       }
-      #endif
 
       inline bool valid() const
       {

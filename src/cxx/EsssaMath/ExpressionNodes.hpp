@@ -38,9 +38,6 @@
 #include <string>
 #include <cassert>
 
-#define exprtk_disable_enhanced_features
-#define exprtk_disable_cardinal_pow_optimisation
-
 namespace Essa::Math{
    namespace details
    {
@@ -419,7 +416,6 @@ namespace Essa::Math{
          virtual const range_t& range_ref() const = 0;
       };
 
-      #ifndef exprtk_disable_string_capabilities
       template <typename T>
       class string_base_node
       {
@@ -506,7 +502,6 @@ namespace Essa::Math{
          const std::string value_;
          range_t rp_;
       };
-      #endif
 
       template <typename T>
       class unary_node : public expression_node<T>
@@ -571,6 +566,7 @@ namespace Essa::Math{
          operator_type operation_;
          branch_t branch_;
       };
+
 
       template <typename T>
       class binary_node : public expression_node<T>
@@ -711,11 +707,23 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
+            
             char _buf[2048]{0};
             std::string _name = to_str(operation());
-            bool sig = check_significance(operation(), branch_[0].first->operation());
+            bool sig = false;
+            
+            if(binary_node<T>* _node = dynamic_cast<binary_node<T>*>(branch_[0].first))
+               sig = check_significance(operation(), _node->operation());
+            else
+               sig = false;
+
             std::string _arg1 = (sig ? "(" : "") + branch_[0].first->ToString() + (sig ? ")" : "");
-            sig = check_significance(operation(), branch_[1].first->operation());
+            
+            if(binary_node<T>* _node = dynamic_cast<binary_node<T>*>(branch_[1].first))
+               sig = check_significance(operation(), _node->operation());
+            else
+               sig = false;
+
             std::string _arg2 = (sig ? "(" : "") + branch_[1].first->ToString() + (sig ? ")" : "");
             sprintf(_buf, _name.c_str(), _arg1.c_str(), _arg2.c_str());
             return _buf;
@@ -962,7 +970,6 @@ namespace Essa::Math{
          branch_t consequent_;
       };
 
-      #ifndef exprtk_disable_break_continue
       template <typename T>
       class break_exception
       {
@@ -1048,7 +1055,6 @@ namespace Essa::Math{
             return "(continue_node)";
          }
       };
-      #endif
 
       struct loop_runtime_checker
       {
@@ -1413,7 +1419,6 @@ namespace Essa::Math{
          }
       };
 
-      #ifndef exprtk_disable_break_continue
       template <typename T>
       class while_loop_bc_node : public while_loop_node<T>
       {
@@ -1737,7 +1742,6 @@ namespace Essa::Math{
             return "(for_loop_bc_rtc_node)";
          }
       };
-      #endif
 
       template <typename T>
       class switch_node : public expression_node<T>
@@ -2075,11 +2079,10 @@ namespace Essa::Math{
             cache.first  = r0;
             cache.second = r1;
 
-            #ifndef exprtk_enable_range_runtime_checks
+            if(!enable_range_runtime_checks)
             return (r0 <= r1);
-            #else
-            return range_runtime_check(r0, r1, size);
-            #endif
+            else
+               return range_runtime_check(r0, r1, size);
          }
 
          inline std::size_t const_size() const
@@ -2098,7 +2101,6 @@ namespace Essa::Math{
          std::pair<bool,std::size_t        > n1_c;
          mutable cached_range_t             cache;
 
-         #ifdef exprtk_enable_range_runtime_checks
          bool range_runtime_check(const std::size_t r0,
                                   const std::size_t r1,
                                   const std::size_t size) const
@@ -2117,7 +2119,6 @@ namespace Essa::Math{
 
             return (r0 <= r1);
          }
-         #endif
       };
 
       template <typename T>
@@ -2683,7 +2684,6 @@ namespace Essa::Math{
          vds_t           vds_;
       };
 
-      #ifndef exprtk_disable_string_capabilities
       template <typename T>
       class stringvar_node exprtk_final
                            : public expression_node <T>,
@@ -3432,14 +3432,12 @@ namespace Essa::Math{
 
                      exprtk_loop( 0) exprtk_loop( 1)
                      exprtk_loop( 2) exprtk_loop( 3)
-                     #ifndef exprtk_disable_superscalar_unroll
                      exprtk_loop( 4) exprtk_loop( 5)
                      exprtk_loop( 6) exprtk_loop( 7)
                      exprtk_loop( 8) exprtk_loop( 9)
                      exprtk_loop(10) exprtk_loop(11)
                      exprtk_loop(12) exprtk_loop(13)
                      exprtk_loop(14) exprtk_loop(15)
-                     #endif
 
                      s0 += lud.batch_size;
                      s1 += lud.batch_size;
@@ -3453,14 +3451,12 @@ namespace Essa::Math{
                      #define case_stmt(N)                       \
                      case N : { std::swap(s0[i], s1[i]); ++i; } \
 
-                     #ifndef exprtk_disable_superscalar_unroll
                      case_stmt(15) case_stmt(14)
                      case_stmt(13) case_stmt(12)
                      case_stmt(11) case_stmt(10)
                      case_stmt( 9) case_stmt( 8)
                      case_stmt( 7) case_stmt( 6)
                      case_stmt( 5) case_stmt( 4)
-                     #endif
                      case_stmt( 3) case_stmt( 2)
                      case_stmt( 1)
                   }
@@ -4297,7 +4293,6 @@ namespace Essa::Math{
          irange_ptr            str_range_ptr_;
          std::vector<branch_t> arg_list_;
       };
-      #endif
 
       template <typename T, std::size_t N>
       inline T axn(const T a, const T x)
@@ -5044,14 +5039,12 @@ namespace Essa::Math{
 
                   exprtk_loop( 0) exprtk_loop( 1)
                   exprtk_loop( 2) exprtk_loop( 3)
-                  #ifndef exprtk_disable_superscalar_unroll
                   exprtk_loop( 4) exprtk_loop( 5)
                   exprtk_loop( 6) exprtk_loop( 7)
                   exprtk_loop( 8) exprtk_loop( 9)
                   exprtk_loop(10) exprtk_loop(11)
                   exprtk_loop(12) exprtk_loop(13)
                   exprtk_loop(14) exprtk_loop(15)
-                  #endif
 
                   vec += lud.batch_size;
                }
@@ -5062,14 +5055,12 @@ namespace Essa::Math{
                   #define case_stmt(N) \
                   case N : *vec++ = v; \
 
-                  #ifndef exprtk_disable_superscalar_unroll
                   case_stmt(15) case_stmt(14)
                   case_stmt(13) case_stmt(12)
                   case_stmt(11) case_stmt(10)
                   case_stmt( 9) case_stmt( 8)
                   case_stmt( 7) case_stmt( 6)
                   case_stmt( 5) case_stmt( 4)
-                  #endif
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
@@ -5203,14 +5194,12 @@ namespace Essa::Math{
 
                   exprtk_loop( 0) exprtk_loop( 1)
                   exprtk_loop( 2) exprtk_loop( 3)
-                  #ifndef exprtk_disable_superscalar_unroll
-                  exprtk_loop( 4) exprtk_loop( 5)
+                     exprtk_loop( 4) exprtk_loop( 5)
                   exprtk_loop( 6) exprtk_loop( 7)
                   exprtk_loop( 8) exprtk_loop( 9)
                   exprtk_loop(10) exprtk_loop(11)
                   exprtk_loop(12) exprtk_loop(13)
                   exprtk_loop(14) exprtk_loop(15)
-                  #endif
 
                   vec0 += lud.batch_size;
                   vec1 += lud.batch_size;
@@ -5222,14 +5211,12 @@ namespace Essa::Math{
                   #define case_stmt(N)        \
                   case N : *vec0++ = *vec1++; \
 
-                  #ifndef exprtk_disable_superscalar_unroll
                   case_stmt(15) case_stmt(14)
                   case_stmt(13) case_stmt(12)
                   case_stmt(11) case_stmt(10)
                   case_stmt( 9) case_stmt( 8)
                   case_stmt( 7) case_stmt( 6)
                   case_stmt( 5) case_stmt( 4)
-                  #endif
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
@@ -5504,14 +5491,12 @@ namespace Essa::Math{
 
                   exprtk_loop( 0) exprtk_loop( 1)
                   exprtk_loop( 2) exprtk_loop( 3)
-                  #ifndef exprtk_disable_superscalar_unroll
                   exprtk_loop( 4) exprtk_loop( 5)
                   exprtk_loop( 6) exprtk_loop( 7)
                   exprtk_loop( 8) exprtk_loop( 9)
                   exprtk_loop(10) exprtk_loop(11)
                   exprtk_loop(12) exprtk_loop(13)
                   exprtk_loop(14) exprtk_loop(15)
-                  #endif
 
                   vec += lud.batch_size;
                }
@@ -5522,14 +5507,12 @@ namespace Essa::Math{
                   #define case_stmt(N)                  \
                   case N : Operation::assign(*vec++,v); \
 
-                  #ifndef exprtk_disable_superscalar_unroll
                   case_stmt(15) case_stmt(14)
                   case_stmt(13) case_stmt(12)
                   case_stmt(11) case_stmt(10)
                   case_stmt( 9) case_stmt( 8)
                   case_stmt( 7) case_stmt( 6)
                   case_stmt( 5) case_stmt( 4)
-                  #endif
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
@@ -5661,14 +5644,12 @@ namespace Essa::Math{
 
                   exprtk_loop( 0) exprtk_loop( 1)
                   exprtk_loop( 2) exprtk_loop( 3)
-                  #ifndef exprtk_disable_superscalar_unroll
                   exprtk_loop( 4) exprtk_loop( 5)
                   exprtk_loop( 6) exprtk_loop( 7)
                   exprtk_loop( 8) exprtk_loop( 9)
                   exprtk_loop(10) exprtk_loop(11)
                   exprtk_loop(12) exprtk_loop(13)
                   exprtk_loop(14) exprtk_loop(15)
-                  #endif
 
                   vec0 += lud.batch_size;
                   vec1 += lud.batch_size;
@@ -5682,14 +5663,12 @@ namespace Essa::Math{
                   #define case_stmt(N)                                              \
                   case N : { vec0[i] = Operation::process(vec0[i], vec1[i]); ++i; } \
 
-                  #ifndef exprtk_disable_superscalar_unroll
                   case_stmt(15) case_stmt(14)
                   case_stmt(13) case_stmt(12)
                   case_stmt(11) case_stmt(10)
                   case_stmt( 9) case_stmt( 8)
                   case_stmt( 7) case_stmt( 6)
                   case_stmt( 5) case_stmt( 4)
-                  #endif
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
@@ -5858,14 +5837,12 @@ namespace Essa::Math{
 
                   exprtk_loop( 0) exprtk_loop( 1)
                   exprtk_loop( 2) exprtk_loop( 3)
-                  #ifndef exprtk_disable_superscalar_unroll
                   exprtk_loop( 4) exprtk_loop( 5)
                   exprtk_loop( 6) exprtk_loop( 7)
                   exprtk_loop( 8) exprtk_loop( 9)
                   exprtk_loop(10) exprtk_loop(11)
                   exprtk_loop(12) exprtk_loop(13)
                   exprtk_loop(14) exprtk_loop(15)
-                  #endif
 
                   vec0 += lud.batch_size;
                   vec1 += lud.batch_size;
@@ -5880,14 +5857,12 @@ namespace Essa::Math{
                   #define case_stmt(N)                                              \
                   case N : { vec2[i] = Operation::process(vec0[i], vec1[i]); ++i; } \
 
-                  #ifndef exprtk_disable_superscalar_unroll
                   case_stmt(15) case_stmt(14)
                   case_stmt(13) case_stmt(12)
                   case_stmt(11) case_stmt(10)
                   case_stmt( 9) case_stmt( 8)
                   case_stmt( 7) case_stmt( 6)
                   case_stmt( 5) case_stmt( 4)
-                  #endif
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
@@ -6025,14 +6000,12 @@ namespace Essa::Math{
 
                   exprtk_loop( 0) exprtk_loop( 1)
                   exprtk_loop( 2) exprtk_loop( 3)
-                  #ifndef exprtk_disable_superscalar_unroll
                   exprtk_loop( 4) exprtk_loop( 5)
                   exprtk_loop( 6) exprtk_loop( 7)
                   exprtk_loop( 8) exprtk_loop( 9)
                   exprtk_loop(10) exprtk_loop(11)
                   exprtk_loop(12) exprtk_loop(13)
                   exprtk_loop(14) exprtk_loop(15)
-                  #endif
 
                   vec0 += lud.batch_size;
                   vec1 += lud.batch_size;
@@ -6046,14 +6019,12 @@ namespace Essa::Math{
                   #define case_stmt(N)                                        \
                   case N : { vec1[i] = Operation::process(vec0[i], v); ++i; } \
 
-                  #ifndef exprtk_disable_superscalar_unroll
                   case_stmt(15) case_stmt(14)
                   case_stmt(13) case_stmt(12)
                   case_stmt(11) case_stmt(10)
                   case_stmt( 9) case_stmt( 8)
                   case_stmt( 7) case_stmt( 6)
                   case_stmt( 5) case_stmt( 4)
-                  #endif
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
@@ -6189,14 +6160,12 @@ namespace Essa::Math{
 
                   exprtk_loop( 0) exprtk_loop( 1)
                   exprtk_loop( 2) exprtk_loop( 3)
-                  #ifndef exprtk_disable_superscalar_unroll
                   exprtk_loop( 4) exprtk_loop( 5)
                   exprtk_loop( 6) exprtk_loop( 7)
                   exprtk_loop( 8) exprtk_loop( 9)
                   exprtk_loop(10) exprtk_loop(11)
                   exprtk_loop(12) exprtk_loop(13)
                   exprtk_loop(14) exprtk_loop(15)
-                  #endif
 
                   vec0 += lud.batch_size;
                   vec1 += lud.batch_size;
@@ -6210,14 +6179,12 @@ namespace Essa::Math{
                   #define case_stmt(N)                                        \
                   case N : { vec0[i] = Operation::process(v, vec1[i]); ++i; } \
 
-                  #ifndef exprtk_disable_superscalar_unroll
                   case_stmt(15) case_stmt(14)
                   case_stmt(13) case_stmt(12)
                   case_stmt(11) case_stmt(10)
                   case_stmt( 9) case_stmt( 8)
                   case_stmt( 7) case_stmt( 6)
                   case_stmt( 5) case_stmt( 4)
-                  #endif
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
@@ -6349,14 +6316,12 @@ namespace Essa::Math{
 
                   exprtk_loop( 0) exprtk_loop( 1)
                   exprtk_loop( 2) exprtk_loop( 3)
-                  #ifndef exprtk_disable_superscalar_unroll
                   exprtk_loop( 4) exprtk_loop( 5)
                   exprtk_loop( 6) exprtk_loop( 7)
                   exprtk_loop( 8) exprtk_loop( 9)
                   exprtk_loop(10) exprtk_loop(11)
                   exprtk_loop(12) exprtk_loop(13)
                   exprtk_loop(14) exprtk_loop(15)
-                  #endif
 
                   vec0 += lud.batch_size;
                   vec1 += lud.batch_size;
@@ -6370,14 +6335,12 @@ namespace Essa::Math{
                   #define case_stmt(N)                                     \
                   case N : { vec1[i] = Operation::process(vec0[i]); ++i; } \
 
-                  #ifndef exprtk_disable_superscalar_unroll
                   case_stmt(15) case_stmt(14)
                   case_stmt(13) case_stmt(12)
                   case_stmt(11) case_stmt(10)
                   case_stmt( 9) case_stmt( 8)
                   case_stmt( 7) case_stmt( 6)
                   case_stmt( 5) case_stmt( 4)
-                  #endif
                   case_stmt( 3) case_stmt( 2)
                   case_stmt( 1)
                }
@@ -7134,8 +7097,7 @@ namespace Essa::Math{
                   ts.type = type_store_t::e_vector;
                   vi->vec()->vec_holder().set_ref(&ts.vec_data);
                }
-               #ifndef exprtk_disable_string_capabilities
-               else if (is_generally_string_node(arg_list_[i]))
+               else if (is_generally_string_node(arg_list_[i]) && !disable_string_capabilities)
                {
                   string_base_node<T>* sbn = reinterpret_cast<string_base_node<T>*>(0);
 
@@ -7170,7 +7132,6 @@ namespace Essa::Math{
                   else
                      range_list_[i].range = &(ri->range_ref());
                }
-               #endif
                else if (is_variable_node(arg_list_[i]))
                {
                   variable_node_ptr_t var = variable_node_ptr_t(0);
@@ -7247,12 +7208,9 @@ namespace Essa::Math{
                      type_store_t& ts = typestore_list_[i];
 
                      ts.size = rp.cache_size();
-                     #ifndef exprtk_disable_string_capabilities
-                     if (ts.type == type_store_t::e_string)
+                     if (ts.type == type_store_t::e_string && !disable_string_capabilities)
                         ts.data = const_cast<char_ptr>(rdt.str_node->base()) + rp.cache.first;
-                     else
-                     #endif
-                        ts.data = static_cast<char_ptr>(rdt.data) + (rp.cache.first * rdt.type_size);
+                     ts.data = static_cast<char_ptr>(rdt.data) + (rp.cache.first * rdt.type_size);
                   }
                   else
                      return false;
@@ -7273,7 +7231,6 @@ namespace Essa::Math{
          mutable range_list_t      range_list_;
       };
 
-      #ifndef exprtk_disable_string_capabilities
       template <typename T, typename StringFunction>
       class string_function_node : public generic_function_node<T,StringFunction>,
                                    public string_base_node<T>,
@@ -7361,7 +7318,6 @@ namespace Essa::Math{
          mutable range_t     range_;
          mutable std::string ret_string_;
       };
-      #endif
 
       template <typename T, typename GenericFunction>
       class multimode_genfunction_node : public generic_function_node<T,GenericFunction>
@@ -7410,7 +7366,6 @@ namespace Essa::Math{
          std::size_t param_seq_index_;
       };
 
-      #ifndef exprtk_disable_string_capabilities
       template <typename T, typename StringFunction>
       class multimode_strfunction_node exprtk_final : public string_function_node<T,StringFunction>
       {
@@ -7463,7 +7418,6 @@ namespace Essa::Math{
 
          const std::size_t param_seq_index_;
       };
-      #endif
 
       class return_exception
       {};
@@ -7484,7 +7438,6 @@ namespace Essa::Math{
          }
       };
 
-      #ifndef exprtk_disable_return_statement
       template <typename T>
       class return_node exprtk_final : public generic_function_node<T,null_igenfunc<T> >
       {
@@ -7595,7 +7548,6 @@ namespace Essa::Math{
          mutable bool        return_invoked_;
          branch_t                      body_;
       };
-      #endif
 
       #define exprtk_define_unary_op(OpName)                    \
       template <typename T>                                     \
@@ -9267,7 +9219,6 @@ namespace Essa::Math{
          branch_t branch_;
       };
 
-      #ifndef exprtk_disable_string_capabilities
       template <typename T, typename SType0, typename SType1, typename Operation>
       class sos_node exprtk_final : public sos_base_node<T>
       {
@@ -9704,7 +9655,6 @@ namespace Essa::Math{
          sosos_node(const node_type&) exprtk_delete;
          node_type& operator=(const node_type&) exprtk_delete;
       };
-      #endif
 
       template <typename T, typename PowOp>
       class ipow_node exprtk_final: public expression_node<T>

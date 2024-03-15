@@ -35,9 +35,6 @@
 #include <deque>
 #include <iostream>
 
-#define exprtk_disable_enhanced_features
-#define exprtk_disable_cardinal_pow_optimisation
-
 namespace Essa::Math{
    namespace details
    {
@@ -243,11 +240,7 @@ namespace Essa::Math{
 
       namespace loop_unroll
       {
-         #ifndef exprtk_disable_superscalar_unroll
          const unsigned int global_loop_batch_size = 16;
-         #else
-         const unsigned int global_loop_batch_size = 4;
-         #endif
 
          struct details
          {

@@ -33,9 +33,6 @@
 
 #include "Parser.hpp"
 
-#define exprtk_disable_enhanced_features
-#define exprtk_disable_cardinal_pow_optimisation
-
 #ifndef exprtk_disable_rtl_io
 namespace Essa::Math
 {

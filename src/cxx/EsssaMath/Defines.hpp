@@ -48,9 +48,6 @@
 #include <utility>
 #include <vector>
 
-#define exprtk_disable_enhanced_features
-#define exprtk_disable_cardinal_pow_optimisation
-
 namespace Essa::Math
 {
    #ifdef exprtk_enable_debugging
@@ -96,6 +93,17 @@ namespace Essa::Math
       typedef uchar_t const*         uchar_cptr;
       typedef unsigned long long int _uint64_t;
       typedef long long int          _int64_t;
+
+      inline bool disable_caseinsensitivity = false;
+      inline bool disable_string_capabilities = true;
+      inline bool disable_break_continue = true;
+      inline bool enable_range_runtime_checks = true;
+      inline bool disable_superscalar_unroll = false;
+      inline bool disable_comments = true;
+      inline bool disable_return_statement = true;
+      inline bool disable_enhanced_features = false;
+      inline bool disable_sc_andor = true;
+      inline bool disable_cardinal_pow_optimisation = false;
 
       inline bool is_whitespace(const char_t c)
       {
@@ -174,81 +182,73 @@ namespace Essa::Math
                 is_whitespace(c);
       }
 
-      #ifndef exprtk_disable_caseinsensitivity
       inline void case_normalise(std::string& s)
       {
-         for (std::size_t i = 0; i < s.size(); ++i)
-         {
-            s[i] = static_cast<std::string::value_type>(std::tolower(s[i]));
+         if(!disable_caseinsensitivity){
+            for (std::size_t i = 0; i < s.size(); ++i)
+            {
+               s[i] = static_cast<std::string::value_type>(std::tolower(s[i]));
+            }
+         }else{
+
          }
       }
 
       inline bool imatch(const char_t c1, const char_t c2)
       {
-         return std::tolower(c1) == std::tolower(c2);
+         if(!disable_caseinsensitivity){
+            return std::tolower(c1) == std::tolower(c2);
+         }else{
+            return c1 == c2;
+         }
       }
 
       inline bool imatch(const std::string& s1, const std::string& s2)
       {
-         if (s1.size() == s2.size())
-         {
-            for (std::size_t i = 0; i < s1.size(); ++i)
+         if(!disable_caseinsensitivity){
+            if (s1.size() == s2.size())
             {
-               if (std::tolower(s1[i]) != std::tolower(s2[i]))
+               for (std::size_t i = 0; i < s1.size(); ++i)
                {
-                  return false;
+                  if (std::tolower(s1[i]) != std::tolower(s2[i]))
+                  {
+                     return false;
+                  }
                }
+
+               return true;
             }
 
-            return true;
+            return false;
+         }else{
+            return s1 == s2;
          }
-
-         return false;
       }
 
       struct ilesscompare
       {
          inline bool operator() (const std::string& s1, const std::string& s2) const
          {
-            const std::size_t length = std::min(s1.size(),s2.size());
+         if(!disable_caseinsensitivity){
+               const std::size_t length = std::min(s1.size(),s2.size());
 
-            for (std::size_t i = 0; i < length;  ++i)
-            {
-               const char_t c1 = static_cast<char_t>(std::tolower(s1[i]));
-               const char_t c2 = static_cast<char_t>(std::tolower(s2[i]));
+               for (std::size_t i = 0; i < length;  ++i)
+               {
+                  const char_t c1 = static_cast<char_t>(std::tolower(s1[i]));
+                  const char_t c2 = static_cast<char_t>(std::tolower(s2[i]));
 
-               if (c1 > c2)
-                  return false;
-               else if (c1 < c2)
-                  return true;
+                  if (c1 > c2)
+                     return false;
+                  else if (c1 < c2)
+                     return true;
+               }
+
+               return s1.size() < s2.size();
+            }else{
+               return s1 < s2;
             }
-
-            return s1.size() < s2.size();
          }
       };
-
-      #else
-      inline void case_normalise(std::string&)
-      {}
-
-      inline bool imatch(const char_t c1, const char_t c2)
-      {
-         return c1 == c2;
-      }
-
-      inline bool imatch(const std::string& s1, const std::string& s2)
-      {
-         return s1 == s2;
-      }
-
-      struct ilesscompare
-      {
-         inline bool operator() (const std::string& s1, const std::string& s2) const
-         {
-            return s1 < s2;
-         }
-      };
-      #endif
 
       inline bool is_valid_sf_symbol(const std::string& symbol)
       {

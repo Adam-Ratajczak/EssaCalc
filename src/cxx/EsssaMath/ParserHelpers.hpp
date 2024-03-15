@@ -33,9 +33,6 @@
 
 #include "Generator.hpp"
 
-#define exprtk_disable_enhanced_features
-#define exprtk_disable_cardinal_pow_optimisation
-
 namespace Essa::Math{
    namespace lexer{
       class parser_helper
@@ -421,13 +418,11 @@ namespace Essa::Math{
       return std::string(view.begin(),view.size());
    }
 
-   #ifndef exprtk_disable_return_statement
    namespace details
    {
       template <typename T> class return_node;
       template <typename T> class return_envelope_node;
    }
-   #endif
 
    template <typename T>
    class results_context
@@ -477,9 +472,7 @@ namespace Essa::Math{
       bool results_available_;
       ts_list_t parameter_list_;
 
-      #ifndef exprtk_disable_return_statement
       friend class details::return_node<T>;
       friend class details::return_envelope_node<T>;
-      #endif
    };
 }

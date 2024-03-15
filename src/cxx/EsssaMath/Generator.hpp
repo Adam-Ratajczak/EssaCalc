@@ -31,10 +31,8 @@
 
 #pragma once
 
+#include "Defines.hpp"
 #include "Lexer.hpp"
-
-#define exprtk_disable_enhanced_features
-#define exprtk_disable_cardinal_pow_optimisation
 
 namespace Essa::Math{
    namespace lexer{
@@ -191,9 +189,10 @@ namespace Essa::Math{
             return (s_end_ == itr);
          }
 
-         #ifndef exprtk_disable_comments
          inline bool is_comment_start(details::char_cptr itr) const
          {
+            if(details::disable_comments)
+               return false;
             const char_t c0 = *(itr + 0);
             const char_t c1 = *(itr + 1);
 
@@ -206,12 +205,6 @@ namespace Essa::Math{
             }
             return false;
          }
-         #else
-         inline bool is_comment_start(details::char_cptr) const
-         {
-            return false;
-         }
-         #endif
 
          inline void skip_whitespace()
          {
@@ -223,7 +216,8 @@ namespace Essa::Math{
 
          inline void skip_comments()
          {
-            #ifndef exprtk_disable_comments
+            if(details::disable_comments)
+               return;
             // The following comment styles are supported:
             // 1. // .... \n
             // 2. #  .... \n
@@ -295,7 +289,6 @@ namespace Essa::Math{
                t.set_error(token::e_error, cmt_start, cmt_start + mode, base_itr_);
                token_list_.push_back(t);
             }
-            #endif
          }
 
          inline void scan_token()
@@ -330,13 +323,11 @@ namespace Essa::Math{
                scan_special_function();
                return;
             }
-            #ifndef exprtk_disable_string_capabilities
-            else if ('\'' == (*s_itr_))
+            else if ('\'' == (*s_itr_) && !details::disable_string_capabilities)
             {
                scan_string();
                return;
             }
-            #endif
             else if ('~' == (*s_itr_))
             {
                token_t t;
@@ -599,7 +590,6 @@ namespace Essa::Math{
             return;
          }
 
-         #ifndef exprtk_disable_string_capabilities
          inline void scan_string()
          {
             details::char_cptr initial_itr = s_itr_ + 1;
@@ -701,7 +691,6 @@ namespace Essa::Math{
 
             return;
          }
-         #endif
 
       private:
 

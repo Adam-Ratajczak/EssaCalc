@@ -33,9 +33,6 @@
 
 #include "ExpressionNodes.hpp"
 
-#define exprtk_disable_enhanced_features
-#define exprtk_disable_cardinal_pow_optimisation
-
 namespace Essa::Math{
    namespace details
    {
@@ -1001,14 +998,12 @@ namespace Essa::Math{
                   #define case_stmt(N)         \
                   case N : result += vec[i++]; \
 
-                  #ifndef exprtk_disable_superscalar_unroll
                   case_stmt(16) case_stmt(15)
                   case_stmt(14) case_stmt(13)
                   case_stmt(12) case_stmt(11)
                   case_stmt(10) case_stmt( 9)
                   case_stmt( 8) case_stmt( 7)
                   case_stmt( 6) case_stmt( 5)
-                  #endif
                   case_stmt( 4) case_stmt( 3)
                   case_stmt( 2) case_stmt( 1)
                }
@@ -1033,14 +1028,12 @@ namespace Essa::Math{
 
                exprtk_loop( 0) exprtk_loop( 1)
                exprtk_loop( 2) exprtk_loop( 3)
-               #ifndef exprtk_disable_superscalar_unroll
                exprtk_loop( 4) exprtk_loop( 5)
                exprtk_loop( 6) exprtk_loop( 7)
                exprtk_loop( 8) exprtk_loop( 9)
                exprtk_loop(10) exprtk_loop(11)
                exprtk_loop(12) exprtk_loop(13)
                exprtk_loop(14) exprtk_loop(15)
-               #endif
 
                vec += lud.batch_size;
             }
@@ -1053,14 +1046,12 @@ namespace Essa::Math{
                #define case_stmt(N)       \
                case N : r[0] += vec[i++]; \
 
-               #ifndef exprtk_disable_superscalar_unroll
                case_stmt(15) case_stmt(14)
                case_stmt(13) case_stmt(12)
                case_stmt(11) case_stmt(10)
                case_stmt( 9) case_stmt( 8)
                case_stmt( 7) case_stmt( 6)
                case_stmt( 5) case_stmt( 4)
-               #endif
                case_stmt( 3) case_stmt( 2)
                case_stmt( 1)
             }
@@ -1069,13 +1060,12 @@ namespace Essa::Math{
             #undef exprtk_loop
             #undef case_stmt
 
-            return (r[ 0] + r[ 1] + r[ 2] + r[ 3])
-                   #ifndef exprtk_disable_superscalar_unroll
-                 + (r[ 4] + r[ 5] + r[ 6] + r[ 7])
+
+            return r[ 0] + r[ 1] + r[ 2] + r[ 3] +
+                  ((!disable_superscalar_unroll) ? (
+                   (r[ 4] + r[ 5] + r[ 6] + r[ 7])
                  + (r[ 8] + r[ 9] + r[10] + r[11])
-                 + (r[12] + r[13] + r[14] + r[15])
-                   #endif
-                   ;
+                 + (r[12] + r[13] + r[14] + r[15])) : T(0));
          }
       };
 
@@ -1102,14 +1092,12 @@ namespace Essa::Math{
                   #define case_stmt(N)         \
                   case N : result *= vec[i++]; \
 
-                  #ifndef exprtk_disable_superscalar_unroll
                   case_stmt(16) case_stmt(15)
                   case_stmt(14) case_stmt(13)
                   case_stmt(12) case_stmt(11)
                   case_stmt(10) case_stmt( 9)
                   case_stmt( 8) case_stmt( 7)
                   case_stmt( 6) case_stmt( 5)
-                  #endif
                   case_stmt( 4) case_stmt( 3)
                   case_stmt( 2) case_stmt( 1)
                }
@@ -1134,14 +1122,12 @@ namespace Essa::Math{
 
                exprtk_loop( 0) exprtk_loop( 1)
                exprtk_loop( 2) exprtk_loop( 3)
-               #ifndef exprtk_disable_superscalar_unroll
                exprtk_loop( 4) exprtk_loop( 5)
                exprtk_loop( 6) exprtk_loop( 7)
                exprtk_loop( 8) exprtk_loop( 9)
                exprtk_loop(10) exprtk_loop(11)
                exprtk_loop(12) exprtk_loop(13)
                exprtk_loop(14) exprtk_loop(15)
-               #endif
 
                vec += lud.batch_size;
             }
@@ -1154,14 +1140,12 @@ namespace Essa::Math{
                #define case_stmt(N)       \
                case N : r[0] *= vec[i++]; \
 
-               #ifndef exprtk_disable_superscalar_unroll
                case_stmt(15) case_stmt(14)
                case_stmt(13) case_stmt(12)
                case_stmt(11) case_stmt(10)
                case_stmt( 9) case_stmt( 8)
                case_stmt( 7) case_stmt( 6)
                case_stmt( 5) case_stmt( 4)
-               #endif
                case_stmt( 3) case_stmt( 2)
                case_stmt( 1)
             }
@@ -1171,12 +1155,10 @@ namespace Essa::Math{
             #undef case_stmt
 
             return (r[ 0] * r[ 1] * r[ 2] * r[ 3])
-                   #ifndef exprtk_disable_superscalar_unroll
-                 + (r[ 4] * r[ 5] * r[ 6] * r[ 7])
+                 + ((!disable_superscalar_unroll) ? (
+                   (r[ 4] * r[ 5] * r[ 6] * r[ 7])
                  + (r[ 8] * r[ 9] * r[10] * r[11])
-                 + (r[12] * r[13] * r[14] * r[15])
-                   #endif
-                   ;
+                 + (r[12] * r[13] * r[14] * r[15])) : T(0));
          }
       };
 

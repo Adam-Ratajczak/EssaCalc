@@ -44,9 +44,6 @@
 #include "SymbolTable.hpp"
 #include "Expression.hpp"
 
-#define exprtk_disable_enhanced_features
-#define exprtk_disable_cardinal_pow_optimisation
-
 namespace Essa::Math{
    namespace parser_error
    {
@@ -216,14 +213,12 @@ namespace Essa::Math{
       typedef details::while_loop_rtc_node<T>             while_loop_rtc_node_t;
       typedef details::repeat_until_loop_rtc_node<T>      repeat_until_loop_rtc_node_t;
       typedef details::for_loop_rtc_node<T>               for_loop_rtc_node_t;
-      #ifndef exprtk_disable_break_continue
       typedef details::while_loop_bc_node<T>              while_loop_bc_node_t;
       typedef details::repeat_until_loop_bc_node<T>       repeat_until_loop_bc_node_t;
       typedef details::for_loop_bc_node<T>                for_loop_bc_node_t;
       typedef details::while_loop_bc_rtc_node<T>          while_loop_bc_rtc_node_t;
       typedef details::repeat_until_loop_bc_rtc_node<T>   repeat_until_loop_bc_rtc_node_t;
       typedef details::for_loop_bc_rtc_node<T>            for_loop_bc_rtc_node_t;
-      #endif
       typedef details::switch_node<T>                     switch_node_t;
       typedef details::variable_node<T>                   variable_node_t;
       typedef details::vector_elem_node<T>                vector_elem_node_t;
@@ -231,7 +226,6 @@ namespace Essa::Math{
       typedef details::rebasevector_celem_node<T>         rebasevector_celem_node_t;
       typedef details::vector_node<T>                     vector_node_t;
       typedef details::range_pack<T>                      range_t;
-      #ifndef exprtk_disable_string_capabilities
       typedef details::stringvar_node<T>                  stringvar_node_t;
       typedef details::string_literal_node<T>             string_literal_node_t;
       typedef details::string_range_node<T>               string_range_node_t;
@@ -242,7 +236,6 @@ namespace Essa::Math{
       typedef details::assignment_string_range_node<T>    assignment_string_range_node_t;
       typedef details::conditional_string_node<T>         conditional_string_node_t;
       typedef details::cons_conditional_str_node<T>       cons_conditional_str_node_t;
-      #endif
       typedef details::assignment_node<T>                 assignment_node_t;
       typedef details::assignment_vec_elem_node<T>        assignment_vec_elem_node_t;
       typedef details::assignment_rebasevec_elem_node<T>  assignment_rebasevec_elem_node_t;
@@ -320,9 +313,7 @@ namespace Essa::Math{
          typedef variable_node_t*          variable_node_ptr;
          typedef vector_holder_t*          vector_holder_ptr;
          typedef expression_node_t*        expression_node_ptr;
-         #ifndef exprtk_disable_string_capabilities
          typedef stringvar_node_t*         stringvar_node_ptr;
-         #endif
 
          scope_element()
          : name("???")
@@ -336,9 +327,7 @@ namespace Essa::Math{
          , data     (0)
          , var_node (0)
          , vec_node (0)
-         #ifndef exprtk_disable_string_capabilities
          , str_node(0)
-         #endif
          {}
 
          bool operator < (const scope_element& se) const
@@ -372,9 +361,7 @@ namespace Essa::Math{
             data      = 0;
             var_node  = 0;
             vec_node  = 0;
-            #ifndef exprtk_disable_string_capabilities
             str_node  = 0;
-            #endif
          }
 
          std::string  name;
@@ -388,9 +375,7 @@ namespace Essa::Math{
          void*        data;
          expression_node_ptr var_node;
          vector_holder_ptr   vec_node;
-         #ifndef exprtk_disable_string_capabilities
          stringvar_node_ptr str_node;
-         #endif
       };
 
       class scope_element_manager
@@ -527,11 +512,15 @@ namespace Essa::Math{
                case scope_element::e_vecelem    : delete se.var_node;
                                                   break;
 
-               #ifndef exprtk_disable_string_capabilities
-               case scope_element::e_string     : delete reinterpret_cast<std::string*>(se.data);
+               case scope_element::e_string     : 
+                  if(!details::disable_string_capabilities){
+
+                     delete reinterpret_cast<std::string*>(se.data);
                                                   delete se.str_node;
+                  }else{
+                     return;
+                  }
                                                   break;
-               #endif
 
                default                          : return;
             }
@@ -800,9 +789,7 @@ namespace Essa::Math{
          typedef typename symbol_table_t::local_data_t local_data_t;
          typedef typename symbol_table_t::variable_ptr variable_ptr;
          typedef typename symbol_table_t::function_ptr function_ptr;
-         #ifndef exprtk_disable_string_capabilities
          typedef typename symbol_table_t::stringvar_ptr stringvar_ptr;
-         #endif
          typedef typename symbol_table_t::vector_holder_ptr    vector_holder_ptr;
          typedef typename symbol_table_t::vararg_function_ptr  vararg_function_ptr;
          typedef typename symbol_table_t::generic_function_ptr generic_function_ptr;
@@ -829,7 +816,6 @@ namespace Essa::Math{
             vector_holder_ptr vector_holder;
          };
 
-         #ifndef exprtk_disable_string_capabilities
          struct string_context
          {
             string_context()
@@ -840,7 +826,6 @@ namespace Essa::Math{
             const symbol_table_t* symbol_table;
             stringvar_ptr str_var;
          };
-         #endif
 
          inline bool empty() const
          {
@@ -946,7 +931,6 @@ namespace Essa::Math{
             return result;
          }
 
-         #ifndef exprtk_disable_string_capabilities
          inline string_context get_string_context(const std::string& string_name) const
          {
             string_context result;
@@ -993,7 +977,6 @@ namespace Essa::Math{
 
             return result;
          }
-         #endif
 
          inline function_ptr get_function(const std::string& function_name) const
          {
@@ -1162,7 +1145,6 @@ namespace Essa::Math{
             return false;
          }
 
-         #ifndef exprtk_disable_string_capabilities
          inline bool is_constant_string(const std::string& symbol_name) const
          {
             if (!valid_symbol(symbol_name))
@@ -1180,7 +1162,6 @@ namespace Essa::Math{
 
             return false;
          }
-         #endif
 
          inline bool symbol_exists(const std::string& symbol) const
          {
@@ -1211,7 +1192,6 @@ namespace Essa::Math{
             return false;
          }
 
-         #ifndef exprtk_disable_string_capabilities
          inline bool is_stringvar(const std::string& stringvar_name) const
          {
             for (std::size_t i = 0; i < symtab_list_.size(); ++i)
@@ -1249,7 +1229,6 @@ namespace Essa::Math{
 
             return false;
          }
-         #endif
 
          inline bool is_function(const std::string& function_name) const
          {
@@ -1309,7 +1288,6 @@ namespace Essa::Math{
             return local_data().vector_store.entity_name(ptr);
          }
 
-         #ifndef exprtk_disable_string_capabilities
          inline std::string get_stringvar_name(const expression_node_ptr& ptr) const
          {
             return local_data().stringvar_store.entity_name(ptr);
@@ -1319,7 +1297,6 @@ namespace Essa::Math{
          {
             return local_data().stringvar_store.entity_name(ptr);
          }
-         #endif
 
          inline local_data_t& local_data(const std::size_t& index = 0)
          {
@@ -2348,98 +2325,113 @@ namespace Essa::Math{
 
       inline bool compile(const std::string& expression_string, expression<T>& expr)
       {
-         state_          .reset();
-         error_list_     .clear();
-         brkcnt_list_    .clear();
-         synthesis_error_.clear();
-         sem_            .cleanup();
-
-         return_cleanup();
-
-         expression_generator_.set_allocator(node_allocator_);
-
-         if (expression_string.empty())
-         {
-            set_error(
-               make_error(parser_error::e_syntax,
-                          "ERR001 - Empty expression!",
-                          exprtk_error_location));
-
-            return false;
-         }
-
-         if (!init(expression_string))
-         {
-            process_lexer_errors();
-            return false;
-         }
-
-         if (lexer().empty())
-         {
-            set_error(
-               make_error(parser_error::e_syntax,
-                          "ERR002 - Empty expression!",
-                          exprtk_error_location));
-
-            return false;
-         }
-
-         if (!run_assemblies())
-         {
-            return false;
-         }
-
-         symtab_store_.symtab_list_ = expr.get_symbol_table_list();
-         dec_.clear();
-
-         lexer().begin();
-
-         next_token();
-
-         expression_node_ptr e = parse_corpus();
-
-         if ((0 != e) && (token_t::e_eof == current_token().type))
-         {
-            bool* retinvk_ptr = 0;
-
-            if (state_.return_stmt_present)
-            {
-               dec_.return_present_ = true;
-
-               e = expression_generator_
-                     .return_envelope(e, results_context_, retinvk_ptr);
+         for(size_t i = 0; i < 2; i++){
+            if(i == 0){
+               details::disable_enhanced_features = false;
+               details::disable_cardinal_pow_optimisation = false;
+            }else{
+               details::disable_enhanced_features = true;
+               details::disable_cardinal_pow_optimisation = true;
             }
 
-            expr.set_expression(e);
-            expr.set_retinvk(retinvk_ptr);
+            state_          .reset();
+            error_list_     .clear();
+            brkcnt_list_    .clear();
+            synthesis_error_.clear();
+            sem_            .cleanup();
 
-            register_local_vars(expr);
-            register_return_results(expr);
+            return_cleanup();
 
-            return !(!expr);
-         }
-         else
-         {
-            if (error_list_.empty())
+            expression_generator_.set_allocator(node_allocator_);
+
+            if (expression_string.empty())
             {
                set_error(
                   make_error(parser_error::e_syntax,
-                             current_token(),
-                             "ERR003 - Invalid expression encountered",
-                             exprtk_error_location));
+                           "ERR001 - Empty expression!",
+                           exprtk_error_location));
+
+               return false;
             }
 
-            if ((0 != e) && branch_deletable(e))
+            if (!init(expression_string))
             {
-               destroy_node(e);
+               process_lexer_errors();
+               return false;
             }
 
-            dec_.clear    ();
-            sem_.cleanup  ();
-            return_cleanup();
+            if (lexer().empty())
+            {
+               set_error(
+                  make_error(parser_error::e_syntax,
+                           "ERR002 - Empty expression!",
+                           exprtk_error_location));
 
-            return false;
+               return false;
+            }
+
+            if (!run_assemblies())
+            {
+               return false;
+            }
+
+            symtab_store_.symtab_list_ = expr.get_symbol_table_list();
+            dec_.clear();
+
+            lexer().begin();
+
+            next_token();
+
+            expression_node_ptr e = parse_corpus();
+
+            if ((0 != e) && (token_t::e_eof == current_token().type))
+            {
+               bool* retinvk_ptr = 0;
+
+               if (state_.return_stmt_present)
+               {
+                  dec_.return_present_ = true;
+
+                  e = expression_generator_
+                        .return_envelope(e, results_context_, retinvk_ptr);
+               }
+
+               if(i == 0){
+                  expr.set_expression(e);
+                  expr.set_retinvk(retinvk_ptr);
+               }else{
+                  expr.set_unoptimized_expr(e);
+               }
+            }
+            else
+            {
+               if (error_list_.empty())
+               {
+                  set_error(
+                     make_error(parser_error::e_syntax,
+                              current_token(),
+                              "ERR003 - Invalid expression encountered",
+                              exprtk_error_location));
+               }
+
+               if ((0 != e) && branch_deletable(e))
+               {
+                  destroy_node(e);
+               }
+
+               dec_.clear    ();
+               sem_.cleanup  ();
+               return_cleanup();
+
+               return false;
+            }
          }
+         
+         register_local_vars(expr);
+         register_return_results(expr);
+         details::disable_enhanced_features = false;
+         details::disable_cardinal_pow_optimisation = false;
+         return !(!expr);
       }
 
       inline expression_t compile(const std::string& expression_string, symbol_table_t& symtab)
@@ -2940,11 +2932,10 @@ namespace Essa::Math{
                                            }
                                            else if (details::imatch(current_token().value,s_and1))
                                            {
-                                              #ifndef exprtk_disable_sc_andor
-                                              current_state.set(e_level03, e_level04, details::e_scand);
-                                              #else
-                                              current_state.set(e_level03, e_level04, details::e_and);
-                                              #endif
+                                              if(!details::disable_sc_andor)
+                                                current_state.set(e_level03, e_level04, details::e_scand);
+                                              else
+                                                current_state.set(e_level03, e_level04, details::e_and);
                                               break;
                                            }
                                            else if (details::imatch(current_token().value,s_nand))
@@ -2959,11 +2950,10 @@ namespace Essa::Math{
                                            }
                                            else if (details::imatch(current_token().value,s_or1))
                                            {
-                                              #ifndef exprtk_disable_sc_andor
-                                              current_state.set(e_level01, e_level02, details::e_scor);
-                                              #else
-                                              current_state.set(e_level01, e_level02, details::e_or);
-                                              #endif
+                                              if(!details::disable_sc_andor)
+                                                current_state.set(e_level01, e_level02, details::e_scor);
+                                              else
+                                                current_state.set(e_level01, e_level02, details::e_or);
                                               break;
                                            }
                                            else if (details::imatch(current_token().value,s_nor))
@@ -3744,8 +3734,7 @@ namespace Essa::Math{
             result = false;
          }
 
-         #ifndef exprtk_disable_string_capabilities
-         if (result)
+         if (result && !details::disable_string_capabilities)
          {
             const bool consq_is_str = is_generally_string_node(consequent );
             const bool alter_is_str = is_generally_string_node(alternative);
@@ -3767,7 +3756,6 @@ namespace Essa::Math{
                result = false;
             }
          }
-         #endif
 
          if (result)
          {
@@ -3918,8 +3906,7 @@ namespace Essa::Math{
             }
          }
 
-         #ifndef exprtk_disable_string_capabilities
-         if (result)
+         if (result && !details::disable_string_capabilities)
          {
             const bool consq_is_str = is_generally_string_node(consequent );
             const bool alter_is_str = is_generally_string_node(alternative);
@@ -3941,7 +3928,6 @@ namespace Essa::Math{
                result = false;
             }
          }
-         #endif
 
          if (result)
          {
@@ -4101,8 +4087,7 @@ namespace Essa::Math{
             result = false;
          }
 
-         #ifndef exprtk_disable_string_capabilities
-         if (result)
+         if (result && !details::disable_string_capabilities)
          {
             const bool consq_is_str = is_generally_string_node(consequent );
             const bool alter_is_str = is_generally_string_node(alternative);
@@ -4124,7 +4109,6 @@ namespace Essa::Math{
                result = false;
             }
          }
-         #endif
 
          if (result)
          {
@@ -5011,9 +4995,12 @@ namespace Essa::Math{
          return result;
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline expression_node_ptr parse_string_range_statement(expression_node_ptr& expression)
       {
+         if(details::disable_string_capabilities){
+            return error_node();
+         }
+
          if (!token_is(token_t::e_lsqrbracket))
          {
             set_error(
@@ -5058,12 +5045,6 @@ namespace Essa::Math{
 
          return result;
       }
-      #else
-      inline expression_node_ptr parse_string_range_statement(expression_node_ptr&)
-      {
-         return error_node();
-      }
-      #endif
 
       inline void parse_pending_string_rangesize(expression_node_ptr& expression)
       {
@@ -5440,9 +5421,12 @@ namespace Essa::Math{
          dec_.add_symbol(symbol,st);
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline expression_node_ptr parse_string()
       {
+         if(details::disable_string_capabilities){
+            return error_node();
+         }
+
          const std::string symbol = current_token().value;
 
          typedef details::stringvar_node<T>* strvar_node_t;
@@ -5539,16 +5523,13 @@ namespace Essa::Math{
 
          return result;
       }
-      #else
-      inline expression_node_ptr parse_string()
-      {
-         return error_node();
-      }
-      #endif
 
-      #ifndef exprtk_disable_string_capabilities
       inline expression_node_ptr parse_const_string()
       {
+         if(details::disable_string_capabilities){
+            return error_node();
+         }
+
          const std::string   const_str = current_token().value;
          expression_node_ptr result    = expression_generator_(const_str);
 
@@ -5612,12 +5593,6 @@ namespace Essa::Math{
 
          return result;
       }
-      #else
-      inline expression_node_ptr parse_const_string()
-      {
-         return error_node();
-      }
-      #endif
 
       inline expression_node_ptr parse_vector()
       {
@@ -6274,7 +6249,6 @@ namespace Essa::Math{
             return false;
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline expression_node_ptr parse_string_function_call(igeneric_function<T>* function, const std::string& function_name)
       {
          // Move pass the function name
@@ -6397,7 +6371,6 @@ namespace Essa::Math{
          sdd.delete_ptr = (0 == result);
          return result;
       }
-      #endif
 
       template <typename Type, std::size_t NumberOfParameters>
       struct parse_special_function_impl
@@ -6517,7 +6490,6 @@ namespace Essa::Math{
          return node_allocator_.allocate<details::null_node<T> >();
       }
 
-      #ifndef exprtk_disable_break_continue
       inline expression_node_ptr parse_break_statement()
       {
          if (state_.parsing_break_stmt)
@@ -6615,7 +6587,6 @@ namespace Essa::Math{
             return node_allocator_.allocate<details::continue_node<T> >();
          }
       }
-      #endif
 
       inline expression_node_ptr parse_define_vector_statement(const std::string& vec_name)
       {
@@ -6947,9 +6918,12 @@ namespace Essa::Math{
          return result;
       }
 
-      #ifndef exprtk_disable_string_capabilities
       inline expression_node_ptr parse_define_string_statement(const std::string& str_name, expression_node_ptr initialisation_expression)
       {
+         if(details::disable_string_capabilities){
+            return error_node();
+         }
+
          stringvar_node_t* str_node = reinterpret_cast<stringvar_node_t*>(0);
 
          scope_element& se = sem_.get_element(str_name);
@@ -7019,12 +6993,6 @@ namespace Essa::Math{
 
          return expression_generator_(details::e_assign,branch);
       }
-      #else
-      inline expression_node_ptr parse_define_string_statement(const std::string&, expression_node_ptr)
-      {
-         return error_node();
-      }
-      #endif
 
       inline bool local_variable_is_shadowed(const std::string& symbol)
       {
@@ -7536,9 +7504,12 @@ namespace Essa::Math{
          return result;
       }
 
-      #ifndef exprtk_disable_return_statement
       inline expression_node_ptr parse_return_statement()
       {
+         if(details::disable_return_statement){
+            return error_node();
+         }
+
          if (state_.parsing_return_stmt)
          {
             set_error(
@@ -7651,12 +7622,6 @@ namespace Essa::Math{
 
          return result;
       }
-      #else
-      inline expression_node_ptr parse_return_statement()
-      {
-         return error_node();
-      }
-      #endif
 
       inline bool post_variable_process(const std::string& symbol)
       {
@@ -7819,22 +7784,18 @@ namespace Essa::Math{
                {
                   return parse_vector();
                }
-               #ifndef exprtk_disable_string_capabilities
-               else if (scope_element::e_string == se.type)
+               else if (scope_element::e_string == se.type && !details::disable_string_capabilities)
                {
                   return parse_string();
                }
-               #endif
             }
          }
 
-         #ifndef exprtk_disable_string_capabilities
          // Are we dealing with a string variable?
-         if (symtab_store_.is_stringvar(symbol))
+         if (symtab_store_.is_stringvar(symbol) && !details::disable_string_capabilities)
          {
             return parse_string();
          }
-         #endif
 
          {
             // Are we dealing with a function?
@@ -7914,7 +7875,7 @@ namespace Essa::Math{
             }
          }
 
-         #ifndef exprtk_disable_string_capabilities
+         if(!details::disable_string_capabilities)
          {
             // Are we dealing with a vararg string returning function?
             igeneric_function<T>* string_function = symtab_store_.get_string_function(symbol);
@@ -7939,9 +7900,6 @@ namespace Essa::Math{
                   return error_node();
                }
             }
-         }
-
-         {
             // Are we dealing with a vararg overloaded scalar/string returning function?
             igeneric_function<T>* overload_function = symtab_store_.get_overload_function(symbol);
 
@@ -7966,7 +7924,6 @@ namespace Essa::Math{
                }
             }
          }
-         #endif
 
          // Are we dealing with a vector?
          if (symtab_store_.is_vector(symbol))
@@ -8158,16 +8115,14 @@ namespace Essa::Math{
          {
             return parse_null_statement();
          }
-         #ifndef exprtk_disable_break_continue
-         else if (details::imatch(symbol, symbol_break))
+         else if (details::imatch(symbol, symbol_break) && !details::disable_break_continue)
          {
             return parse_break_statement();
          }
-         else if (details::imatch(symbol, symbol_continue))
+         else if (details::imatch(symbol, symbol_continue) && !details::disable_break_continue)
          {
             return parse_continue_statement();
          }
-         #endif
          else if (details::imatch(symbol, symbol_var))
          {
             return parse_define_var_statement();
@@ -8176,15 +8131,13 @@ namespace Essa::Math{
          {
             return parse_swap_statement();
          }
-         #ifndef exprtk_disable_return_statement
          else if (
                    details::imatch(symbol, symbol_return) &&
-                   settings_.control_struct_enabled(symbol)
+                   settings_.control_struct_enabled(symbol) && !details::disable_return_statement
                  )
          {
             return parse_return_statement();
          }
-         #endif
          else if (symtab_store_.valid() || !sem_.empty())
          {
             return parse_symtab_symbol();
@@ -8249,12 +8202,10 @@ namespace Essa::Math{
          {
             branch = parse_symbol();
          }
-         #ifndef exprtk_disable_string_capabilities
-         else if (token_t::e_string == current_token().type)
+         else if (token_t::e_string == current_token().type && !details::disable_string_capabilities)
          {
             branch = parse_const_string();
          }
-         #endif
          else if (token_t::e_lbracket == current_token().type)
          {
             next_token();
@@ -8409,7 +8360,8 @@ namespace Essa::Math{
 
          inline void init_synthesize_map()
          {
-            #ifndef exprtk_disable_enhanced_features
+            if(details::disable_enhanced_features)
+               return;
             synthesize_map_["(v)o(v)"] = synthesize_vov_expression::process;
             synthesize_map_["(c)o(v)"] = synthesize_cov_expression::process;
             synthesize_map_["(v)o(c)"] = synthesize_voc_expression::process;
@@ -8477,7 +8429,6 @@ namespace Essa::Math{
             register_synthezier(synthesize_covocov_expression4)
             register_synthezier(synthesize_vocovoc_expression4)
             register_synthezier(synthesize_covovoc_expression4)
-            #endif
          }
 
          inline void set_parser(parser_t& p)
@@ -8559,7 +8510,6 @@ namespace Essa::Math{
             return node_allocator_->allocate<literal_node_t>(v);
          }
 
-         #ifndef exprtk_disable_string_capabilities
          inline expression_node_ptr operator() (const std::string& s) const
          {
             return node_allocator_->allocate<string_literal_node_t>(s);
@@ -8582,7 +8532,6 @@ namespace Essa::Math{
             else
                return error_node();
          }
-         #endif
 
          inline bool unary_optimisable(const details::operator_type& operation) const
          {
@@ -8702,9 +8651,9 @@ namespace Essa::Math{
                    parser_->settings_.assignment_enabled(operation);
          }
 
-         #ifndef exprtk_disable_string_capabilities
          inline bool valid_string_operation(const details::operator_type& operation) const
          {
+            if(!details::disable_string_capabilities){
             return (details::e_add    == operation) ||
                    (details::e_lt     == operation) ||
                    (details::e_lte    == operation) ||
@@ -8718,13 +8667,10 @@ namespace Essa::Math{
                    (details::e_assign == operation) ||
                    (details::e_addass == operation) ||
                    (details::e_swap   == operation) ;
+            }else{
+               return false;
+            }
          }
-         #else
-         inline bool valid_string_operation(const details::operator_type&) const
-         {
-            return false;
-         }
-         #endif
 
          inline std::string to_str(const details::operator_type& operation) const
          {
@@ -9039,20 +8985,15 @@ namespace Essa::Math{
             return (b0_string && b1_string && b2_string && (details::e_inrange == operation));
          }
 
-         #ifndef exprtk_disable_sc_andor
          inline bool is_shortcircuit_expression(const details::operator_type& operation) const
          {
+            if(details::disable_sc_andor)
+               return false;
             return (
                      (details::e_scand == operation) ||
                      (details::e_scor  == operation)
                    );
          }
-         #else
-         inline bool is_shortcircuit_expression(const details::operator_type&) const
-         {
-            return false;
-         }
-         #endif
 
          inline bool is_null_present(expression_node_ptr (&branch)[2]) const
          {
@@ -9148,75 +9089,75 @@ namespace Essa::Math{
             {
                return synthesize_null_expression(operation, branch);
             }
-            #ifndef exprtk_disable_cardinal_pow_optimisation
-            else if (is_constpow_operation(operation, branch))
+            else if (is_constpow_operation(operation, branch) && !details::disable_cardinal_pow_optimisation)
             {
                return cardinal_pow_optimisation(branch);
             }
-            #endif
 
             expression_node_ptr result = error_node();
 
-            #ifndef exprtk_disable_enhanced_features
-            if (synthesize_expression(operation, branch, result))
-            {
-               return result;
-            }
-            else
-            {
-               /*
-                  Possible reductions:
-                  1. c o cob -> cob
-                  2. cob o c -> cob
-                  3. c o boc -> boc
-                  4. boc o c -> boc
-               */
-               result = error_node();
-
-               if (cocob_optimisable(operation, branch))
+            if(!details::disable_enhanced_features){
+               if (synthesize_expression(operation, branch, result))
                {
-                  result = synthesize_cocob_expression::process((*this), operation, branch);
-               }
-               else if (coboc_optimisable(operation, branch) && (0 == result))
-               {
-                  result = synthesize_coboc_expression::process((*this), operation, branch);
-               }
-
-               if (result)
                   return result;
-            }
+               }
+               else
+               {
+                  /*
+                     Possible reductions:
+                     1. c o cob -> cob
+                     2. cob o c -> cob
+                     3. c o boc -> boc
+                     4. boc o c -> boc
+                  */
+                  result = error_node();
 
-            if (uvouv_optimisable(operation, branch))
-            {
-               return synthesize_uvouv_expression(operation, branch);
-            }
-            else if (vob_optimisable(operation, branch))
-            {
-               return synthesize_vob_expression::process((*this), operation, branch);
-            }
-            else if (bov_optimisable(operation, branch))
-            {
-               return synthesize_bov_expression::process((*this), operation, branch);
-            }
-            else if (cob_optimisable(operation, branch))
-            {
-               return synthesize_cob_expression::process((*this), operation, branch);
-            }
-            else if (boc_optimisable(operation, branch))
-            {
-               return synthesize_boc_expression::process((*this), operation, branch);
-            }
-            else if (cov_optimisable(operation, branch))
-            {
-               return synthesize_cov_expression::process((*this), operation, branch);
-            }
-            else if (binext_optimisable(operation, branch))
-            {
-               return synthesize_binary_ext_expression::process((*this), operation, branch);
-            }
-            else
-            #endif
+                  if (cocob_optimisable(operation, branch))
+                  {
+                     result = synthesize_cocob_expression::process((*this), operation, branch);
+                  }
+                  else if (coboc_optimisable(operation, branch) && (0 == result))
+                  {
+                     result = synthesize_coboc_expression::process((*this), operation, branch);
+                  }
+
+                  if (result)
+                     return result;
+               }
+
+               if (uvouv_optimisable(operation, branch))
+               {
+                  return synthesize_uvouv_expression(operation, branch);
+               }
+               else if (vob_optimisable(operation, branch))
+               {
+                  return synthesize_vob_expression::process((*this), operation, branch);
+               }
+               else if (bov_optimisable(operation, branch))
+               {
+                  return synthesize_bov_expression::process((*this), operation, branch);
+               }
+               else if (cob_optimisable(operation, branch))
+               {
+                  return synthesize_cob_expression::process((*this), operation, branch);
+               }
+               else if (boc_optimisable(operation, branch))
+               {
+                  return synthesize_boc_expression::process((*this), operation, branch);
+               }
+               else if (cov_optimisable(operation, branch))
+               {
+                  return synthesize_cov_expression::process((*this), operation, branch);
+               }
+               else if (binext_optimisable(operation, branch))
+               {
+                  return synthesize_binary_ext_expression::process((*this), operation, branch);
+               }
+               else
+                  return synthesize_expression<binary_node_t,2>(operation, branch);
+            }else{
                return synthesize_expression<binary_node_t,2>(operation, branch);
+            }
          }
 
          inline expression_node_ptr operator() (const details::operator_type& operation, expression_node_ptr (&branch)[3])
@@ -9273,6 +9214,10 @@ namespace Essa::Math{
                                                 expression_node_ptr consequent,
                                                 expression_node_ptr alternative) const
          {
+            if(details::disable_string_capabilities){
+               return error_node();
+            }
+
             if ((0 == condition) || (0 == consequent))
             {
                details::free_node(*node_allocator_, condition  );
@@ -9314,7 +9259,6 @@ namespace Essa::Math{
                         allocate<cons_conditional_node_t>(condition, consequent);
          }
 
-         #ifndef exprtk_disable_string_capabilities
          inline expression_node_ptr conditional_string(expression_node_ptr condition,
                                                        expression_node_ptr consequent,
                                                        expression_node_ptr alternative) const
@@ -9357,14 +9301,6 @@ namespace Essa::Math{
             else
                return error_node();
          }
-         #else
-         inline expression_node_ptr conditional_string(expression_node_ptr,
-                                                       expression_node_ptr,
-                                                       expression_node_ptr) const
-         {
-            return error_node();
-         }
-         #endif
 
          inline expression_node_ptr conditional_vector(expression_node_ptr condition,
                                                        expression_node_ptr consequent,
@@ -9460,8 +9396,7 @@ namespace Essa::Math{
                   return node_allocator_->allocate<while_loop_node_t>
                            (condition, branch);
             }
-            #ifndef exprtk_disable_break_continue
-            else
+            else if(!details::disable_break_continue)
             {
                if (rtc)
                   return node_allocator_->allocate<while_loop_bc_rtc_node_t>
@@ -9470,9 +9405,8 @@ namespace Essa::Math{
                   return node_allocator_->allocate<while_loop_bc_node_t>
                            (condition, branch);
             }
-            #else
+            else
                return error_node();
-            #endif
          }
 
          inline expression_node_ptr repeat_until_loop(expression_node_ptr& condition,
@@ -9514,8 +9448,7 @@ namespace Essa::Math{
                   return node_allocator_->allocate<repeat_until_loop_node_t>
                            (condition, branch);
             }
-            #ifndef exprtk_disable_break_continue
-            else
+            else if(!details::disable_break_continue)
             {
                if (rtc)
                   return node_allocator_->allocate<repeat_until_loop_bc_rtc_node_t>
@@ -9523,10 +9456,8 @@ namespace Essa::Math{
                else
                   return node_allocator_->allocate<repeat_until_loop_bc_node_t>
                            (condition, branch);
-            }
-            #else
+            } else
                return error_node();
-            #endif
          }
 
          inline expression_node_ptr for_loop(expression_node_ptr& initialiser,
@@ -9583,8 +9514,7 @@ namespace Essa::Math{
                                             loop_body
                                           );
             }
-            #ifndef exprtk_disable_break_continue
-            else
+            else if(!details::disable_break_continue)
             {
                if (rtc)
                   return node_allocator_->allocate<for_loop_bc_rtc_node_t>
@@ -9603,10 +9533,8 @@ namespace Essa::Math{
                                             incrementor,
                                             loop_body
                                           );
-            }
-            #else
+            } else
                return error_node();
-            #endif
          }
 
          template <typename Allocator,
@@ -10246,14 +10174,11 @@ namespace Essa::Math{
             else if (all_nodes_variables(arg_list))
                return varnode_optimise_varargfunc(operation,arg_list);
 
-            #ifndef exprtk_disable_string_capabilities
-            if (details::e_smulti == operation)
+            if (details::e_smulti == operation && !details::disable_string_capabilities)
             {
                return node_allocator_->
                  allocate<details::str_vararg_node<Type,details::vararg_multi_op<Type> > >(arg_list);
             }
-            else
-            #endif
             {
                switch (operation)
                {
@@ -10407,7 +10332,6 @@ namespace Essa::Math{
             }
          }
 
-         #ifndef exprtk_disable_string_capabilities
          inline expression_node_ptr string_function_call(igeneric_function_t* gf,
                                                          std::vector<expression_node_ptr>& arg_list,
                                                          const std::size_t& param_seq_index = std::numeric_limits<std::size_t>::max())
@@ -10460,11 +10384,13 @@ namespace Essa::Math{
                return error_node();
             }
          }
-         #endif
 
-         #ifndef exprtk_disable_return_statement
          inline expression_node_ptr return_call(std::vector<expression_node_ptr>& arg_list)
          {
+            if(details::disable_enhanced_features){
+               return error_node();
+            }
+
             if (!all_nodes_valid(arg_list))
             {
                details::free_all_nodes(*node_allocator_,arg_list);
@@ -10497,6 +10423,10 @@ namespace Essa::Math{
                                                     results_context_t* rc,
                                                     bool*& return_invoked)
          {
+            if(details::disable_enhanced_features){
+               return error_node();
+            }
+
             typedef details::return_envelope_node<Type> alloc_type;
 
             expression_node_ptr result = node_allocator_->
@@ -10506,19 +10436,6 @@ namespace Essa::Math{
 
             return result;
          }
-         #else
-         inline expression_node_ptr return_call(std::vector<expression_node_ptr>&)
-         {
-            return error_node();
-         }
-
-         inline expression_node_ptr return_envelope(expression_node_ptr,
-                                                    results_context_t*,
-                                                    bool*&)
-         {
-            return error_node();
-         }
-         #endif
 
          inline expression_node_ptr vector_element(const std::string& symbol,
                                                    vector_holder_ptr vector_base,
@@ -10585,7 +10502,8 @@ namespace Essa::Math{
          template <std::size_t N, typename NodePtr>
          inline bool is_constant_foldable(NodePtr (&b)[N]) const
          {
-            #ifndef exprtk_disable_enhanced_features
+            if(details::disable_enhanced_features)
+               return false;
             for (std::size_t i = 0; i < N; ++i)
             {
                if (0 == b[i])
@@ -10595,9 +10513,6 @@ namespace Essa::Math{
             }
 
             return true;
-            #else
-            return false;
-            #endif
          }
 
          template <typename NodePtr,
@@ -10605,7 +10520,8 @@ namespace Essa::Math{
                    template <typename, typename> class Sequence>
          inline bool is_constant_foldable(const Sequence<NodePtr,Allocator>& b) const
          {
-            #ifndef exprtk_disable_enhanced_features
+            if(details::disable_enhanced_features)
+               return false;
             for (std::size_t i = 0; i < b.size(); ++i)
             {
                if (0 == b[i])
@@ -10615,9 +10531,6 @@ namespace Essa::Math{
             }
 
             return true;
-            #else
-            return false;
-            #endif
          }
 
          void lodge_assignment(symbol_type cst, expression_node_ptr node)
@@ -10635,12 +10548,10 @@ namespace Essa::Math{
                                                      .get_variable_name(node);
                                     break;
 
-               #ifndef exprtk_disable_string_capabilities
-               case e_st_string   : symbol_name = parser_->symtab_store_
-                                                     .get_stringvar_name(node);
+               case e_st_string   : 
+                  if(!details::disable_string_capabilities)
+                     symbol_name = parser_->symtab_store_.get_stringvar_name(node);
                                     break;
-               #endif
-
                case e_st_vector   : {
                                        typedef details::vector_holder<T> vector_holder_t;
 
@@ -10691,13 +10602,12 @@ namespace Essa::Math{
                   case details::expression_node<T>::e_vector:
                      return reinterpret_cast<const void*>(static_cast<vector_node_t*>(node)->vec_holder().data());
 
-                  #ifndef exprtk_disable_string_capabilities
                   case details::expression_node<T>::e_stringvar:
-                     return reinterpret_cast<const void*>((static_cast<stringvar_node_t*>(node)->base()));
-
+                     if(!details::disable_string_capabilities)
+                        return reinterpret_cast<const void*>((static_cast<stringvar_node_t*>(node)->base()));
                   case details::expression_node<T>::e_stringvarrng:
-                     return reinterpret_cast<const void*>((static_cast<string_range_node_t*>(node)->base()));
-                  #endif
+                     if(!details::disable_string_capabilities)
+                        return reinterpret_cast<const void*>((static_cast<string_range_node_t*>(node)->base()));
                   default : return reinterpret_cast<const void*>(0);
                }
             }
@@ -10760,18 +10670,16 @@ namespace Essa::Math{
                lodge_assignment(e_st_vecelem,branch[0]);
                return synthesize_expression<assignment_rebasevec_celem_node_t, 2>(operation, branch);
             }
-            #ifndef exprtk_disable_string_capabilities
-            else if (details::is_string_node(branch[0]))
+            else if (details::is_string_node(branch[0]) && !details::disable_string_capabilities)
             {
                lodge_assignment(e_st_string,branch[0]);
                return synthesize_expression<assignment_string_node_t,2>(operation, branch);
             }
-            else if (details::is_string_range_node(branch[0]))
+            else if (details::is_string_range_node(branch[0]) && !details::disable_string_capabilities)
             {
                lodge_assignment(e_st_string,branch[0]);
                return synthesize_expression<assignment_string_range_node_t,2>(operation, branch);
             }
-            #endif
             else if (details::is_vector_node(branch[0]))
             {
                lodge_assignment(e_st_vector,branch[0]);
@@ -10918,10 +10826,10 @@ namespace Essa::Math{
                   }
                }
             }
-            #ifndef exprtk_disable_string_capabilities
             else if (
                       (details::e_addass == operation) &&
-                      details::is_string_node(branch[0])
+                      details::is_string_node(branch[0]) &&
+                      !details::disable_string_capabilities
                     )
             {
                typedef details::assignment_string_node<T,details::asn_addassignment> addass_t;
@@ -10930,7 +10838,6 @@ namespace Essa::Math{
 
                return synthesize_expression<addass_t,2>(operation,branch);
             }
-            #endif
             else
             {
                parser_->set_synthesis_error("Invalid assignment operation[2]");
@@ -11079,10 +10986,8 @@ namespace Essa::Math{
             const bool v0_is_ivec = details::is_ivector_node  (branch[0]);
             const bool v1_is_ivec = details::is_ivector_node  (branch[1]);
 
-            #ifndef exprtk_disable_string_capabilities
             const bool v0_is_str = details::is_generally_string_node(branch[0]);
             const bool v1_is_str = details::is_generally_string_node(branch[1]);
-            #endif
 
             expression_node_ptr result = error_node();
 
@@ -11107,8 +11012,7 @@ namespace Essa::Math{
             {
                result = node_allocator_->allocate<details::swap_vecvec_node<T> >(branch[0],branch[1]);
             }
-            #ifndef exprtk_disable_string_capabilities
-            else if (v0_is_str && v1_is_str)
+            else if (v0_is_str && v1_is_str && !details::disable_string_capabilities)
             {
                if (is_string_node(branch[0]) && is_string_node(branch[1]))
                   result = node_allocator_->allocate<details::swap_string_node<T> >
@@ -11117,7 +11021,6 @@ namespace Essa::Math{
                   result = node_allocator_->allocate<details::swap_genstrings_node<T> >
                                                (branch[0], branch[1]);
             }
-            #endif
             else
             {
                parser_->set_synthesis_error("Only variables, strings, vectors or vector elements can be swapped");
@@ -11130,9 +11033,10 @@ namespace Essa::Math{
             return result;
          }
 
-         #ifndef exprtk_disable_sc_andor
          inline expression_node_ptr synthesize_shortcircuit_expression(const details::operator_type& operation, expression_node_ptr (&branch)[2])
          {
+            if(details::disable_sc_andor)
+               return error_node();
             expression_node_ptr result = error_node();
 
             if (details::is_constant_node(branch[0]))
@@ -11181,12 +11085,6 @@ namespace Essa::Math{
             else
                return error_node();
          }
-         #else
-         inline expression_node_ptr synthesize_shortcircuit_expression(const details::operator_type&, expression_node_ptr (&)[2])
-         {
-            return error_node();
-         }
-         #endif
 
          #define basic_opr_switch_statements         \
          case_stmt(details::e_add , details::add_op) \
@@ -11210,7 +11108,6 @@ namespace Essa::Math{
          case_stmt(details::e_xor  , details::xor_op ) \
          case_stmt(details::e_xnor , details::xnor_op) \
 
-         #ifndef exprtk_disable_cardinal_pow_optimisation
          template <typename TType, template <typename, typename> class IPowNode>
          inline expression_node_ptr cardinal_pow_optimisation_impl(const TType& v, const unsigned int& p)
          {
@@ -11242,6 +11139,8 @@ namespace Essa::Math{
 
          inline expression_node_ptr cardinal_pow_optimisation(const T& v, const T& c)
          {
+            if(details::disable_cardinal_pow_optimisation)
+               return error_node();
             const bool not_recipricol = (c >= T(0));
             const unsigned int p = static_cast<unsigned int>(details::numeric::to_int32(details::numeric::abs(c)));
 
@@ -11263,11 +11162,15 @@ namespace Essa::Math{
 
          inline bool cardinal_pow_optimisable(const details::operator_type& operation, const T& c) const
          {
+            if(details::disable_cardinal_pow_optimisation)
+               return false;
             return (details::e_pow == operation) && (details::numeric::abs(c) <= T(60)) && details::numeric::is_integer(c);
          }
 
          inline expression_node_ptr cardinal_pow_optimisation(expression_node_ptr (&branch)[2])
          {
+            if(details::disable_cardinal_pow_optimisation)
+               return error_node();
             const Type c = static_cast<details::literal_node<Type>*>(branch[1])->value();
             const bool not_recipricol = (c >= T(0));
             const unsigned int p = static_cast<unsigned int>(details::numeric::to_int32(details::numeric::abs(c)));
@@ -11285,22 +11188,6 @@ namespace Essa::Math{
             else
                return cardinal_pow_optimisation_impl<expression_node_ptr,details::bipowninv_node>(branch[0],p);
          }
-         #else
-         inline expression_node_ptr cardinal_pow_optimisation(T&, const T&)
-         {
-            return error_node();
-         }
-
-         inline bool cardinal_pow_optimisable(const details::operator_type&, const T&)
-         {
-            return false;
-         }
-
-         inline expression_node_ptr cardinal_pow_optimisation(expression_node_ptr(&)[2])
-         {
-            return error_node();
-         }
-         #endif
 
          struct synthesize_binary_ext_expression
          {
@@ -11460,7 +11347,6 @@ namespace Essa::Math{
             {
                const Type& v = static_cast<details::variable_node<Type>*>(branch[0])->ref();
 
-               #ifndef exprtk_disable_enhanced_features
                if (details::is_sf3ext_node(branch[1]))
                {
                   expression_node_ptr result = error_node();
@@ -11475,7 +11361,6 @@ namespace Essa::Math{
                      return result;
                   }
                }
-               #endif
 
                if (
                     (details::e_mul == operation) ||
@@ -11535,7 +11420,6 @@ namespace Essa::Math{
             {
                const Type& v = static_cast<details::variable_node<Type>*>(branch[1])->ref();
 
-               #ifndef exprtk_disable_enhanced_features
                if (details::is_sf3ext_node(branch[0]))
                {
                   expression_node_ptr result = error_node();
@@ -11551,7 +11435,6 @@ namespace Essa::Math{
                      return result;
                   }
                }
-               #endif
 
                if (
                     (details::e_add == operation) ||
@@ -11718,7 +11601,6 @@ namespace Essa::Math{
                      }
                   }
                }
-               #ifndef exprtk_disable_enhanced_features
                else if (details::is_sf3ext_node(branch[1]))
                {
                   expression_node_ptr result = error_node();
@@ -11734,7 +11616,6 @@ namespace Essa::Math{
                      return result;
                   }
                }
-               #endif
 
                switch (operation)
                {
@@ -11837,7 +11718,6 @@ namespace Essa::Math{
                   }
                }
 
-               #ifndef exprtk_disable_enhanced_features
                if (details::is_sf3ext_node(branch[0]))
                {
                   expression_node_ptr result = error_node();
@@ -11853,7 +11733,6 @@ namespace Essa::Math{
                      return result;
                   }
                }
-               #endif
 
                switch (operation)
                {
@@ -12231,7 +12110,6 @@ namespace Essa::Math{
             }
          };
 
-         #ifndef exprtk_disable_enhanced_features
          inline bool synthesize_expression(const details::operator_type& operation,
                                            expression_node_ptr (&branch)[2],
                                            expression_node_ptr& result)
@@ -17023,7 +16901,6 @@ namespace Essa::Math{
                return "INVALID";
             }
          };
-         #endif
 
          inline expression_node_ptr synthesize_uvouv_expression(const details::operator_type& operation, expression_node_ptr (&branch)[2])
          {
@@ -17098,8 +16975,6 @@ namespace Essa::Math{
          #undef basic_opr_switch_statements
          #undef extended_opr_switch_statements
          #undef unary_opr_switch_statements
-
-         #ifndef exprtk_disable_string_capabilities
 
          #define string_opr_switch_statements            \
          case_stmt(details::e_lt    , details::lt_op   ) \
@@ -17424,11 +17299,14 @@ namespace Essa::Math{
                default : return error_node();
             }
          }
-         #endif
 
-         #ifndef exprtk_disable_string_capabilities
          inline expression_node_ptr synthesize_string_expression(const details::operator_type& opr, expression_node_ptr (&branch)[2])
          {
+            if(details::disable_string_capabilities){
+               details::free_all_nodes(*node_allocator_,branch);
+               return error_node();
+            }
+
             if ((0 == branch[0]) || (0 == branch[1]))
             {
                details::free_all_nodes(*node_allocator_,branch);
@@ -17505,17 +17383,14 @@ namespace Essa::Math{
 
             return error_node();
          }
-         #else
-         inline expression_node_ptr synthesize_string_expression(const details::operator_type&, expression_node_ptr (&branch)[2])
-         {
-            details::free_all_nodes(*node_allocator_,branch);
-            return error_node();
-         }
-         #endif
 
-         #ifndef exprtk_disable_string_capabilities
          inline expression_node_ptr synthesize_string_expression(const details::operator_type& opr, expression_node_ptr (&branch)[3])
          {
+            if(details::disable_string_capabilities){
+               details::free_all_nodes(*node_allocator_,branch);
+               return error_node();
+            }
+
             if (details::e_inrange != opr)
                return error_node();
             else if ((0 == branch[0]) || (0 == branch[1]) || (0 == branch[2]))
@@ -17622,13 +17497,6 @@ namespace Essa::Math{
             else
                return error_node();
          }
-         #else
-         inline expression_node_ptr synthesize_string_expression(const details::operator_type&, expression_node_ptr (&branch)[3])
-         {
-            details::free_all_nodes(*node_allocator_,branch);
-            return error_node();
-         }
-         #endif
 
          inline expression_node_ptr synthesize_null_expression(const details::operator_type& operation, expression_node_ptr (&branch)[2])
          {
@@ -17868,8 +17736,7 @@ namespace Essa::Math{
                   e.register_local_data(se.data, se.size, 1);
                }
             }
-            #ifndef exprtk_disable_string_capabilities
-            else if (scope_element::e_string == se.type)
+            else if (scope_element::e_string == se.type && !details::disable_string_capabilities)
             {
                if (se.str_node)
                {
@@ -17881,13 +17748,10 @@ namespace Essa::Math{
                   e.register_local_data(se.data, se.size, 2);
                }
             }
-            #endif
 
             se.var_node  = 0;
             se.vec_node  = 0;
-            #ifndef exprtk_disable_string_capabilities
             se.str_node  = 0;
-            #endif
             se.data      = 0;
             se.ref_count = 0;
             se.active    = false;
@@ -18079,7 +17943,8 @@ namespace Essa::Math{
 
       inline void return_cleanup()
       {
-         #ifndef exprtk_disable_return_statement
+         if(details::disable_return_statement) 
+            return;
          if (results_context_)
          {
             delete results_context_;
@@ -18087,7 +17952,6 @@ namespace Essa::Math{
          }
 
          state_.return_stmt_present = false;
-         #endif
       }
 
    private:

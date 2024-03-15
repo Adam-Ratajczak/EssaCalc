@@ -36,9 +36,6 @@
 #include "SymbolTable.hpp"
 #include <iostream>
 
-#define exprtk_disable_enhanced_features
-#define exprtk_disable_cardinal_pow_optimisation
-
 namespace Essa::Math{
    template <typename T>
    class function_compositor;
@@ -165,6 +162,7 @@ namespace Essa::Math{
 
          std::size_t ref_count;
          expression_ptr expr;
+         expression_ptr unoptimized_expr;
          local_data_list_t local_data_list;
          results_context_t* results;
          bool  retinv_null;
@@ -222,11 +220,11 @@ namespace Essa::Math{
 
       inline std::string ToString() const{
          assert(control_block_      );
-         assert(control_block_->expr);
+         assert(control_block_->unoptimized_expr);
 
          auto& typ = typeid(control_block_->expr);
 
-         return control_block_->expr->ToString();
+         return control_block_->unoptimized_expr->ToString();
       }
 
       inline bool operator==(const expression<T>& e) const
@@ -340,6 +338,19 @@ namespace Essa::Math{
             }
 
             control_block_ = control_block::create(expr);
+         }
+      }
+
+      inline void set_unoptimized_expr(const expression_ptr expr)
+      {
+         if (expr)
+         {
+            if (!control_block_)
+            {
+               control_block_ = control_block::create(expr);
+            }
+
+            control_block_->unoptimized_expr = expr;
          }
       }
 
