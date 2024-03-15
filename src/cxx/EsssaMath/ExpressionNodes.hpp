@@ -386,7 +386,16 @@ namespace Essa::Math{
          }
 
          inline std::string ToString() const exprtk_override{
-            return std::to_string(value_);
+            const typename details::numeric::details::number_type<T>::type num_type;
+            static const T local_pi = details::numeric::details::const_pi_impl<T>(num_type);
+            static const T local_e = details::numeric::details::const_e_impl<T>(num_type);
+
+            if(value_ == local_pi)
+               return "%pi";
+            else if(value_ == local_e)
+               return "%e";
+            else 
+               return std::to_string(value_);
          }
       private:
 

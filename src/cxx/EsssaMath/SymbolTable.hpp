@@ -465,9 +465,9 @@ namespace Essa::Math{
          {
             struct tie
             {
-               static inline std::pair<bool,variable_node_t*> make(T& t, const bool is_constant = false)
+               static inline std::pair<bool,variable_node_t*> make(T& t, const std::string& _name, const bool is_constant = false)
                {
-                  return std::make_pair(is_constant, new variable_node_t(t, ""));
+                  return std::make_pair(is_constant, new variable_node_t(t, _name));
                }
 
                static inline std::pair<bool,stringvar_node_t*> make(std::string& t, const bool is_constant = false)
@@ -495,7 +495,7 @@ namespace Essa::Math{
 
             if (map.end() == itr)
             {
-               map[symbol_name] = tie::make(t_,is_const);
+               map[symbol_name] = tie::make(t_, symbol_name, is_const);
                ++size;
             }
 

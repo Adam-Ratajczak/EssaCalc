@@ -4486,7 +4486,6 @@ namespace Essa::Math{
                      nse.type      = scope_element::e_variable;
                      nse.depth     = state_.scope_depth;
                      nse.data      = new T(T(0));
-                     std::cout << "1: " << nse.name << "\n";
                      nse.var_node  = node_allocator_.allocate<variable_node_t>(*reinterpret_cast<T*>(nse.data), nse.name);
 
                      if (!sem_.add_element(nse))
@@ -7149,7 +7148,6 @@ namespace Essa::Math{
             nse.type      = scope_element::e_variable;
             nse.depth     = state_.scope_depth;
             nse.data      = new T(T(0));
-                     std::cout << "2: " << nse.name << "\n";
             nse.var_node  = node_allocator_.allocate<variable_node_t>(*reinterpret_cast<T*>(nse.data), nse.name);
 
             if (!sem_.add_element(nse))
@@ -7244,7 +7242,6 @@ namespace Essa::Math{
             nse.depth     = state_.scope_depth;
             nse.ip_index  = sem_.next_ip_index();
             nse.data      = new T(T(0));
-                     std::cout << "3: " << nse.name << "\n";
             nse.var_node  = node_allocator_.allocate<variable_node_t>(*reinterpret_cast<T*>(nse.data), nse.name);
 
             if (!sem_.add_element(nse))
@@ -10442,7 +10439,6 @@ namespace Essa::Math{
                                                    expression_node_ptr index)
          {
             expression_node_ptr result = error_node();
-
             if (details::is_constant_node(index))
             {
                std::size_t i = static_cast<std::size_t>(details::numeric::to_int64(index->value()));
@@ -10470,7 +10466,6 @@ namespace Essa::Math{
                   nse.index     = i;
                   nse.depth     = parser_->state_.scope_depth;
                   nse.data      = 0;
-                     std::cout << "4: " << nse.name << "\n";
                   nse.var_node  = node_allocator_->allocate<variable_node_t>((*(*vector_base)[i]), nse.name);
 
                   if (!parser_->sem_.add_element(nse))

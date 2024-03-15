@@ -10,7 +10,7 @@ void trig_function()
    typedef Essa::Math::expression<T>   expression_t;
    typedef Essa::Math::parser<T>       parser_t;
 
-   const std::string expression_string = "sin(2 * %pi * x) + cos(x / 2 * %pi)";
+   const std::string expression_string = "sin(2 * %pi * x) + cos(x / 2 * %e)";
 
    T x;
 
