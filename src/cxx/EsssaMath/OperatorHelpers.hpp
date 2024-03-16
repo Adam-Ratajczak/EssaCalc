@@ -170,7 +170,7 @@ namespace Essa::Math{
             case e_log2    : return "log(%s)/log(2)";
             case e_log1p   : return "log(1/(%s))";
             case e_logn    : return "log(%s)/log(%s)";
-            case e_neg     : return "~(%s)";
+            case e_neg     : return "(-%s)";
             case e_pos     : return "pos(%s)";
             case e_round   : return "round(%s)";
             case e_roundn  : return "round(%s,%s)";
