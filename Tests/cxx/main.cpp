@@ -1,6 +1,7 @@
-#include <essamath/SymbolTable.hpp>
+#include <Essa/Math/SymbolTable.hpp>
 #include <iostream>
-#include <essamath/EssaMath.hpp>
+#include <Essa/Math/EssaMath.hpp>
+#include <string>
 
 template <typename T>
 void trig_function()

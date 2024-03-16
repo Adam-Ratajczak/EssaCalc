@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Defines.hpp"
 #include "Expression.hpp"
 #include "ExpressionHelper.hpp"
