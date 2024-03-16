@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include "LispApi.hpp"
+#include "../../include/LispApi.hpp"
 
 std::string to_lower(std::string const& _str){
     std::string _result;

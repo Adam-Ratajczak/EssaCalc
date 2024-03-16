@@ -1,4 +1,4 @@
-#include "FunctionUtils.hpp"
+#include "../../include/FunctionUtils.hpp"
 
 namespace Essa::Math{
 
