@@ -32,8 +32,12 @@ void trig_function()
    std::cout << parser.error() << "\n";
    std::cout << integrated.ToString() << "\n";
 
+   auto diff = Essa::Math::differentiate(symbol_table, parser, expression, "x");
+   std::cout << parser.error() << "\n";
+   std::cout << diff.ToString() << "\n";
+
    for(x = 1.0; x <= 3.0; x += 0.1){
-      std::cout << expression.value() << "\t\t" << integrated.value() << "\n";
+      std::cout << expression.value() << "\t\t" << integrated.value() << "\t\t" << diff.value() << "\n";
    }
 }
 

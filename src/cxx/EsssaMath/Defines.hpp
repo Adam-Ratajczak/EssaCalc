@@ -799,13 +799,6 @@ namespace Essa::Math
             exprtk_register_real_type_tag(long double)
             exprtk_register_real_type_tag(float      )
 
-            exprtk_register_int_type_tag(short         )
-            exprtk_register_int_type_tag(int           )
-            exprtk_register_int_type_tag(_int64_t      )
-            exprtk_register_int_type_tag(unsigned short)
-            exprtk_register_int_type_tag(unsigned int  )
-            exprtk_register_int_type_tag(_uint64_t     )
-
             #undef exprtk_register_real_type_tag
             #undef exprtk_register_int_type_tag
 
