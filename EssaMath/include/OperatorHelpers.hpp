@@ -704,7 +704,7 @@ namespace Essa::Math{
             return e_none;
          }
 
-         inline virtual std::string ToString() const {
+         inline virtual std::string to_string() const {
             return "(expression_node)";
          }
       }; // class expression_node

@@ -218,13 +218,13 @@ namespace Essa::Math{
          return *this;
       }
 
-      inline std::string ToString() const{
+      inline std::string to_string() const{
          assert(control_block_      );
          assert(control_block_->unoptimized_expr);
 
          auto& typ = typeid(control_block_->expr);
 
-         return control_block_->unoptimized_expr->ToString();
+         return control_block_->unoptimized_expr->to_string();
       }
 
       inline bool operator==(const expression<T>& e) const

@@ -10,7 +10,7 @@ void trig_function()
    typedef Essa::Math::expression<T>   expression_t;
    typedef Essa::Math::parser<T>       parser_t;
 
-   const std::string expression_string = "sin(2 * %pi * x) + cos(x / 2 * %e)";
+   const std::string expression_string = "sin((2 + %pi) * x) - cos(x / 2 ^ (%e+1))";
 
    T x;
 
@@ -25,19 +25,15 @@ void trig_function()
    parser.compile(expression_string, expression);
 
    std::cout << parser.error() << "\n";
-   std::cout << expression.ToString() << "\n";
+   std::cout << expression.to_string() << "\n";
 
    auto integrated = Essa::Math::integrate(symbol_table, parser, expression, "x");
    std::cout << parser.error() << "\n";
-   std::cout << integrated.ToString() << "\n";
+   std::cout << integrated.to_string() << "\n";
 
    auto diff = Essa::Math::differentiate(symbol_table, parser, expression, "x");
    std::cout << parser.error() << "\n";
-   std::cout << diff.ToString() << "\n";
-
-   for(x = 1.0; x <= 3.0; x += 0.1){
-      std::cout << expression.value() << "\t\t" << integrated.value() << "\t\t" << diff.value() << "\n";
-   }
+   std::cout << diff.to_string() << "\n";
 }
 
 int main(int argc, char **argv)

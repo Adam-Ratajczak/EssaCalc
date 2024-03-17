@@ -42,13 +42,13 @@ public:
 
     static std::shared_ptr<LispObject> Parse(std::istream& _ss);
 
-    virtual std::string ToString() const = 0;
+    virtual std::string to_string() const = 0;
 };
 
 class LispList : public LispObject{
 public:
     LispList(std::deque<Token>& _tokens);
-    std::string ToString() const override;
+    std::string to_string() const override;
 private:
     std::string _name;
     std::vector<std::shared_ptr<LispObject>> _objectVec;
@@ -57,7 +57,7 @@ private:
 class LispValue : public LispObject{
 public:
     LispValue(std::deque<Token>& _tokens);
-    std::string ToString() const override;
+    std::string to_string() const override;
 private:
     std::string _value;
 };
@@ -119,7 +119,7 @@ LispList::LispList(std::deque<Token>& _tokens) : LispObject(_tokens){
     _tokens.pop_front();
 }
 
-std::string LispList::ToString() const{
+std::string LispList::to_string() const{
     std::string _op;
     bool _braces = false;
     bool _initial = false;
@@ -172,7 +172,7 @@ std::string LispList::ToString() const{
                 _result += ",";
             }
 
-            _result += _objectVec[i]->ToString();
+            _result += _objectVec[i]->to_string();
         }
 
         _result += ")";
@@ -189,7 +189,7 @@ std::string LispList::ToString() const{
             _result += _op;
         }
 
-        _result += _objectVec[i]->ToString();
+        _result += _objectVec[i]->to_string();
     }
 
     if(_braces) _result += ")";
@@ -205,7 +205,7 @@ LispValue::LispValue(std::deque<Token>& _tokens) : LispObject(_tokens){
     _tokens.pop_front();
 }
 
-std::string LispValue::ToString() const{
+std::string LispValue::to_string() const{
     return _value;
 }
 
@@ -241,7 +241,7 @@ std::string evaluate(const std::string& _exp) {
         std::stringstream ss;
         ss << _res;
         auto _obj = LispObject::Parse(ss);
-        return _obj->ToString();
+        return _obj->to_string();
     }catch(std::range_error&){
         return evaluate(_exp);
     }

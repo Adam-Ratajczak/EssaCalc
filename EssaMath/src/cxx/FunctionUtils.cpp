@@ -11,7 +11,7 @@ expression<T> integrate(symbol_table<T>& _table, parser<T>& _parser, expression<
     if(!_table.is_variable(_var))
         expression_string = _var;
     else
-        expression_string = evaluate("integrate(" + _expr.ToString() + "," + _var + ")");
+        expression_string = evaluate("integrate(" + _expr.to_string() + "," + _var + ")");
 
     expression<T> expression;
     expression.register_symbol_table(_table);
@@ -26,7 +26,7 @@ expression<T> differentiate(symbol_table<T>& _table, parser<T>& _parser, express
     if(!_table.is_variable(_var))
         expression_string = _var;
     else
-        expression_string = evaluate("diff(" + _expr.ToString() + "," + _var + ")");
+        expression_string = evaluate("diff(" + _expr.to_string() + "," + _var + ")");
 
     expression<T> expression;
     expression.register_symbol_table(_table);
