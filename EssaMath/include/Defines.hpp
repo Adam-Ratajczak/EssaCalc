@@ -831,6 +831,9 @@ namespace Essa::Math
                }                                                   \
             };                                                     \
 
+            exprtk_define_epsilon_type(int16_t                    , 0.0)
+            exprtk_define_epsilon_type(int32_t                    , 0.0)
+            exprtk_define_epsilon_type(int64_t                    , 0.0)
             exprtk_define_epsilon_type(float                      , 0.00000100000f)
             exprtk_define_epsilon_type(double                     , 0.000000000100)
             exprtk_define_epsilon_type(long double                , 0.000000000001)

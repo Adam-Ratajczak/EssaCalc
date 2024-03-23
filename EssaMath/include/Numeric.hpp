@@ -54,6 +54,12 @@ namespace Essa::Math{
             {
                return std::not_equal_to<T>()(v,v);
             }
+
+            template <typename T>
+            inline bool is_nan_impl(const T v, int_type_tag)
+            {
+               return std::not_equal_to<T>()(v,v);
+            }
                
             template <typename T>
             inline bool is_i_impl(const T v, complex_type_tag)
@@ -63,6 +69,12 @@ namespace Essa::Math{
 
             template <typename T>
             inline bool is_i_impl(const T v, real_type_tag)
+            {
+               return false;
+            }
+
+            template <typename T>
+            inline bool is_i_impl(const T v, int_type_tag)
             {
                return false;
             }
@@ -120,6 +132,12 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline int to_int32_impl(const T v, int_type_tag)
+            {
+               return static_cast<int>(v);
+            }
+
+            template <typename T>
             inline _int64_t to_int64_impl(const T v, complex_type_tag)
             {
                return static_cast<_int64_t>(v.real());
@@ -127,6 +145,12 @@ namespace Essa::Math{
 
             template <typename T>
             inline _int64_t to_int64_impl(const T v, real_type_tag)
+            {
+               return static_cast<_int64_t>(v);
+            }
+
+            template <typename T>
+            inline _int64_t to_int64_impl(const T v, int_type_tag)
             {
                return static_cast<_int64_t>(v);
             }
@@ -152,7 +176,13 @@ namespace Essa::Math{
             template <typename T>
             inline T abs_impl(const T v, real_type_tag)
             {
-               return ((v < T(0)) ? -v : v);
+               return std::fabs(v);
+            }
+
+            template <typename T>
+            inline T abs_impl(const T v, int_type_tag)
+            {
+               return std::abs(v);
             }
 
             template <typename T>
@@ -367,15 +397,7 @@ namespace Essa::Math{
             template <typename T>
             inline T expm1_impl(const T v, int_type_tag)
             {
-               return T(std::exp<double>(v)) - T(1);
-            }
-
-            template <typename T>
-            inline T nequal_impl(const T v0, const T v1, real_type_tag)
-            {
-               typedef real_type_tag rtg;
-               const T epsilon = epsilon_type<T>::value();
-               return (abs_impl(v0 - v1,rtg()) > (std::max(T(1),std::max(abs_impl(v0,rtg()),abs_impl(v1,rtg()))) * epsilon)) ? T(1) : T(0);
+               return T(std::exp<T>(v)) - T(1);
             }
 
             template <typename T>
@@ -384,6 +406,14 @@ namespace Essa::Math{
                typedef real_type_tag rtg;
                const T epsilon = epsilon_type<T>::value();
                return v0 != v1 ? T(1, 0) : T(0, 0);
+            }
+
+            template <typename T>
+            inline T nequal_impl(const T v0, const T v1, real_type_tag)
+            {
+               typedef real_type_tag rtg;
+               const T epsilon = epsilon_type<T>::value();
+               return (abs_impl(v0 - v1,rtg()) > (std::max(T(1),std::max(abs_impl(v0,rtg()),abs_impl(v1,rtg()))) * epsilon)) ? T(1) : T(0);
             }
 
             inline float nequal_impl(const float v0, const float v1, real_type_tag)
@@ -522,6 +552,12 @@ namespace Essa::Math{
             inline T round_impl(const T v, real_type_tag)
             {
                return ((v < T(0)) ? std::ceil(v - T(0.5)) : std::floor(v + T(0.5)));
+            }
+
+            template <typename T>
+            inline T round_impl(const T v, int_type_tag)
+            {
+               return v;
             }
 
             template <typename T>
@@ -920,35 +956,42 @@ namespace Essa::Math{
             template <typename T> inline T const_qnan_impl(real_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
             template <typename T> inline T    const_i_impl(real_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
 
-            template <typename T> inline T   abs_impl(const T v, int_type_tag) { return ((v >= T(0)) ? v : -v); }
+            template <typename T> inline T  acos_impl(const T v, int_type_tag) { return std::acos (v); }
+            template <typename T> inline T acosh_impl(const T v, int_type_tag) { return std::log(v + std::sqrt((v * v) - T(1))); }
+            template <typename T> inline T  asin_impl(const T v, int_type_tag) { return std::asin (v); }
+            template <typename T> inline T asinh_impl(const T v, int_type_tag) { return std::log(v + std::sqrt((v * v) + T(1))); }
+            template <typename T> inline T  atan_impl(const T v, int_type_tag) { return std::atan (v); }
+            template <typename T> inline T atanh_impl(const T v, int_type_tag) { return (std::log(T(1) + v) - std::log(T(1) - v)) / T(2); }
+            template <typename T> inline T  ceil_impl(const T v, int_type_tag) { return std::ceil (v); }
+            template <typename T> inline T   cos_impl(const T v, int_type_tag) { return std::cos  (v); }
+            template <typename T> inline T  cosh_impl(const T v, int_type_tag) { return std::cosh (v); }
             template <typename T> inline T   exp_impl(const T v, int_type_tag) { return std::exp  (v); }
+            template <typename T> inline T floor_impl(const T v, int_type_tag) { return std::floor(v); }
             template <typename T> inline T   log_impl(const T v, int_type_tag) { return std::log  (v); }
             template <typename T> inline T log10_impl(const T v, int_type_tag) { return std::log10(v); }
             template <typename T> inline T  log2_impl(const T v, int_type_tag) { return std::log(v)/T(numeric::constant::log2); }
             template <typename T> inline T   neg_impl(const T v, int_type_tag) { return -v;            }
             template <typename T> inline T   pos_impl(const T v, int_type_tag) { return +v;            }
-            template <typename T> inline T  ceil_impl(const T v, int_type_tag) { return v;             }
-            template <typename T> inline T floor_impl(const T v, int_type_tag) { return v;             }
-            template <typename T> inline T round_impl(const T v, int_type_tag) { return v;             }
-            template <typename T> inline T  notl_impl(const T v, int_type_tag) { return !v;            }
+            template <typename T> inline T   sin_impl(const T v, int_type_tag) { return std::sin  (v); }
+            template <typename T> inline T  sinh_impl(const T v, int_type_tag) { return std::sinh (v); }
             template <typename T> inline T  sqrt_impl(const T v, int_type_tag) { return std::sqrt (v); }
-            template <typename T> inline T  frac_impl(const T  , int_type_tag) { return T(0);          }
-            template <typename T> inline T trunc_impl(const T v, int_type_tag) { return v;             }
-            template <typename T> inline T  acos_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T acosh_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T  asin_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T asinh_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T  atan_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T atanh_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T   cos_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T  cosh_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T   sin_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T  sinh_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T   tan_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T  tanh_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T   cot_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T   sec_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
-            template <typename T> inline T   csc_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
+            template <typename T> inline T   tan_impl(const T v, int_type_tag) { return std::tan  (v); }
+            template <typename T> inline T  tanh_impl(const T v, int_type_tag) { return std::tanh (v); }
+            template <typename T> inline T   cot_impl(const T v, int_type_tag) { return T(1) / std::tan(v); }
+            template <typename T> inline T   sec_impl(const T v, int_type_tag) { return T(1) / std::cos(v); }
+            template <typename T> inline T   csc_impl(const T v, int_type_tag) { return T(1) / std::sin(v); }
+            template <typename T> inline T   r2d_impl(const T v, int_type_tag) { return (v * T(numeric::constant::_180_pi)); }
+            template <typename T> inline T   d2r_impl(const T v, int_type_tag) { return (v * T(numeric::constant::pi_180));  }
+            template <typename T> inline T   d2g_impl(const T v, int_type_tag) { return (v * T(10.0/9.0)); }
+            template <typename T> inline T   g2d_impl(const T v, int_type_tag) { return (v * T(9.0/10.0)); }
+            template <typename T> inline T  notl_impl(const T v, int_type_tag) { return (std::not_equal_to<T>()(T(0),v) ? T(0) : T(1)); }
+            template <typename T> inline T  frac_impl(const T v, int_type_tag) { return (v - static_cast<long long>(v)); }
+            template <typename T> inline T trunc_impl(const T v, int_type_tag) { return T(static_cast<long long>(v));    }
+
+            template <typename T> inline T   const_pi_impl(int_type_tag) { return T(numeric::constant::pi);            }
+            template <typename T> inline T    const_e_impl(int_type_tag) { return T(numeric::constant::e);             }
+            template <typename T> inline T const_qnan_impl(int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
+            template <typename T> inline T    const_i_impl(int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
 
             template <typename T>
             inline bool is_integer_impl(const T& v, complex_type_tag)
@@ -973,10 +1016,15 @@ namespace Essa::Math{
          template <typename Type>
          struct numeric_info { enum { length = 0, size = 32, bound_length = 0, min_exp = 0, max_exp = 0 }; };
 
-         template <> struct numeric_info<int        > { enum { length = 10, size = 16, bound_length = 9 }; };
-         template <> struct numeric_info<float      > { enum { min_exp =  -38, max_exp =  +38 }; };
-         template <> struct numeric_info<double     > { enum { min_exp = -308, max_exp = +308 }; };
-         template <> struct numeric_info<long double> { enum { min_exp = -308, max_exp = +308 }; };
+         // template <> struct numeric_info<int16_t                     > { enum { length = 10, size = 16, bound_length = 9, min_exp = -9, max_exp = +9 }; };
+         // template <> struct numeric_info<int32_t                     > { enum { length = 10, size = 16, bound_length = 9, min_exp = -9, max_exp = +9 }; };
+         // template <> struct numeric_info<int64_t                     > { enum { length = 10, size = 16, bound_length = 9, min_exp = -9, max_exp = +9 }; };
+         template <> struct numeric_info<float                       > { enum { min_exp =  -38, max_exp =  +38 }; };
+         template <> struct numeric_info<double                      > { enum { min_exp = -308, max_exp = +308 }; };
+         template <> struct numeric_info<long double                 > { enum { min_exp = -308, max_exp = +308 }; };
+         // template <> struct numeric_info<std::complex<float>         > { enum { min_exp =  -38, max_exp =  +38 }; };
+         // template <> struct numeric_info<std::complex<double>        > { enum { min_exp = -308, max_exp = +308 }; };
+         // template <> struct numeric_info<std::complex<long double>   > { enum { min_exp = -308, max_exp = +308 }; };
 
          template <typename T>
          inline int to_int32(const T v)
@@ -1332,22 +1380,22 @@ namespace Essa::Math{
 
          const int e = std::abs(exponent);
 
-         if (exponent >= std::numeric_limits<T>::min_exponent10)
+         if (exponent >= std::numeric_limits<double>::min_exponent10)
          {
             if (e < fract10_size)
             {
                if (exponent > 0)
-                  return T(d * fract10[e]);
+                  return T(d * T(fract10[e]));
                else
-                  return T(d / fract10[e]);
+                  return T(d / T(fract10[e]));
             }
             else
-               return T(d * std::pow(10.0, 10.0 * exponent));
+               return T(d * T(std::pow(10.0, 10.0 * exponent)));
          }
          else
          {
-                     d /= T(fract10[           -std::numeric_limits<T>::min_exponent10]);
-            return T(d /    fract10[-exponent + std::numeric_limits<T>::min_exponent10]);
+                     d /= T(fract10[               - std::numeric_limits<double>::min_exponent10]);
+            return T(d /  T(fract10[-exponent      + std::numeric_limits<double>::min_exponent10]));
          }
       }
    }

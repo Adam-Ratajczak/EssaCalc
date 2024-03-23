@@ -12,6 +12,8 @@
 #include <string.h>
 #include <string>
 #include "../../include/LispApi.hpp"
+#include <deque>
+#include <vector>
 
 std::string to_lower(std::string const& _str){
     std::string _result;

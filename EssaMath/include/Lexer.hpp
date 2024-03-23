@@ -187,9 +187,9 @@ namespace Essa::Math{
          return (numeric_info<T>::min_exp <= exponent) && (exponent <= numeric_info<T>::max_exp);
       }
 
+
       template <typename Iterator, typename T>
-      inline bool string_to_real(Iterator& itr_external, const Iterator end, T& t, numeric::details::real_type_tag)
-      {
+      inline bool string_to_real(Iterator& itr_external, const Iterator end, T& t, numeric::details::complex_type_tag){
          if (end == itr_external) return false;
 
          Iterator itr = itr_external;
@@ -208,19 +208,19 @@ namespace Essa::Math{
 
          static const char_t zero = static_cast<uchar_t>('0');
 
-         #define parse_digit_1(d)          \
-         if ((digit = (*itr - zero)) < 10) \
-            { d = d * T(10) + digit; }     \
-         else                              \
-            { break; }                     \
-         if (end == ++itr) break;          \
+         #define parse_digit_1(d)                     \
+         if ((digit = (*itr - zero)) < 10)            \
+            { d = T(d.real() * 10 + digit); }     \
+         else                                         \
+            { break; }                                \
+         if (end == ++itr) break;                     \
 
-         #define parse_digit_2(d)          \
-         if ((digit = (*itr - zero)) < 10) \
-            { d = d * T(10) + digit; }     \
-         else                              \
-            { break; }                     \
-            ++itr;                         \
+         #define parse_digit_2(d)                     \
+         if ((digit = (*itr - zero)) < 10)            \
+            { d = T(d.real() * 10 + digit); }     \
+         else                                         \
+            { break; }                                \
+            ++itr;                                    \
 
          if ('.' != (*itr))
          {
@@ -346,7 +346,8 @@ namespace Essa::Math{
       }
 
       template <typename Iterator, typename T>
-      inline bool string_to_real(Iterator& itr_external, const Iterator end, T& t, numeric::details::complex_type_tag){
+      inline bool string_to_real(Iterator& itr_external, const Iterator end, T& t, numeric::details::real_type_tag)
+      {
          if (end == itr_external) return false;
 
          Iterator itr = itr_external;
@@ -365,19 +366,19 @@ namespace Essa::Math{
 
          static const char_t zero = static_cast<uchar_t>('0');
 
-         #define parse_digit_1(d)                     \
-         if ((digit = (*itr - zero)) < 10)            \
-            { d = T(d.real() * 10 + digit); }     \
-         else                                         \
-            { break; }                                \
-         if (end == ++itr) break;                     \
+         #define parse_digit_1(d)          \
+         if ((digit = (*itr - zero)) < 10) \
+            { d = d * T(10) + digit; }     \
+         else                              \
+            { break; }                     \
+         if (end == ++itr) break;          \
 
-         #define parse_digit_2(d)                     \
-         if ((digit = (*itr - zero)) < 10)            \
-            { d = T(d.real() * 10 + digit); }     \
-         else                                         \
-            { break; }                                \
-            ++itr;                                    \
+         #define parse_digit_2(d)          \
+         if ((digit = (*itr - zero)) < 10) \
+            { d = d * T(10) + digit; }     \
+         else                              \
+            { break; }                     \
+            ++itr;                         \
 
          if ('.' != (*itr))
          {
@@ -433,7 +434,165 @@ namespace Essa::Math{
             {
                typename std::iterator_traits<Iterator>::value_type c = (*itr);
 
-               if (('e' == c) || ('E' == c))
+               if (('e' == c) || ('E' == c) || ('b' == c) || ('B' == c))
+               {
+                  int exp = 0;
+
+                  if (!details::string_to_type_converter_impl_ref(++itr, end, exp))
+                  {
+                     if (end == itr)
+                        return false;
+                     else
+                        c = (*itr);
+                  }
+
+                  exponent += exp;
+               }
+
+               if (end != itr)
+               {
+                  if (('f' == c) || ('F' == c) || ('l' == c) || ('L' == c))
+                     ++itr;
+                  else if ('#' == c)
+                  {
+                     if (end == ++itr)
+                        return false;
+                     else if (('I' <= (*itr)) && ((*itr) <= 'n'))
+                     {
+                        if (('i' == (*itr)) || ('I' == (*itr)))
+                        {
+                           return parse_inf(itr, end, t, negative);
+                        }
+                        else if (('n' == (*itr)) || ('N' == (*itr)))
+                        {
+                           return parse_nan(itr, end, t);
+                        }
+                        else
+                           return false;
+                     }
+                     else
+                        return false;
+                  }
+                  else if (('I' <= (*itr)) && ((*itr) <= 'n'))
+                  {
+                     if (('i' == (*itr)) || ('I' == (*itr)))
+                     {
+                        return parse_inf(itr, end, t, negative);
+                     }
+                     else if (('n' == (*itr)) || ('N' == (*itr)))
+                     {
+                        return parse_nan(itr, end, t);
+                     }
+                     else
+                        return false;
+                  }
+                  else
+                     return false;
+               }
+            }
+         }
+
+         if ((end != itr) || (!instate))
+            return false;
+         else if (!valid_exponent<T>(exponent, numeric::details::real_type_tag()))
+            return false;
+         else if (exponent)
+            d = compute_pow10(d,exponent);
+
+         t = static_cast<T>((negative) ? -d : d);
+         return true;
+      }
+
+      template <typename Iterator, typename T>
+      inline bool string_to_real(Iterator& itr_external, const Iterator end, T& t, numeric::details::int_type_tag)
+      {
+         if (end == itr_external) return false;
+
+         Iterator itr = itr_external;
+
+         T d = T(0);
+
+         const bool negative = ('-' == (*itr));
+
+         if (negative || '+' == (*itr))
+         {
+            if (end == ++itr)
+               return false;
+         }
+
+         bool instate = false;
+
+         static const char_t zero = static_cast<uchar_t>('0');
+
+         #define parse_digit_1(d)          \
+         if ((digit = (*itr - zero)) < 10) \
+            { d = d * T(10) + digit; }     \
+         else                              \
+            { break; }                     \
+         if (end == ++itr) break;          \
+
+         #define parse_digit_2(d)          \
+         if ((digit = (*itr - zero)) < 10) \
+            { d = d * T(10) + digit; }     \
+         else                              \
+            { break; }                     \
+            ++itr;                         \
+
+         if ('.' != (*itr))
+         {
+            const Iterator curr = itr;
+
+            while ((end != itr) && (zero == (*itr))) ++itr;
+
+            while (end != itr)
+            {
+               unsigned int digit;
+               parse_digit_1(d)
+               parse_digit_1(d)
+               parse_digit_2(d)
+            }
+
+            if (curr != itr) instate = true;
+         }
+
+         int exponent = 0;
+
+         if (end != itr)
+         {
+            if ('.' == (*itr))
+            {
+               const Iterator curr = ++itr;
+               T tmp_d = T(0);
+
+               while (end != itr)
+               {
+                  unsigned int digit;
+                  parse_digit_1(tmp_d)
+                  parse_digit_1(tmp_d)
+                  parse_digit_2(tmp_d)
+               }
+
+               if (curr != itr)
+               {
+                  instate = true;
+
+                  const int frac_exponent = static_cast<int>(-std::distance(curr, itr));
+
+                  if (!valid_exponent<T>(frac_exponent, numeric::details::real_type_tag()))
+                     return false;
+
+                  d += compute_pow10(tmp_d, frac_exponent);
+               }
+
+               #undef parse_digit_1
+               #undef parse_digit_2
+            }
+
+            if (end != itr)
+            {
+               typename std::iterator_traits<Iterator>::value_type c = (*itr);
+
+               if (('e' == c) || ('E' == c) || ('b' == c) || ('B' == c))
                {
                   int exp = 0;
 

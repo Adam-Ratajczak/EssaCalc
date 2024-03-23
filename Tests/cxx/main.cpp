@@ -24,16 +24,16 @@ void trig_function_double()
    parser_t parser;
    parser.compile(expression_string, expression);
 
-   std::cout << parser.error() << "\n";
-   std::cout << expression.to_string() << "\n";
+   std::cout << "Expr error: " <<parser.error() << "\n";
+   std::cout << "Expr: " << expression.to_string() << "\n";
 
    auto integrated = Essa::Math::integrate(symbol_table, parser, expression, "x");
-   std::cout << parser.error() << "\n";
-   std::cout << integrated.to_string() << "\n";
+   std::cout << "Integral error: " << parser.error() << "\n";
+   std::cout << "Integral: " << integrated.to_string() << "\n";
 
    auto diff = Essa::Math::differentiate(symbol_table, parser, expression, "x");
-   std::cout << parser.error() << "\n";
-   std::cout << diff.to_string() << "\n";
+   std::cout << "Diff error: " << parser.error() << "\n";
+   std::cout << "Diff: " << diff.to_string() << "\n";
 
    for(x = 2.0; x <= 4.0; x += 0.1){
       std::cout << expression.value() << "\t\t" << integrated.value() << "\t\t" << diff.value() << "\n";
@@ -60,19 +60,19 @@ void trig_function_complex()
    parser_t parser;
    parser.compile(expression_string, expression);
 
-   std::cout << parser.error() << "\n";
-   std::cout << expression.to_string() << "\n";
+   std::cout << "Expr error: " <<parser.error() << "\n";
+   std::cout << "Expr: " << expression.to_string() << "\n";
 
-   // auto integrated = Essa::Math::integrate(symbol_table, parser, expression, "x");
-   // std::cout << parser.error() << "\n";
-   // std::cout << integrated.to_string() << "\n";
+   auto integrated = Essa::Math::integrate(symbol_table, parser, expression, "x");
+   std::cout << "Integral error: " << parser.error() << "\n";
+   std::cout << "Integral: " << integrated.to_string() << "\n";
 
-   // auto diff = Essa::Math::differentiate(symbol_table, parser, expression, "x");
-   // std::cout << parser.error() << "\n";
-   // std::cout << diff.to_string() << "\n";
+   auto diff = Essa::Math::differentiate(symbol_table, parser, expression, "x");
+   std::cout << "Diff error: " << parser.error() << "\n";
+   std::cout << "Diff: " << diff.to_string() << "\n";
 
    for(x = 2.0; x.real() <= 4.0; x += 0.1){
-      std::cout << expression.value() << "\n";
+      std::cout << expression.value() << "\t\t" << integrated.value() << "\t\t" << diff.value() << "\n";
    }
 }
 

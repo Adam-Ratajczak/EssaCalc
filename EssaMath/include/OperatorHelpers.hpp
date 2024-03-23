@@ -674,34 +674,49 @@ namespace Essa::Math{
       template <typename T>
       inline bool is_generally_string_node(const expression_node<T>* node);
 
-      inline bool is_true(const double v)
+      inline bool is_true(const int16_t v)
       {
-         return std::not_equal_to<double>()(0.0,v);
+         return std::not_equal_to()(0.0,v);
       }
 
-      inline bool is_true(const long double v)
+      inline bool is_true(const int32_t v)
       {
-         return std::not_equal_to<long double>()(0.0L,v);
+         return std::not_equal_to()(0.0,v);
+      }
+
+      inline bool is_true(const int64_t v)
+      {
+         return std::not_equal_to()(0.0,v);
       }
 
       inline bool is_true(const float v)
       {
-         return std::not_equal_to<float>()(0.0f,v);
+         return std::not_equal_to()(0.0,v);
       }
 
-      inline bool is_true(const std::complex<double> v)
+      inline bool is_true(const double v)
       {
-         return std::not_equal_to<std::complex<double>>()(std::complex<double>(0.0,0.0),v);
+         return std::not_equal_to()(0.0,v);
       }
 
-      inline bool is_true(const std::complex<long double> v)
+      inline bool is_true(const long double v)
       {
-         return std::not_equal_to<std::complex<long double>>()(std::complex<long double>(0.0,0.0),v);
+         return std::not_equal_to()(0.0,v);
       }
 
       inline bool is_true(const std::complex<float> v)
       {
-         return std::not_equal_to<std::complex<float>>()(std::complex<float>(0.0,0.0),v);
+         return std::not_equal_to()(std::complex<float>(0.0),v);
+      }
+
+      inline bool is_true(const std::complex<double> v)
+      {
+         return std::not_equal_to()(std::complex<double>(0.0),v);
+      }
+
+      inline bool is_true(const std::complex<long double> v)
+      {
+         return std::not_equal_to()(std::complex<long double>(0.0),v);
       }
 
       template <typename T>
