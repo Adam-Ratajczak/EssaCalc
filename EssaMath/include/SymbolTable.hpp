@@ -31,8 +31,10 @@
 
 #pragma once
 
-#include "Functions.hpp"
-#include "ExpressionNodes.hpp"
+#include "include/Functions.hpp"
+#include "include/ExpressionNodes.hpp"
+#include <list>
+#include <set>
 
 namespace Essa::Math{
    template <typename T>

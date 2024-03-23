@@ -31,12 +31,11 @@
 
 #pragma once
 
-#include "Defines.hpp"
-#include "ParserHelpers.hpp"
-#include "OperatorHelpers.hpp"
+#include "include/Defines.hpp"
+#include "include/ParserHelpers.hpp"
+#include "include/OperatorHelpers.hpp"
 #include "include/Numeric.hpp"
 #include <cstdio>
-#include <sstream>
 #include <string>
 #include <cassert>
 

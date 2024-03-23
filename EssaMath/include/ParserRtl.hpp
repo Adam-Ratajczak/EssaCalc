@@ -31,7 +31,8 @@
 
 #pragma once
 
-#include "Parser.hpp"
+#include "include/SymbolTable.hpp"
+#include "include/Functions.hpp"
 
 #ifndef exprtk_disable_rtl_io
 namespace Essa::Math

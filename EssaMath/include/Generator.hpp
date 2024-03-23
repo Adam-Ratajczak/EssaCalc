@@ -31,8 +31,9 @@
 
 #pragma once
 
-#include "Defines.hpp"
-#include "Lexer.hpp"
+#include "include/Defines.hpp"
+#include "include/Lexer.hpp"
+#include <vector>
 
 namespace Essa::Math{
    namespace lexer{

@@ -1,7 +1,7 @@
 #pragma once
-#include "SymbolTable.hpp"
-#include "Parser.hpp"
-#include "Expression.hpp"
+#include "include/SymbolTable.hpp"
+#include "include/Parser.hpp"
+#include "include/Expression.hpp"
 
 namespace Essa::Math{
 

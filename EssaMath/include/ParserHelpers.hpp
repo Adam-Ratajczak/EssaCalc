@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "Generator.hpp"
+#include "include/Generator.hpp"
 
 namespace Essa::Math{
    namespace lexer{

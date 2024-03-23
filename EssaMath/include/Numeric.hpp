@@ -31,8 +31,8 @@
 
 #pragma once
 
-#include "Defines.hpp"
-#include "Faddeeva.hpp"
+#include "include/Defines.hpp"
+#include "include/Faddeeva.hpp"
 #include <cmath>
 #include <limits>
 #include <sstream>

@@ -31,9 +31,10 @@
 
 #pragma once
 
-#include "Numeric.hpp"
+#include "include/Numeric.hpp"
 #include <deque>
-#include <iostream>
+#include <vector>
+#include <map>
 
 namespace Essa::Math{
    namespace details

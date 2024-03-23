@@ -31,10 +31,9 @@
 
 #pragma once
 
-#include "ExpressionNodes.hpp"
-#include "OperatorHelpers.hpp"
-#include "SymbolTable.hpp"
-#include <iostream>
+#include "include/ExpressionNodes.hpp"
+#include "include/OperatorHelpers.hpp"
+#include "include/SymbolTable.hpp"
 
 namespace Essa::Math{
    template <typename T>

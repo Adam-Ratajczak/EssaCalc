@@ -31,8 +31,7 @@
 
 #pragma once
 
-#include "Expression.hpp"
-
+#include "include/Expression.hpp"
 
 namespace Essa::Math{
     template <typename T>

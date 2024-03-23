@@ -31,8 +31,8 @@
 
 #pragma once
 
-#include "Defines.hpp"
-#include "Numeric.hpp"
+#include "include/Defines.hpp"
+#include "include/Numeric.hpp"
 
 namespace Essa::Math{
    namespace details{

@@ -1,4 +1,3 @@
-#include <Essa/Math/SymbolTable.hpp>
 #include <complex>
 #include <iostream>
 #include <Essa/Math/EssaMath.hpp>

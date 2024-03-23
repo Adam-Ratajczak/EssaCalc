@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include "../../include/LispApi.hpp"
+#include "include/LispApi.hpp"
 #include <deque>
 #include <vector>
 

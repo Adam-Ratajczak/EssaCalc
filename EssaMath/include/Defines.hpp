@@ -38,17 +38,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <functional>
 #include <iterator>
-#include <limits>
-#include <list>
-#include <map>
-#include <set>
-#include <stack>
-#include <stdexcept>
 #include <string>
-#include <utility>
-#include <vector>
 
 namespace Essa::Math
 {

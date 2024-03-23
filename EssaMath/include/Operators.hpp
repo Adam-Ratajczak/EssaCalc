@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "ExpressionNodes.hpp"
+#include "include/ExpressionNodes.hpp"
 #include "include/Numeric.hpp"
 
 namespace Essa::Math{

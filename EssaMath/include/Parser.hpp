@@ -31,18 +31,18 @@
 
 #pragma once
 
-#include "Defines.hpp"
-#include "Numeric.hpp"
-#include "Lexer.hpp"
-#include "Token.hpp"
-#include "ParserHelpers.hpp"
-#include "OperatorHelpers.hpp"
-#include "ExpressionNodes.hpp"
-#include "Operators.hpp"
-#include "NodeAllocator.hpp"
-#include "Functions.hpp"
-#include "SymbolTable.hpp"
-#include "Expression.hpp"
+#include "include/Defines.hpp"
+#include "include/Numeric.hpp"
+#include "include/Lexer.hpp"
+#include "include/Token.hpp"
+#include "include/ParserHelpers.hpp"
+#include "include/OperatorHelpers.hpp"
+#include "include/ExpressionNodes.hpp"
+#include "include/Operators.hpp"
+#include "include/NodeAllocator.hpp"
+#include "include/Functions.hpp"
+#include "include/SymbolTable.hpp"
+#include "include/Expression.hpp"
 
 namespace Essa::Math{
    namespace parser_error
