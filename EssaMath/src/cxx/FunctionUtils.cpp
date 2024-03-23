@@ -1,5 +1,20 @@
 #include "../../include/FunctionUtils.hpp"
 
+#define TEMPLATE_DEF_EXPRVAR(name, type)                                                                                                        \
+template expression<type> name(symbol_table<type>& _table, parser<type>& _parser, expression<type>& _expr, std::string const& _var);
+
+#define DEF_ALL_TEMPLATES_EXPRVAR(name)                 \
+TEMPLATE_DEF_EXPRVAR(name, double)                      \
+TEMPLATE_DEF_EXPRVAR(name, long double)                 \
+TEMPLATE_DEF_EXPRVAR(name, float)                       \
+TEMPLATE_DEF_EXPRVAR(name, int16_t)                     \
+TEMPLATE_DEF_EXPRVAR(name, int32_t)                     \
+TEMPLATE_DEF_EXPRVAR(name, int64_t)                     \
+TEMPLATE_DEF_EXPRVAR(name, std::complex<double>)        \
+TEMPLATE_DEF_EXPRVAR(name, std::complex<long double>)   \
+TEMPLATE_DEF_EXPRVAR(name, std::complex<float>)         
+
+
 namespace Essa::Math{
 
 extern std::string evaluate(const std::string& _exp);

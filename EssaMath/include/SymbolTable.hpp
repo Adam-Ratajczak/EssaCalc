@@ -1351,6 +1351,7 @@ namespace Essa::Math{
       {
          return add_pi      () &&
                 add_e       () &&
+                add_i       () &&
                 add_epsilon () &&
                 add_infinity() ;
       }
@@ -1367,6 +1368,13 @@ namespace Essa::Math{
          const typename details::numeric::details::number_type<T>::type num_type;
          static const T local_e = details::numeric::details::const_e_impl<T>(num_type);
          return add_constant("%e",local_e);
+      }
+
+      inline bool add_i()
+      {
+         const typename details::numeric::details::number_type<T>::type num_type;
+         static const T local_i = details::numeric::details::const_i_impl<T>(num_type);
+         return add_constant("%i",local_i);
       }
 
       inline bool add_epsilon()

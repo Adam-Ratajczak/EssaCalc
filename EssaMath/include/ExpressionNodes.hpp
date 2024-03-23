@@ -396,6 +396,8 @@ namespace Essa::Math{
                return "%pi";
             else if(value_ == local_e)
                return "%e";
+            else if(numeric::is_i<T>(value_))
+               return "%i";
             else{
                return numeric::num_to_string<T>(value_);
             }

@@ -56,6 +56,18 @@ namespace Essa::Math{
             }
                
             template <typename T>
+            inline bool is_i_impl(const T v, complex_type_tag)
+            {
+               return std::equal_to<T>()(v,T(0, 1));
+            }
+
+            template <typename T>
+            inline bool is_i_impl(const T v, real_type_tag)
+            {
+               return false;
+            }
+               
+            template <typename T>
             inline std::string to_string_impl(const T v, complex_type_tag)
             {
                std::string _result;
@@ -985,6 +997,13 @@ namespace Essa::Math{
          {
             const typename details::number_type<T>::type num_type;
             return is_nan_impl(v, num_type);
+         }
+
+         template <typename T>
+         inline bool is_i(const T v)
+         {
+            const typename details::number_type<T>::type num_type;
+            return is_i_impl(v, num_type);
          }
 
          template <typename T>
