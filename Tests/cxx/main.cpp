@@ -45,7 +45,8 @@ void trig_function_complex()
    typedef Essa::Math::expression<std::complex<double>>   expression_t;
    typedef Essa::Math::parser<std::complex<double>>       parser_t;
 
-   const std::string expression_string = "sin(x + (2 + %pi) * x * %i) - cos(x / 2 ^ (%e+1))";
+   // const std::string expression_string = "sin(x + (2 + %pi) * x * %i) - cos(x / 2 ^ (%e+1))";
+   const std::string expression_string = "erf(x + (2 + %pi) * x * %i)";
 
    std::complex<double> x;
 

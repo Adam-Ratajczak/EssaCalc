@@ -460,7 +460,7 @@ namespace Essa::Math
       static const std::string base_function_list[] =
                                   {
                                     "abs",  "acos",  "acosh",  "and",  "asin",  "asinh", "atan",
-                                    "atanh", "atan2", "avg",  "break", "case", "ceil",  "clamp",
+                                    "atan2", "atanh", "avg",  "break", "case", "ceil",  "clamp",
                                     "continue",   "cos",   "cosh",   "cot",   "csc",  "default",
                                     "deg2grad",  "deg2rad",   "equal",  "erf",   "erfc",  "exp",
                                     "expm1",  "false",   "floor",  "for",   "frac",  "grad2deg",

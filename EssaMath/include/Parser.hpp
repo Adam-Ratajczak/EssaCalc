@@ -1612,22 +1612,28 @@ namespace Essa::Math{
 
          enum settings_base_funcs
          {
-            e_bf_unknown = 0,
-            e_bf_abs       , e_bf_acos     , e_bf_acosh    , e_bf_asin    ,
-            e_bf_asinh     , e_bf_atan     , e_bf_atan2    , e_bf_atanh   ,
-            e_bf_avg       , e_bf_ceil     , e_bf_clamp    , e_bf_cos     ,
-            e_bf_cosh      , e_bf_cot      , e_bf_csc      , e_bf_equal   ,
-            e_bf_erf       , e_bf_erfc     , e_bf_exp      , e_bf_expm1   ,
-            e_bf_floor     , e_bf_frac     , e_bf_hypot    , e_bf_iclamp  ,
-            e_bf_like      , e_bf_log      , e_bf_log10    , e_bf_log1p   ,
-            e_bf_log2      , e_bf_logn     , e_bf_mand     , e_bf_max     ,
-            e_bf_min       , e_bf_mod      , e_bf_mor      , e_bf_mul     ,
-            e_bf_ncdf      , e_bf_pow      , e_bf_root     , e_bf_round   ,
-            e_bf_roundn    , e_bf_sec      , e_bf_sgn      , e_bf_sin     ,
-            e_bf_sinc      , e_bf_sinh     , e_bf_sqrt     , e_bf_sum     ,
-            e_bf_swap      , e_bf_tan      , e_bf_tanh     , e_bf_trunc   ,
-            e_bf_not_equal , e_bf_inrange  , e_bf_deg2grad , e_bf_deg2rad ,
-            e_bf_rad2deg   , e_bf_grad2deg
+            e_bf_unknown = 0, e_bf_abs,         e_bf_acos,        e_bf_acosh,
+            e_bf_and,         e_bf_asin,        e_bf_asinh,       e_bf_atan,
+            e_bf_atan2,       e_bf_atanh,       e_bf_avg,         e_bf_break,
+            e_bf_case,        e_bf_ceil,        e_bf_clamp,       e_bf_continue,
+            e_bf_cos,         e_bf_cosh,        e_bf_cot,         e_bf_csc,
+            e_bf_default,     e_bf_deg2grad,    e_bf_deg2rad,     e_bf_equal,
+            e_bf_erf,         e_bf_erfc,        e_bf_exp,         e_bf_expm1,
+            e_bf_false,       e_bf_floor,       e_bf_for,         e_bf_frac,
+            e_bf_grad2deg,    e_bf_hypot,       e_bf_iclamp,      e_bf_if,
+            e_bf_else,        e_bf_ilike,       e_bf_in,          e_bf_inrange,
+            e_bf_like,        e_bf_log,         e_bf_log10,       e_bf_log2,
+            e_bf_logn,        e_bf_log1p,       e_bf_mand,        e_bf_max,
+            e_bf_min,         e_bf_mod,         e_bf_mor,         e_bf_mul,
+            e_bf_ncdf,        e_bf_nand,        e_bf_nor,         e_bf_not,
+            e_bf_not_equal,   e_bf_null,        e_bf_or,          e_bf_pow,
+            e_bf_rad2deg,     e_bf_repeat,      e_bf_return,      e_bf_root,
+            e_bf_round,       e_bf_roundn,      e_bf_sec,         e_bf_sgn,
+            e_bf_shl,         e_bf_shr,         e_bf_sin,         e_bf_sinc,
+            e_bf_sinh,        e_bf_sqrt,        e_bf_sum,         e_bf_swap,
+            e_bf_switch,      e_bf_tan,         e_bf_tanh,        e_bf_true,
+            e_bf_trunc,       e_bf_until,       e_bf_var,         e_bf_while,
+            e_bf_xnor,        e_bf_xor,         e_bf_and2,        e_bf_or2
          };
 
          enum settings_control_structs
@@ -2253,8 +2259,69 @@ namespace Essa::Math{
 
         settings_.disable_all_assignment_ops();
         settings_.disable_all_control_structures();
-        settings_.disable_all_inequality_ops();
         settings_.disable_all_logic_ops();
+
+        settings_.disable_arithmetic_operation(settings_t::e_arith_mod);
+
+        settings_.disable_inequality_operation(settings_t::e_ineq_eq);
+        settings_.disable_inequality_operation(settings_t::e_ineq_nequal);
+
+        settings_.disable_base_function(settings_t::e_bf_and);
+        settings_.disable_base_function(settings_t::e_bf_avg);
+        settings_.disable_base_function(settings_t::e_bf_break);
+        settings_.disable_base_function(settings_t::e_bf_case);
+        settings_.disable_base_function(settings_t::e_bf_ceil);
+        settings_.disable_base_function(settings_t::e_bf_clamp);
+        settings_.disable_base_function(settings_t::e_bf_continue);
+        settings_.disable_base_function(settings_t::e_bf_default);
+        settings_.disable_base_function(settings_t::e_bf_deg2grad);
+        settings_.disable_base_function(settings_t::e_bf_deg2rad);
+        settings_.disable_base_function(settings_t::e_bf_equal);
+        settings_.disable_base_function(settings_t::e_bf_false);
+        settings_.disable_base_function(settings_t::e_bf_floor);
+        settings_.disable_base_function(settings_t::e_bf_for);
+        settings_.disable_base_function(settings_t::e_bf_frac);
+        settings_.disable_base_function(settings_t::e_bf_grad2deg);
+        settings_.disable_base_function(settings_t::e_bf_hypot);
+        settings_.disable_base_function(settings_t::e_bf_iclamp);
+        settings_.disable_base_function(settings_t::e_bf_if);
+        settings_.disable_base_function(settings_t::e_bf_else);
+        settings_.disable_base_function(settings_t::e_bf_ilike);
+        settings_.disable_base_function(settings_t::e_bf_in);
+        settings_.disable_base_function(settings_t::e_bf_inrange);
+        settings_.disable_base_function(settings_t::e_bf_like);
+        settings_.disable_base_function(settings_t::e_bf_mand);
+        settings_.disable_base_function(settings_t::e_bf_max);
+        settings_.disable_base_function(settings_t::e_bf_min);
+        settings_.disable_base_function(settings_t::e_bf_mod);
+        settings_.disable_base_function(settings_t::e_bf_mor);
+        settings_.disable_base_function(settings_t::e_bf_mul);
+        settings_.disable_base_function(settings_t::e_bf_nand);
+        settings_.disable_base_function(settings_t::e_bf_nor);
+        settings_.disable_base_function(settings_t::e_bf_not);
+        settings_.disable_base_function(settings_t::e_bf_not_equal);
+        settings_.disable_base_function(settings_t::e_bf_null);
+        settings_.disable_base_function(settings_t::e_bf_or);
+        settings_.disable_base_function(settings_t::e_bf_rad2deg);
+        settings_.disable_base_function(settings_t::e_bf_repeat);
+        settings_.disable_base_function(settings_t::e_bf_return);
+        settings_.disable_base_function(settings_t::e_bf_round);
+        settings_.disable_base_function(settings_t::e_bf_roundn);
+        settings_.disable_base_function(settings_t::e_bf_sgn);
+        settings_.disable_base_function(settings_t::e_bf_shl);
+        settings_.disable_base_function(settings_t::e_bf_shr);
+        settings_.disable_base_function(settings_t::e_bf_sum);
+        settings_.disable_base_function(settings_t::e_bf_swap);
+        settings_.disable_base_function(settings_t::e_bf_switch);
+        settings_.disable_base_function(settings_t::e_bf_true);
+        settings_.disable_base_function(settings_t::e_bf_trunc);
+        settings_.disable_base_function(settings_t::e_bf_until);
+        settings_.disable_base_function(settings_t::e_bf_var);
+        settings_.disable_base_function(settings_t::e_bf_while);
+        settings_.disable_base_function(settings_t::e_bf_xnor);
+        settings_.disable_base_function(settings_t::e_bf_xor);
+        settings_.disable_base_function(settings_t::e_bf_and2);
+        settings_.disable_base_function(settings_t::e_bf_or2);
       }
 
      ~parser() {}
@@ -2586,10 +2653,10 @@ namespace Essa::Math{
          return true;
       }
 
-      inline settings_store& settings()
-      {
-         return settings_;
-      }
+      // inline settings_store& settings()
+      // {
+      //    return settings_;
+      // }
 
       inline parser_error::type get_error(const std::size_t& index) const
       {
