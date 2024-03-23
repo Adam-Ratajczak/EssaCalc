@@ -32,22 +32,85 @@
 #pragma once
 
 #include "Defines.hpp"
+#include "Faddeeva.hpp"
 #include <cmath>
+#include <limits>
+#include <sstream>
+#include <string>
 
 namespace Essa::Math{
    namespace details{
          namespace numeric{
             namespace details{
+               
+            template <typename T>
+            inline bool is_nan_impl(const T v, complex_type_tag)
+            {
+               return std::not_equal_to<T>()(v,v);
+            }
+
             template <typename T>
             inline bool is_nan_impl(const T v, real_type_tag)
             {
                return std::not_equal_to<T>()(v,v);
+            }
+               
+            template <typename T>
+            inline std::string to_string_impl(const T v, complex_type_tag)
+            {
+               std::string _result;
+               if(v.real() != 0){
+                  std::stringstream ss;
+                  ss << v.real();
+                  _result += ss.str();
+               }
+
+               if(v.imag() != 0){
+                  std::stringstream ss;
+                  ss << v.imag();
+                  if(v.imag() > 0)
+                     _result += "+";
+                  _result += ss.str() + "*%i";
+               }
+
+               if(_result.empty())
+                  _result = "=";
+
+               return _result;
+            }
+               
+            template <typename T>
+            inline std::string to_string_impl(const T v, real_type_tag)
+            {
+               std::stringstream ss;
+               ss << v;
+               return ss.str();
+            }
+               
+            template <typename T>
+            inline std::string to_string_impl(const T v, int_type_tag)
+            {
+               std::stringstream ss;
+               ss << v;
+               return ss.str();
+            }
+
+            template <typename T>
+            inline int to_int32_impl(const T v, complex_type_tag)
+            {
+               return static_cast<int>(v.real());
             }
 
             template <typename T>
             inline int to_int32_impl(const T v, real_type_tag)
             {
                return static_cast<int>(v);
+            }
+
+            template <typename T>
+            inline _int64_t to_int64_impl(const T v, complex_type_tag)
+            {
+               return static_cast<_int64_t>(v.real());
             }
 
             template <typename T>
@@ -69,9 +132,21 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T abs_impl(const T v, complex_type_tag)
+            {
+               return T(std::fabs(v.real()), std::fabs(v.imag()));
+            }
+
+            template <typename T>
             inline T abs_impl(const T v, real_type_tag)
             {
                return ((v < T(0)) ? -v : v);
+            }
+
+            template <typename T>
+            inline T min_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return std::numeric_limits<T>::quiet_NaN();
             }
 
             template <typename T>
@@ -81,9 +156,165 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T min_impl(const T v0, const T v1, int_type_tag)
+            {
+               return std::min<T>(v0,v1);
+            }
+
+            template <typename T>
+            inline T max_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return std::numeric_limits<T>::quiet_NaN();
+            }
+
+            template <typename T>
             inline T max_impl(const T v0, const T v1, real_type_tag)
             {
                return std::max<T>(v0,v1);
+            }
+
+            template <typename T>
+            inline T max_impl(const T v0, const T v1, int_type_tag)
+            {
+               return std::max<T>(v0,v1);
+            }
+
+            template <typename T>
+            inline T inrange_impl(const T v0, const T v1, const T v2, complex_type_tag)
+            {
+               return T(0, 0);
+            }
+
+            template <typename T>
+            inline T inrange_impl(const T v0, const T v1, const T v2, real_type_tag)
+            {
+               return (v1 < v0) ? T(0) : ((v1 > v2) ? T(0) : T(1));
+            }
+
+            template <typename T>
+            inline T inrange_impl(const T v0, const T v1, const T v2, int_type_tag)
+            {
+               return (v1 < v0) ? T(0) : ((v1 > v2) ? T(0) : T(1));
+            }
+
+            template <typename T>
+            inline T clamp_impl(const T v0, const T v1, const T v2, complex_type_tag)
+            {
+               return T(0, 0);
+            }
+
+            template <typename T>
+            inline T clamp_impl(const T v0, const T v1, const T v2, real_type_tag)
+            {
+               return (v1 < v0) ? v0 : (v1 > v2 ? v2 : v1);
+            }
+
+            template <typename T>
+            inline T clamp_impl(const T v0, const T v1, const T v2, int_type_tag)
+            {
+               return (v1 < v0) ? v0 : (v1 > v2 ? v2 : v1);
+            }
+
+            template <typename T>
+            inline T iclamp_impl(const T v0, const T v1, const T v2, complex_type_tag)
+            {
+               return T(0, 0);
+            }
+
+            template <typename T>
+            inline T iclamp_impl(const T v0, const T v1, const T v2, real_type_tag)
+            {
+               if ((v1 <= v0) || (v1 >= v2))
+                  return v1;
+               else
+                  return ((T(2) * v1  <= (v2 + v0)) ? v0 : v2);
+            }
+
+            template <typename T>
+            inline T iclamp_impl(const T v0, const T v1, const T v2, int_type_tag)
+            {
+               if ((v1 <= v0) || (v1 >= v2))
+                  return v1;
+               else
+                  return ((T(2) * v1  <= (v2 + v0)) ? v0 : v2);
+            }
+
+            template <typename T>
+            inline T lth_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return v0.real() < v1.real() ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T lth_impl(const T v0, const T v1, real_type_tag)
+            {
+               return v0 < v1 ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T lth_impl(const T v0, const T v1, int_type_tag)
+            {
+               return v0 < v1 ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T leq_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return v0.real() <= v1.real() ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T leq_impl(const T v0, const T v1, real_type_tag)
+            {
+               return v0 <= v1 ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T leq_impl(const T v0, const T v1, int_type_tag)
+            {
+               return v0 <= v1 ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T geq_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return v0.real() >= v1.real() ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T geq_impl(const T v0, const T v1, real_type_tag)
+            {
+               return v0 >= v1 ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T geq_impl(const T v0, const T v1, int_type_tag)
+            {
+               return v0 >= v1 ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T gth_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return v0.real() > v1.real() ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T gth_impl(const T v0, const T v1, real_type_tag)
+            {
+               return v0 > v1 ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T gth_impl(const T v0, const T v1, int_type_tag)
+            {
+               return v0 > v1 ? T(1) : T(0);
+            }
+
+            template <typename T>
+            inline T equal_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return (v0 == v1) ? T(1, 0) : T(0, 0);  
             }
 
             template <typename T>
@@ -103,6 +334,12 @@ namespace Essa::Math{
             inline T equal_impl(const T v0, const T v1, int_type_tag)
             {
                return (v0 == v1) ? 1 : 0;
+            }
+
+            template <typename T>
+            inline T expm1_impl(const T v, complex_type_tag)
+            {
+               return std::exp(v) - T(1, 0);
             }
 
             template <typename T>
@@ -129,6 +366,14 @@ namespace Essa::Math{
                return (abs_impl(v0 - v1,rtg()) > (std::max(T(1),std::max(abs_impl(v0,rtg()),abs_impl(v1,rtg()))) * epsilon)) ? T(1) : T(0);
             }
 
+            template <typename T>
+            inline T nequal_impl(const T v0, const T v1, complex_type_tag)
+            {
+               typedef real_type_tag rtg;
+               const T epsilon = epsilon_type<T>::value();
+               return v0 != v1 ? T(1, 0) : T(0, 0);
+            }
+
             inline float nequal_impl(const float v0, const float v1, real_type_tag)
             {
                typedef real_type_tag rtg;
@@ -140,6 +385,12 @@ namespace Essa::Math{
             inline T nequal_impl(const T v0, const T v1, int_type_tag)
             {
                return (v0 != v1) ? 1 : 0;
+            }
+
+            template <typename T>
+            inline T modulus_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return T(std::fmod(v0.real(),v1.real()), std::fmod(v0.imag(),v1.imag()));
             }
 
             template <typename T>
@@ -155,6 +406,12 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T pow_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return std::pow(v0,v1);
+            }
+
+            template <typename T>
             inline T pow_impl(const T v0, const T v1, real_type_tag)
             {
                return std::pow(v0,v1);
@@ -167,6 +424,12 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T logn_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return std::log(v0) / std::log(v1);
+            }
+
+            template <typename T>
             inline T logn_impl(const T v0, const T v1, real_type_tag)
             {
                return std::log(v0) / std::log(v1);
@@ -176,6 +439,12 @@ namespace Essa::Math{
             inline T logn_impl(const T v0, const T v1, int_type_tag)
             {
                return static_cast<T>(logn_impl<double>(static_cast<double>(v0),static_cast<double>(v1),real_type_tag()));
+            }
+
+            template <typename T>
+            inline T log1p_impl(const T v, complex_type_tag)
+            {
+               return std::log(T(1, 0) + v);
             }
 
             template <typename T>
@@ -206,6 +475,12 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T root_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return std::pow(v0, T(1, 0) / v1);
+            }
+
+            template <typename T>
             inline T root_impl(const T v0, const T v1, real_type_tag)
             {
                if (v1 < T(0))
@@ -226,9 +501,24 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T round_impl(const T v, complex_type_tag)
+            {
+               return T(round(v.real()), round(v.imag()));
+            }
+
+            template <typename T>
             inline T round_impl(const T v, real_type_tag)
             {
                return ((v < T(0)) ? std::ceil(v - T(0.5)) : std::floor(v + T(0.5)));
+            }
+
+            template <typename T>
+            inline T roundn_impl(const T v0, const T v1, complex_type_tag)
+            {
+               const int index = std::max<int>(0, std::min<int>(pow10_size - 1, static_cast<int>(std::floor(v1.real()))));
+               const double p10 = double(pow10[index]);
+
+               return T(v0.real() < 0.0 ? std::ceil ((v0.real() * p10) - 0.5) / p10 : std::floor ((v0.real() * p10) + 0.5) / p10, v0.imag() < 0.0 ? std::ceil ((v0.imag() * p10) - 0.5) / p10 : std::floor ((v0.imag() * p10) + 0.5) / p10);
             }
 
             template <typename T>
@@ -250,6 +540,12 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T hypot_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return std::sqrt((v0 * v0) + (v1 * v1));
+            }
+
+            template <typename T>
             inline T hypot_impl(const T v0, const T v1, real_type_tag)
             {
                return std::sqrt((v0 * v0) + (v1 * v1));
@@ -259,6 +555,12 @@ namespace Essa::Math{
             inline T hypot_impl(const T v0, const T v1, int_type_tag)
             {
                return static_cast<T>(std::sqrt(static_cast<double>((v0 * v0) + (v1 * v1))));
+            }
+
+            template <typename T>
+            inline T atan2_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return std::atan(v0/v1);
             }
 
             template <typename T>
@@ -274,6 +576,12 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T shr_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return v0 * (T(1) / std::pow(T(2),static_cast<T>(static_cast<int>(v1.real()))));
+            }
+
+            template <typename T>
             inline T shr_impl(const T v0, const T v1, real_type_tag)
             {
                return v0 * (T(1) / std::pow(T(2),static_cast<T>(static_cast<int>(v1))));
@@ -286,6 +594,12 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T shl_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return v0 * std::pow(T(2),static_cast<T>(static_cast<int>(v1.real())));
+            }
+
+            template <typename T>
             inline T shl_impl(const T v0, const T v1, real_type_tag)
             {
                return v0 * std::pow(T(2),static_cast<T>(static_cast<int>(v1)));
@@ -295,6 +609,12 @@ namespace Essa::Math{
             inline T shl_impl(const T v0, const T v1, int_type_tag)
             {
                return v0 << v1;
+            }
+
+            template <typename T>
+            inline T sgn_impl(const T v, complex_type_tag)
+            {
+               return T(v.real() < 0 ? -1 : v.real() == 0 ? 0 : +1, v.imag() < 0 ? -1 : v.imag() == 0 ? 0 : +1);
             }
 
             template <typename T>
@@ -314,6 +634,12 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T and_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return (is_true_impl(v0.real()) && is_true_impl(v1.real())) ? T(1) : T(0);
+            }
+
+            template <typename T>
             inline T and_impl(const T v0, const T v1, real_type_tag)
             {
                return (is_true_impl(v0) && is_true_impl(v1)) ? T(1) : T(0);
@@ -323,6 +649,12 @@ namespace Essa::Math{
             inline T and_impl(const T v0, const T v1, int_type_tag)
             {
                return v0 && v1;
+            }
+
+            template <typename T>
+            inline T nand_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return (is_false_impl(v0.real()) || is_false_impl(v1.real())) ? T(1) : T(0);
             }
 
             template <typename T>
@@ -338,6 +670,12 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T or_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return (is_true_impl(v0.real()) || is_true_impl(v1.real())) ? T(1) : T(0);
+            }
+
+            template <typename T>
             inline T or_impl(const T v0, const T v1, real_type_tag)
             {
                return (is_true_impl(v0) || is_true_impl(v1)) ? T(1) : T(0);
@@ -347,6 +685,12 @@ namespace Essa::Math{
             inline T or_impl(const T v0, const T v1, int_type_tag)
             {
                return (v0 || v1);
+            }
+
+            template <typename T>
+            inline T nor_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return (is_false_impl(v0.real()) && is_false_impl(v1.real())) ? T(1) : T(0);
             }
 
             template <typename T>
@@ -362,6 +706,12 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T xor_impl(const T v0, const T v1, complex_type_tag)
+            {
+               return (is_false_impl(v0.real()) != is_false_impl(v1.real())) ? T(1) : T(0);
+            }
+
+            template <typename T>
             inline T xor_impl(const T v0, const T v1, real_type_tag)
             {
                return (is_false_impl(v0) != is_false_impl(v1)) ? T(1) : T(0);
@@ -371,6 +721,18 @@ namespace Essa::Math{
             inline T xor_impl(const T v0, const T v1, int_type_tag)
             {
                return v0 ^ v1;
+            }
+
+            template <typename T>
+            inline T xnor_impl(const T v0, const T v1, complex_type_tag)
+            {
+               const bool v0_true = is_true_impl(v0.real());
+               const bool v1_true = is_true_impl(v1.real());
+
+               if ((v0_true &&  v1_true) || (!v0_true && !v1_true))
+                  return T(1);
+               else
+                  return T(0);
             }
 
             template <typename T>
@@ -397,42 +759,16 @@ namespace Essa::Math{
                   return T(0);
             }
 
-            #if (defined(_MSC_VER) && (_MSC_VER >= 1900)) || !defined(_MSC_VER)
-            #define exprtk_define_erf(TT, impl)                \
-            inline TT erf_impl(const TT v) { return impl(v); } \
-
-            exprtk_define_erf(      float,::erff)
-            exprtk_define_erf(     double,::erf )
-            exprtk_define_erf(long double,::erfl)
-            #undef exprtk_define_erf
-            #endif
+            template <typename T>
+            inline T erf_impl(const T v, complex_type_tag)
+            {
+               return erf(v);
+            }
 
             template <typename T>
             inline T erf_impl(const T v, real_type_tag)
             {
-               #if defined(_MSC_VER) && (_MSC_VER < 1900)
-               // Credits: Abramowitz & Stegun Equations 7.1.25-28
-               static const T c[] = {
-                                      T( 1.26551223), T(1.00002368),
-                                      T( 0.37409196), T(0.09678418),
-                                      T(-0.18628806), T(0.27886807),
-                                      T(-1.13520398), T(1.48851587),
-                                      T(-0.82215223), T(0.17087277)
-                                    };
-
-               const T t = T(1) / (T(1) + T(0.5) * abs_impl(v,real_type_tag()));
-
-               const T result = T(1) - t * std::exp((-v * v) -
-                                            c[0] + t * (c[1] + t *
-                                           (c[2] + t * (c[3] + t *
-                                           (c[4] + t * (c[5] + t *
-                                           (c[6] + t * (c[7] + t *
-                                           (c[8] + t * (c[9]))))))))));
-
-               return (v >= T(0)) ? result : -result;
-               #else
-               return erf_impl(v);
-               #endif
+               return erf(v);
             }
 
             template <typename T>
@@ -441,24 +777,16 @@ namespace Essa::Math{
                return erf_impl(static_cast<double>(v),real_type_tag());
             }
 
-            #if (defined(_MSC_VER) && (_MSC_VER >= 1900)) || !defined(_MSC_VER)
-            #define exprtk_define_erfc(TT, impl)                \
-            inline TT erfc_impl(const TT v) { return impl(v); } \
-
-            exprtk_define_erfc(float      ,::erfcf)
-            exprtk_define_erfc(double     ,::erfc )
-            exprtk_define_erfc(long double,::erfcl)
-            #undef exprtk_define_erfc
-            #endif
+            template <typename T>
+            inline T erfc_impl(const T v, complex_type_tag)
+            {
+               return erfc(v);
+            }
 
             template <typename T>
             inline T erfc_impl(const T v, real_type_tag)
             {
-               #if defined(_MSC_VER) && (_MSC_VER < 1900)
-               return T(1) - erf_impl(v,real_type_tag());
-               #else
-               return erfc_impl(v);
-               #endif
+               return erfc(v);
             }
 
             template <typename T>
@@ -468,18 +796,27 @@ namespace Essa::Math{
             }
 
             template <typename T>
+            inline T ncdf_impl(const T v, complex_type_tag)
+            {
+               return Dawson(v);
+            }
+
+            template <typename T>
             inline T ncdf_impl(const T v, real_type_tag)
             {
-               const T cnd = T(0.5) * (T(1) +
-                             erf_impl(abs_impl(v,real_type_tag()) /
-                                      T(numeric::constant::sqrt2),real_type_tag()));
-               return  (v < T(0)) ? (T(1) - cnd) : cnd;
+               return Dawson(v);
             }
 
             template <typename T>
             inline T ncdf_impl(const T v, int_type_tag)
             {
                return ncdf_impl(static_cast<double>(v),real_type_tag());
+            }
+
+            template <typename T>
+            inline T sinc_impl(const T v, complex_type_tag)
+            {
+               return(std::sin(v) / v);
             }
 
             template <typename T>
@@ -496,6 +833,43 @@ namespace Essa::Math{
             {
                return sinc_impl(static_cast<double>(v),real_type_tag());
             }
+
+            template <typename T> inline T  acos_impl(const T v, complex_type_tag) { return std::acos (v); }
+            template <typename T> inline T acosh_impl(const T v, complex_type_tag) { return std::log(v + std::sqrt((v * v) - T(1))); }
+            template <typename T> inline T  asin_impl(const T v, complex_type_tag) { return std::asin (v); }
+            template <typename T> inline T asinh_impl(const T v, complex_type_tag) { return std::log(v + std::sqrt((v * v) + T(1))); }
+            template <typename T> inline T  atan_impl(const T v, complex_type_tag) { return std::atan (v); }
+            template <typename T> inline T atanh_impl(const T v, complex_type_tag) { return (std::log(T(1) + v) - std::log(T(1) - v)) / T(2); }
+            template <typename T> inline T  ceil_impl(const T v, complex_type_tag) { return T(std::ceil (v.real()), std::ceil (v.imag())); }
+            template <typename T> inline T   cos_impl(const T v, complex_type_tag) { return std::cos  (v); }
+            template <typename T> inline T  cosh_impl(const T v, complex_type_tag) { return std::cosh (v); }
+            template <typename T> inline T   exp_impl(const T v, complex_type_tag) { return std::exp  (v); }
+            template <typename T> inline T floor_impl(const T v, complex_type_tag) { return T(std::floor(v.real()), std::floor(v.imag())); }
+            template <typename T> inline T   log_impl(const T v, complex_type_tag) { return std::log  (v); }
+            template <typename T> inline T log10_impl(const T v, complex_type_tag) { return std::log10(v); }
+            template <typename T> inline T  log2_impl(const T v, complex_type_tag) { return std::log(v)/T(numeric::constant::log2); }
+            template <typename T> inline T   neg_impl(const T v, complex_type_tag) { return -v;            }
+            template <typename T> inline T   pos_impl(const T v, complex_type_tag) { return +v;            }
+            template <typename T> inline T   sin_impl(const T v, complex_type_tag) { return std::sin  (v); }
+            template <typename T> inline T  sinh_impl(const T v, complex_type_tag) { return std::sinh (v); }
+            template <typename T> inline T  sqrt_impl(const T v, complex_type_tag) { return std::sqrt (v); }
+            template <typename T> inline T   tan_impl(const T v, complex_type_tag) { return std::tan  (v); }
+            template <typename T> inline T  tanh_impl(const T v, complex_type_tag) { return std::tanh (v); }
+            template <typename T> inline T   cot_impl(const T v, complex_type_tag) { return T(1) / std::tan(v); }
+            template <typename T> inline T   sec_impl(const T v, complex_type_tag) { return T(1) / std::cos(v); }
+            template <typename T> inline T   csc_impl(const T v, complex_type_tag) { return T(1) / std::sin(v); }
+            template <typename T> inline T   r2d_impl(const T v, complex_type_tag) { return (v * T(numeric::constant::_180_pi)); }
+            template <typename T> inline T   d2r_impl(const T v, complex_type_tag) { return (v * T(numeric::constant::pi_180));  }
+            template <typename T> inline T   d2g_impl(const T v, complex_type_tag) { return (v * T(10.0/9.0)); }
+            template <typename T> inline T   g2d_impl(const T v, complex_type_tag) { return (v * T(9.0/10.0)); }
+            template <typename T> inline T  notl_impl(const T v, complex_type_tag) { return (std::not_equal_to<T>()(T(0),v) ? T(0) : T(1)); }
+            template <typename T> inline T  frac_impl(const T v, complex_type_tag) { return T(v.real() - static_cast<long long>(v.real()), v.imag() - static_cast<long long>(v.imag())); }
+            template <typename T> inline T trunc_impl(const T v, complex_type_tag) { return T(static_cast<long long>(v.real()), static_cast<long long>(v.imag()));    }
+
+            template <typename T> inline T   const_pi_impl(complex_type_tag) { return T(numeric::constant::pi, 0.0);       }
+            template <typename T> inline T    const_e_impl(complex_type_tag) { return T(numeric::constant::e, 0.0);        }
+            template <typename T> inline T const_qnan_impl(complex_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
+            template <typename T> inline T   const_i_impl(complex_type_tag) { return T(0.0, 1.0);                          }
 
             template <typename T> inline T  acos_impl(const T v, real_type_tag) { return std::acos (v); }
             template <typename T> inline T acosh_impl(const T v, real_type_tag) { return std::log(v + std::sqrt((v * v) - T(1))); }
@@ -532,6 +906,7 @@ namespace Essa::Math{
             template <typename T> inline T   const_pi_impl(real_type_tag) { return T(numeric::constant::pi);            }
             template <typename T> inline T    const_e_impl(real_type_tag) { return T(numeric::constant::e);             }
             template <typename T> inline T const_qnan_impl(real_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
+            template <typename T> inline T    const_i_impl(real_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
 
             template <typename T> inline T   abs_impl(const T v, int_type_tag) { return ((v >= T(0)) ? v : -v); }
             template <typename T> inline T   exp_impl(const T v, int_type_tag) { return std::exp  (v); }
@@ -563,6 +938,13 @@ namespace Essa::Math{
             template <typename T> inline T   sec_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
             template <typename T> inline T   csc_impl(const T  , int_type_tag) { return std::numeric_limits<T>::quiet_NaN(); }
 
+            template <typename T>
+            inline bool is_integer_impl(const T& v, complex_type_tag)
+            {
+               if(v.imag() == 0)
+                  return std::equal_to<T>()(T(0),std::fmod(v.real(),1.0));
+               return false;
+            }
             template <typename T>
             inline bool is_integer_impl(const T& v, real_type_tag)
             {
@@ -606,17 +988,73 @@ namespace Essa::Math{
          }
 
          template <typename T>
-         inline T min(const T v0, const T v1)
+         inline std::string num_to_string(const T v)
+         {
+            const typename details::number_type<T>::type num_type;
+            return to_string_impl(v, num_type);
+         }
+
+         template <typename T>
+         inline T min_num(const T v0, const T v1)
          {
             const typename details::number_type<T>::type num_type;
             return min_impl(v0, v1, num_type);
          }
 
          template <typename T>
-         inline T max(const T v0, const T v1)
+         inline T max_num(const T v0, const T v1)
          {
             const typename details::number_type<T>::type num_type;
             return max_impl(v0, v1, num_type);
+         }
+
+         template <typename T>
+         inline T inrange(const T v0, const T v1, const T v2)
+         {
+            const typename details::number_type<T>::type num_type;
+            return inrange_impl(v0, v1, v2, num_type);
+         }
+
+         template <typename T>
+         inline T clamp(const T v0, const T v1, const T v2)
+         {
+            const typename details::number_type<T>::type num_type;
+            return clamp_impl(v0, v1, v2, num_type);
+         }
+
+         template <typename T>
+         inline T iclamp(const T v0, const T v1, const T v2)
+         {
+            const typename details::number_type<T>::type num_type;
+            return iclamp_impl(v0, v1, v2, num_type);
+         }
+
+         template <typename T>
+         inline T lth(const T v0, const T v1)
+         {
+            const typename details::number_type<T>::type num_type;
+            return lth_impl(v0, v1, num_type);
+         }
+
+         template <typename T>
+         inline T leq(const T v0, const T v1)
+         {
+            const typename details::number_type<T>::type num_type;
+            return leq_impl(v0, v1, num_type);
+         }
+
+         template <typename T>
+         inline T geq(const T v0, const T v1)
+         {
+            const typename details::number_type<T>::type num_type;
+            return geq_impl(v0, v1, num_type);
+         }
+
+         template <typename T>
+         inline T gth(const T v0, const T v1)
+         {
+            const typename details::number_type<T>::type num_type;
+            return gth_impl(v0, v1, num_type);
          }
 
          template <typename T>

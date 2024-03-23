@@ -34,7 +34,9 @@
 #include "Defines.hpp"
 #include "ParserHelpers.hpp"
 #include "OperatorHelpers.hpp"
+#include "include/Numeric.hpp"
 #include <cstdio>
+#include <sstream>
 #include <string>
 #include <cassert>
 
@@ -394,8 +396,9 @@ namespace Essa::Math{
                return "%pi";
             else if(value_ == local_e)
                return "%e";
-            else 
-               return std::to_string(value_);
+            else{
+               return numeric::num_to_string<T>(value_);
+            }
          }
       private:
 
@@ -771,14 +774,11 @@ namespace Essa::Math{
 
             switch (operation_)
             {
-               case e_inrange : return (arg1 < arg0) ? T(0) : ((arg1 > arg2) ? T(0) : T(1));
+               case e_inrange : return numeric::inrange<T>(arg0, arg1, arg2);
 
-               case e_clamp   : return (arg1 < arg0) ? arg0 : (arg1 > arg2 ? arg2 : arg1);
+               case e_clamp   : return numeric::clamp<T>(arg0, arg1, arg2);
 
-               case e_iclamp  : if ((arg1 <= arg0) || (arg1 >= arg2))
-                                   return arg1;
-                                else
-                                   return ((T(2) * arg1  <= (arg2 + arg0)) ? arg0 : arg2);
+               case e_iclamp  : return numeric::iclamp<T>(arg0, arg1, arg2);
 
                default        : exprtk_debug(("trinary_node::value() - Error: Invalid operation\n"));
                                 return std::numeric_limits<T>::quiet_NaN();
@@ -1981,7 +1981,7 @@ namespace Essa::Math{
          }
 
          inline std::string to_string() const exprtk_override{
-            return id_.empty() ? std::to_string(*value_) : id_;
+            return id_.empty() ? numeric::num_to_string<T>(*value_) : id_;
          }
       private:
 
@@ -4454,10 +4454,10 @@ namespace Essa::Math{
       define_sfop4(91,(axn<T,9>(x,y) + axn<T,9>(z,w)),"")
       define_sfop4(92,((details::is_true(x) && details::is_true(y)) ? z : w),"")
       define_sfop4(93,((details::is_true(x) || details::is_true(y)) ? z : w),"")
-      define_sfop4(94,((x <  y) ? z : w),"")
-      define_sfop4(95,((x <= y) ? z : w),"")
-      define_sfop4(96,((x >  y) ? z : w),"")
-      define_sfop4(97,((x >= y) ? z : w),"")
+      define_sfop4(94,(details::is_true(numeric::lth<T>(x, y)) ? z : w),"")
+      define_sfop4(95,(details::is_true(numeric::leq<T>(x, y)) ? z : w),"")
+      define_sfop4(96,(details::is_true(numeric::gth<T>(x, y)) ? z : w),"")
+      define_sfop4(97,(details::is_true(numeric::geq<T>(x, y)) ? z : w),"")
       define_sfop4(98,(details::is_true(numeric::equal(x,y)) ? z : w),"")
       define_sfop4(99,(x * numeric::sin(y) + z * numeric::cos(w)),"")
 

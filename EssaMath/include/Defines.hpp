@@ -33,6 +33,8 @@
 
 #include <algorithm>
 #include <cctype>
+#include <complex>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -779,6 +781,7 @@ namespace Essa::Math
             struct unknown_type_tag { unknown_type_tag() {} };
             struct real_type_tag    { real_type_tag   () {} };
             struct int_type_tag     { int_type_tag    () {} };
+            struct complex_type_tag     { complex_type_tag    () {} };
 
             template <typename T>
             struct number_type
@@ -795,12 +798,25 @@ namespace Essa::Math
             template <> struct number_type<T>                    \
             { typedef int_type_tag type; number_type() {} };     \
 
-            exprtk_register_real_type_tag(double     )
-            exprtk_register_real_type_tag(long double)
-            exprtk_register_real_type_tag(float      )
+            #define exprtk_register_complex_type_tag(T)          \
+            template <> struct number_type<T>                    \
+            { typedef complex_type_tag type; number_type() {} }; \
+
+            exprtk_register_real_type_tag(double      )
+            exprtk_register_real_type_tag(long double )
+            exprtk_register_real_type_tag(float       )
+
+            exprtk_register_int_type_tag(int16_t      )
+            exprtk_register_int_type_tag(int32_t      )
+            exprtk_register_int_type_tag(int64_t      )
+
+            exprtk_register_complex_type_tag(std::complex<float>)
+            exprtk_register_complex_type_tag(std::complex<double>)
+            exprtk_register_complex_type_tag(std::complex<long double>)
 
             #undef exprtk_register_real_type_tag
             #undef exprtk_register_int_type_tag
+            #undef exprtk_register_complex_type_tag
 
             template <typename T>
             struct epsilon_type {};
@@ -815,9 +831,12 @@ namespace Essa::Math
                }                                                   \
             };                                                     \
 
-            exprtk_define_epsilon_type(float      , 0.00000100000f)
-            exprtk_define_epsilon_type(double     , 0.000000000100)
-            exprtk_define_epsilon_type(long double, 0.000000000001)
+            exprtk_define_epsilon_type(float                      , 0.00000100000f)
+            exprtk_define_epsilon_type(double                     , 0.000000000100)
+            exprtk_define_epsilon_type(long double                , 0.000000000001)
+            exprtk_define_epsilon_type(std::complex<float>        , 0.00000100000f)
+            exprtk_define_epsilon_type(std::complex<double>       , 0.000000000100)
+            exprtk_define_epsilon_type(std::complex<long double>  , 0.000000000001)
 
             #undef exprtk_define_epsilon_type
          }

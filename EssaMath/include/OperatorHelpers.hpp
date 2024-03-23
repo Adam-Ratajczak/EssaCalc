@@ -539,15 +539,15 @@ namespace Essa::Math{
                   case e_mod    : return modulus<T>(arg0,arg1);
                   case e_pow    : return pow<T>(arg0,arg1);
                   case e_atan2  : return atan2<T>(arg0,arg1);
-                  case e_min    : return std::min<T>(arg0,arg1);
-                  case e_max    : return std::max<T>(arg0,arg1);
+                  case e_min    : return min_num<T>(arg0,arg1);
+                  case e_max    : return max_num<T>(arg0,arg1);
                   case e_logn   : return logn<T>(arg0,arg1);
-                  case e_lt     : return (arg0 <  arg1) ? T(1) : T(0);
-                  case e_lte    : return (arg0 <= arg1) ? T(1) : T(0);
+                  case e_lt     : return lth<T>(arg0,arg1);
+                  case e_lte    : return leq<T>(arg0,arg1);
                   case e_eq     : return std::equal_to<T>()(arg0,arg1) ? T(1) : T(0);
                   case e_ne     : return std::not_equal_to<T>()(arg0,arg1) ? T(1) : T(0);
-                  case e_gte    : return (arg0 >= arg1) ? T(1) : T(0);
-                  case e_gt     : return (arg0 >  arg1) ? T(1) : T(0);
+                  case e_gte    : return geq<T>(arg0,arg1);
+                  case e_gt     : return gth<T>(arg0,arg1);
                   case e_and    : return and_opr <T>(arg0,arg1);
                   case e_nand   : return nand_opr<T>(arg0,arg1);
                   case e_or     : return or_opr  <T>(arg0,arg1);
@@ -563,44 +563,6 @@ namespace Essa::Math{
                   case e_shl    : return shl     <T>(arg0,arg1);
 
                   default       : exprtk_debug(("numeric::details::process_impl<T> - Invalid binary operation.\n"));
-                                  return std::numeric_limits<T>::quiet_NaN();
-               }
-            }
-
-            template <typename T>
-            inline T process_impl(const operator_type operation, const T arg0, const T arg1, int_type_tag)
-            {
-               switch (operation)
-               {
-                  case e_add    : return (arg0 + arg1);
-                  case e_sub    : return (arg0 - arg1);
-                  case e_mul    : return (arg0 * arg1);
-                  case e_div    : return (arg0 / arg1);
-                  case e_mod    : return arg0 % arg1;
-                  case e_pow    : return pow<T>(arg0,arg1);
-                  case e_min    : return std::min<T>(arg0,arg1);
-                  case e_max    : return std::max<T>(arg0,arg1);
-                  case e_logn   : return logn<T>(arg0,arg1);
-                  case e_lt     : return (arg0 <  arg1) ? T(1) : T(0);
-                  case e_lte    : return (arg0 <= arg1) ? T(1) : T(0);
-                  case e_eq     : return (arg0 == arg1) ? T(1) : T(0);
-                  case e_ne     : return (arg0 != arg1) ? T(1) : T(0);
-                  case e_gte    : return (arg0 >= arg1) ? T(1) : T(0);
-                  case e_gt     : return (arg0 >  arg1) ? T(1) : T(0);
-                  case e_and    : return ((arg0 != T(0)) && (arg1 != T(0))) ? T(1) : T(0);
-                  case e_nand   : return ((arg0 != T(0)) && (arg1 != T(0))) ? T(0) : T(1);
-                  case e_or     : return ((arg0 != T(0)) || (arg1 != T(0))) ? T(1) : T(0);
-                  case e_nor    : return ((arg0 != T(0)) || (arg1 != T(0))) ? T(0) : T(1);
-                  case e_xor    : return arg0 ^ arg1;
-                  case e_xnor   : return !(arg0 ^ arg1);
-                  case e_root   : return root<T>(arg0,arg1);
-                  case e_equal  : return arg0 == arg1;
-                  case e_nequal : return arg0 != arg1;
-                  case e_hypot  : return hypot<T>(arg0,arg1);
-                  case e_shr    : return arg0 >> arg1;
-                  case e_shl    : return arg0 << arg1;
-
-                  default       : exprtk_debug(("numeric::details::process_impl<IntType> - Invalid binary operation.\n"));
                                   return std::numeric_limits<T>::quiet_NaN();
                }
             }
@@ -725,6 +687,21 @@ namespace Essa::Math{
       inline bool is_true(const float v)
       {
          return std::not_equal_to<float>()(0.0f,v);
+      }
+
+      inline bool is_true(const std::complex<double> v)
+      {
+         return std::not_equal_to<std::complex<double>>()(std::complex<double>(0.0,0.0),v);
+      }
+
+      inline bool is_true(const std::complex<long double> v)
+      {
+         return std::not_equal_to<std::complex<long double>>()(std::complex<long double>(0.0,0.0),v);
+      }
+
+      inline bool is_true(const std::complex<float> v)
+      {
+         return std::not_equal_to<std::complex<float>>()(std::complex<float>(0.0,0.0),v);
       }
 
       template <typename T>

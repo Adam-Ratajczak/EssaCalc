@@ -5278,7 +5278,7 @@ namespace Essa::Math{
             {
                const T r0_value = r0->value();
 
-               if (r0_value >= T(0))
+               if (details::is_true(details::numeric::geq<T>(r0_value, T(0))))
                {
                   rp.n0_c.first  = true;
                   rp.n0_c.second = static_cast<std::size_t>(details::numeric::to_int64(r0_value));
@@ -5287,7 +5287,7 @@ namespace Essa::Math{
 
                free_node(node_allocator_,r0);
 
-               if (r0_value < T(0))
+               if (details::is_true(details::numeric::lth<T>(r0_value, T(0))))
                {
                   set_error(
                      make_error(parser_error::e_syntax,
@@ -5343,7 +5343,7 @@ namespace Essa::Math{
             {
                const T r1_value = r1->value();
 
-               if (r1_value >= T(0))
+               if (details::is_true(details::numeric::geq<T>(r1_value, T(0))))
                {
                   rp.n1_c.first   = true;
                   rp.n1_c.second  = static_cast<std::size_t>(details::numeric::to_int64(r1_value));
@@ -5352,7 +5352,7 @@ namespace Essa::Math{
 
                free_node(node_allocator_,r1);
 
-               if (r1_value < T(0))
+               if (details::is_true(details::numeric::lth<T>(r1_value, T(0))))
                {
                   set_error(
                      make_error(parser_error::e_syntax,
@@ -6631,10 +6631,10 @@ namespace Essa::Math{
          const T max_vector_size = T(2000000000.0);
 
          if (
-              (vector_size <= T(0)) ||
+              (details::is_true(details::numeric::leq<T>(vector_size, T(0)))) ||
               std::not_equal_to<T>()
               (T(0),vector_size - details::numeric::trunc(vector_size)) ||
-              (vector_size > max_vector_size)
+              (details::is_true(details::numeric::gth<T>(vector_size, max_vector_size)))
             )
          {
             set_error(
@@ -6813,7 +6813,7 @@ namespace Essa::Math{
                }
             }
 
-            if (T(vec_initilizer_list.size()) > vector_size)
+            if (details::is_true(details::numeric::gth<T>(T(vec_initilizer_list.size()), vector_size)))
             {
                set_error(
                   make_error(parser_error::e_syntax,
@@ -11136,7 +11136,7 @@ namespace Essa::Math{
          {
             if(details::disable_cardinal_pow_optimisation)
                return error_node();
-            const bool not_recipricol = (c >= T(0));
+            const bool not_recipricol = details::is_true(details::numeric::geq<T>(c, T(0)));
             const unsigned int p = static_cast<unsigned int>(details::numeric::to_int32(details::numeric::abs(c)));
 
             if (0 == p)
@@ -11159,7 +11159,7 @@ namespace Essa::Math{
          {
             if(details::disable_cardinal_pow_optimisation)
                return false;
-            return (details::e_pow == operation) && (details::numeric::abs(c) <= T(60)) && details::numeric::is_integer(c);
+            return (details::e_pow == operation) && (details::is_true(details::numeric::leq<T>(details::numeric::abs(c), T(60)))) && details::numeric::is_integer(c);
          }
 
          inline expression_node_ptr cardinal_pow_optimisation(expression_node_ptr (&branch)[2])
@@ -11167,7 +11167,7 @@ namespace Essa::Math{
             if(details::disable_cardinal_pow_optimisation)
                return error_node();
             const Type c = static_cast<details::literal_node<Type>*>(branch[1])->value();
-            const bool not_recipricol = (c >= T(0));
+            const bool not_recipricol = details::is_true(details::numeric::geq<T>(c, T(0)));
             const unsigned int p = static_cast<unsigned int>(details::numeric::to_int32(details::numeric::abs(c)));
 
             node_allocator_->free(branch[1]);

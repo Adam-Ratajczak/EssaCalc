@@ -50,7 +50,7 @@ install(
 )
 
 install(
-    FILES       "${GENERATED_HEADERS_DIR}/essa/version.h"
+    FILES       "${GENERATED_HEADERS_DIR}/essamath/version.h"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/Essa/Math"
 )
 

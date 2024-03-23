@@ -32,6 +32,7 @@
 #pragma once
 
 #include "ExpressionNodes.hpp"
+#include "include/Numeric.hpp"
 
 namespace Essa::Math{
    namespace details
@@ -171,7 +172,7 @@ namespace Essa::Math{
       {
          typedef typename opr_base<T>::Type Type;
 
-         static inline T process(Type t1, Type t2) { return ((t1 < t2) ? T(1) : T(0)); }
+         static inline T process(Type t1, Type t2) { return numeric::lth<T>(t1, t2); }
          static inline T process(const std::string& t1, const std::string& t2) { return ((t1 < t2) ? T(1) : T(0)); }
          static inline typename expression_node<T>::node_type type() { return expression_node<T>::e_lt; }
          static inline details::operator_type operation() { return details::e_lt; }
@@ -182,7 +183,7 @@ namespace Essa::Math{
       {
          typedef typename opr_base<T>::Type Type;
 
-         static inline T process(Type t1, Type t2) { return ((t1 <= t2) ? T(1) : T(0)); }
+         static inline T process(Type t1, Type t2) { return numeric::leq<T>(t1, t2); }
          static inline T process(const std::string& t1, const std::string& t2) { return ((t1 <= t2) ? T(1) : T(0)); }
          static inline typename expression_node<T>::node_type type() { return expression_node<T>::e_lte; }
          static inline details::operator_type operation() { return details::e_lte; }
@@ -193,7 +194,7 @@ namespace Essa::Math{
       {
          typedef typename opr_base<T>::Type Type;
 
-         static inline T process(Type t1, Type t2) { return ((t1 > t2) ? T(1) : T(0)); }
+         static inline T process(Type t1, Type t2) { return numeric::gth<T>(t1, t2); }
          static inline T process(const std::string& t1, const std::string& t2) { return ((t1 > t2) ? T(1) : T(0)); }
          static inline typename expression_node<T>::node_type type() { return expression_node<T>::e_gt; }
          static inline details::operator_type operation() { return details::e_gt; }
@@ -204,7 +205,7 @@ namespace Essa::Math{
       {
          typedef typename opr_base<T>::Type Type;
 
-         static inline T process(Type t1, Type t2) { return ((t1 >= t2) ? T(1) : T(0)); }
+         static inline T process(Type t1, Type t2) { return numeric::geq<T>(t1, t2); }
          static inline T process(const std::string& t1, const std::string& t2) { return ((t1 >= t2) ? T(1) : T(0)); }
          static inline typename expression_node<T>::node_type type() { return expression_node<T>::e_gte; }
          static inline details::operator_type operation() { return details::e_gte; }
@@ -589,7 +590,7 @@ namespace Essa::Math{
                             {
                                const T v = value(arg_list[i]);
 
-                               if (v < result)
+                               if (is_true(numeric::lth<T>(v, result)))
                                   result = v;
                             }
 
@@ -607,29 +608,29 @@ namespace Essa::Math{
          template <typename Sequence>
          static inline T process_2(const Sequence& arg_list)
          {
-            return std::min<T>(value(arg_list[0]),value(arg_list[1]));
+            return numeric::min_num<T>(value(arg_list[0]),value(arg_list[1]));
          }
 
          template <typename Sequence>
          static inline T process_3(const Sequence& arg_list)
          {
-            return std::min<T>(std::min<T>(value(arg_list[0]),value(arg_list[1])),value(arg_list[2]));
+            return numeric::min_num(numeric::min_num(value(arg_list[0]),value(arg_list[1])),value(arg_list[2]));
          }
 
          template <typename Sequence>
          static inline T process_4(const Sequence& arg_list)
          {
-            return std::min<T>(
-                        std::min<T>(value(arg_list[0]), value(arg_list[1])),
-                        std::min<T>(value(arg_list[2]), value(arg_list[3])));
+            return numeric::min_num<T>(
+                        numeric::min_num<T>(value(arg_list[0]), value(arg_list[1])),
+                        numeric::min_num<T>(value(arg_list[2]), value(arg_list[3])));
          }
 
          template <typename Sequence>
          static inline T process_5(const Sequence& arg_list)
          {
-            return std::min<T>(
-                   std::min<T>(std::min<T>(value(arg_list[0]), value(arg_list[1])),
-                               std::min<T>(value(arg_list[2]), value(arg_list[3]))),
+            return numeric::min_num<T>(
+                   numeric::min_num<T>(numeric::min_num<T>(value(arg_list[0]), value(arg_list[1])),
+                               numeric::min_num<T>(value(arg_list[2]), value(arg_list[3]))),
                                value(arg_list[4]));
          }
       };
@@ -660,7 +661,7 @@ namespace Essa::Math{
                             {
                                const T v = value(arg_list[i]);
 
-                               if (v > result)
+                               if (is_true(numeric::gth<T>(v, result)))
                                   result = v;
                             }
 
@@ -678,29 +679,29 @@ namespace Essa::Math{
          template <typename Sequence>
          static inline T process_2(const Sequence& arg_list)
          {
-            return std::max<T>(value(arg_list[0]),value(arg_list[1]));
+            return numeric::max_num<T>(value(arg_list[0]),value(arg_list[1]));
          }
 
          template <typename Sequence>
          static inline T process_3(const Sequence& arg_list)
          {
-            return std::max<T>(std::max<T>(value(arg_list[0]),value(arg_list[1])),value(arg_list[2]));
+            return numeric::max_num<T>(numeric::max_num<T>(value(arg_list[0]),value(arg_list[1])),value(arg_list[2]));
          }
 
          template <typename Sequence>
          static inline T process_4(const Sequence& arg_list)
          {
-            return std::max<T>(
-                        std::max<T>(value(arg_list[0]), value(arg_list[1])),
-                        std::max<T>(value(arg_list[2]), value(arg_list[3])));
+            return numeric::max_num<T>(
+                        numeric::max_num<T>(value(arg_list[0]), value(arg_list[1])),
+                        numeric::max_num<T>(value(arg_list[2]), value(arg_list[3])));
          }
 
          template <typename Sequence>
          static inline T process_5(const Sequence& arg_list)
          {
-            return std::max<T>(
-                   std::max<T>(std::max<T>(value(arg_list[0]), value(arg_list[1])),
-                               std::max<T>(value(arg_list[2]), value(arg_list[3]))),
+            return numeric::max_num<T>(
+                   numeric::max_num<T>(numeric::max_num<T>(value(arg_list[0]), value(arg_list[1])),
+                               numeric::max_num<T>(value(arg_list[2]), value(arg_list[3]))),
                                value(arg_list[4]));
          }
       };
@@ -1190,7 +1191,7 @@ namespace Essa::Math{
             {
                const T v_i = vec[i];
 
-               if (v_i < result)
+               if (is_true(numeric::lth<T>(v_i, result)))
                   result = v_i;
             }
 
@@ -1214,7 +1215,7 @@ namespace Essa::Math{
             {
                const T v_i = vec[i];
 
-               if (v_i > result)
+               if (is_true(numeric::gth<T>(v_i, result)))
                   result = v_i;
             }
 

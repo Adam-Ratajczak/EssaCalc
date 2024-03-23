@@ -345,6 +345,11 @@ namespace Essa::Math{
          return true;
       }
 
+      template <typename Iterator, typename T>
+      inline bool string_to_real(Iterator& itr_external, const Iterator end, T& t, numeric::details::complex_type_tag){
+         return string_to_real(itr_external, end, t.real(), numeric::details::real_type_tag());
+      }
+
       template <typename T>
       inline bool string_to_real(const std::string& s, T& t)
       {

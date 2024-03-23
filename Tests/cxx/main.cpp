@@ -1,4 +1,5 @@
 #include <Essa/Math/SymbolTable.hpp>
+#include <complex>
 #include <iostream>
 #include <Essa/Math/EssaMath.hpp>
 #include <string>
@@ -40,6 +41,7 @@ int main(int argc, char **argv)
 {
    Essa::Math::init_math(argc, argv);
 
+   // trig_function<std::complex<double>>();
    trig_function<double>();
 
    Essa::Math::free_math();
