@@ -33,6 +33,7 @@
 
 #include "include/SymbolTable.hpp"
 #include "include/Functions.hpp"
+#include <algorithm>
 
 #ifndef exprtk_disable_rtl_io
 namespace Essa::Math

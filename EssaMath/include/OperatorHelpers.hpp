@@ -35,6 +35,7 @@
 #include <deque>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 namespace Essa::Math{
    namespace details

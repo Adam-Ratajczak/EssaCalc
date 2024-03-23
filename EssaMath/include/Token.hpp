@@ -36,6 +36,7 @@
 #include <set>
 #include <stack>
 #include <map>
+#include <algorithm>
 
 namespace Essa::Math{
    namespace lexer{
