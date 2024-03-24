@@ -10,4 +10,4 @@ find_package(ECL REQUIRED)
 include_directories(${ECL_INCLUDE_DIR})
 
 add_subdirectory(EssaMath)
-# add_subdirectory(Tests)
+add_subdirectory(Tests)
