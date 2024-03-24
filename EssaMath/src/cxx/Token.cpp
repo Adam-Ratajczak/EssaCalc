@@ -1,4 +1,5 @@
 #include "include/Token.hpp"
+#include <cassert>
 
 namespace Essa::Math{
    namespace lexer{
