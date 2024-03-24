@@ -31,10 +31,8 @@
 
 #pragma once
 
-#include "include/Defines.hpp"
 #include "include/ParserHelpers.hpp"
 #include "include/OperatorHelpers.hpp"
-#include "include/Numeric.hpp"
 #include <cstdio>
 #include <string>
 #include <cassert>
@@ -241,6 +239,81 @@ namespace Essa::Math{
          mutable vector_holder_base* vector_holder_base_;
          uchar_t buffer[64];
       };
+
+      template <typename T>
+      class expression_node : public node_collector_interface<expression_node<T> >,
+                              public node_depth_base<expression_node<T> >
+      {
+      public:
+
+         enum node_type
+         {
+            e_none          , e_null          , e_constant    , e_unary        ,
+            e_binary        , e_binary_ext    , e_trinary     , e_quaternary   ,
+            e_vararg        , e_conditional   , e_while       , e_repeat       ,
+            e_for           , e_switch        , e_mswitch     , e_return       ,
+            e_retenv        , e_variable      , e_stringvar   , e_stringconst  ,
+            e_stringvarrng  , e_cstringvarrng , e_strgenrange , e_strconcat    ,
+            e_stringvarsize , e_strswap       , e_stringsize  , e_stringvararg ,
+            e_function      , e_vafunction    , e_genfunction , e_strfunction  ,
+            e_strcondition  , e_strccondition , e_add         , e_sub          ,
+            e_mul           , e_div           , e_mod         , e_pow          ,
+            e_lt            , e_lte           , e_gt          , e_gte          ,
+            e_eq            , e_ne            , e_and         , e_nand         ,
+            e_or            , e_nor           , e_xor         , e_xnor         ,
+            e_in            , e_like          , e_ilike       , e_inranges     ,
+            e_ipow          , e_ipowinv       , e_abs         , e_acos         ,
+            e_acosh         , e_asin          , e_asinh       , e_atan         ,
+            e_atanh         , e_ceil          , e_cos         , e_cosh         ,
+            e_exp           , e_expm1         , e_floor       , e_log          ,
+            e_log10         , e_log2          , e_log1p       , e_neg          ,
+            e_pos           , e_round         , e_sin         , e_sinc         ,
+            e_sinh          , e_sqrt          , e_tan         , e_tanh         ,
+            e_cot           , e_sec           , e_csc         , e_r2d          ,
+            e_d2r           , e_d2g           , e_g2d         , e_notl         ,
+            e_sgn           , e_erf           , e_erfc        , e_ncdf         ,
+            e_frac          , e_trunc         , e_uvouv       , e_vov          ,
+            e_cov           , e_voc           , e_vob         , e_bov          ,
+            e_cob           , e_boc           , e_vovov       , e_vovoc        ,
+            e_vocov         , e_covov         , e_covoc       , e_vovovov      ,
+            e_vovovoc       , e_vovocov       , e_vocovov     , e_covovov      ,
+            e_covocov       , e_vocovoc       , e_covovoc     , e_vococov      ,
+            e_sf3ext        , e_sf4ext        , e_nulleq      , e_strass       ,
+            e_vector        , e_vecelem       , e_rbvecelem   , e_rbveccelem   ,
+            e_vecdefass     , e_vecvalass     , e_vecvecass   , e_vecopvalass  ,
+            e_vecopvecass   , e_vecfunc       , e_vecvecswap  , e_vecvecineq   ,
+            e_vecvalineq    , e_valvecineq    , e_vecvecarith , e_vecvalarith  ,
+            e_valvecarith   , e_vecunaryop    , e_vecondition , e_break        ,
+            e_continue      , e_swap
+         };
+
+         typedef T value_type;
+         typedef expression_node<T>* expression_ptr;
+         typedef node_collector_interface<expression_node<T> > nci_t;
+         typedef typename nci_t::noderef_list_t noderef_list_t;
+         typedef node_depth_base<expression_node<T> > ndb_t;
+
+         virtual ~expression_node() {}
+
+         inline virtual T value() const
+         {
+            return std::numeric_limits<T>::quiet_NaN();
+         }
+
+         inline virtual expression_node<T>* branch(const std::size_t& index = 0) const
+         {
+            return reinterpret_cast<expression_ptr>(index * 0);
+         }
+
+         inline virtual node_type type() const
+         {
+            return e_none;
+         }
+
+         inline virtual std::string to_string() const {
+            return "";
+         }
+      }; // class expression_node
 
       template <typename T>
       class null_node exprtk_final : public expression_node<T>
@@ -542,7 +615,7 @@ namespace Essa::Math{
             return expression_node<T>::e_unary;
          }
 
-         inline operator_type operation()
+         inline operator_type operation() const
          {
             return operation_;
          }
@@ -613,7 +686,7 @@ namespace Essa::Math{
             return expression_node<T>::e_binary;
          }
 
-         inline operator_type operation()
+         inline operator_type operation() const
          {
             return operation_;
          }

@@ -112,129 +112,12 @@ namespace Essa::Math{
          e_sf4ext60 = 2060, e_sf4ext61 = 2061
       };
 
-      inline std::string to_str(const operator_type opr)
-      {
-         switch (opr)
-         {
-            case e_add     : return "%s+%s"  ;
-            case e_sub     : return "%s-%s"  ;
-            case e_mul     : return  "%s*%s"  ;
-            case e_div     : return  "%s/%s"  ;
-            case e_mod     : return  "%smod%s"  ;
-            case e_pow     : return  "%s^%s"  ;
-            case e_assign  : return "%s:=%s"  ;
-            case e_addass  : return "%s+=%s"  ;
-            case e_subass  : return "%s-=%s"  ;
-            case e_mulass  : return "%s*=%s"  ;
-            case e_divass  : return "%s/=%s"  ;
-            case e_modass  : return "%s%=%s"  ;
-            case e_lt      : return  "%s<%s"  ;
-            case e_lte     : return "%s<=%s"  ;
-            case e_eq      : return "%s==%s"  ;
-            case e_equal   : return  "%s=%s"  ;
-            case e_ne      : return "%s!=%s"  ;
-            case e_nequal  : return "%s<>%s"  ;
-            case e_gte     : return "%s>=%s"  ;
-            case e_gt      : return  "%s>%s"  ;
-            case e_and     : return "%s&%s" ;
-            case e_or      : return "%s|%s"  ;
-            case e_xor     : return "%sxor%s" ;
-            case e_nand    : return "~(%s&%s)";
-            case e_nor     : return "~(%s|%s)" ;
-            case e_xnor    : return "!(%sxor%s)";
-            case e_atan2   : return "atan(%s)";
-            case e_min     : return "min(%s)";
-            case e_max     : return "max(%s)";
-            case e_avg     : return "avg(%s)";
-            case e_sum     : return "sum(%s)";
-            case e_prod    : return "prod(%s)";
-            case e_mand    : return "mand(%s)";
-            case e_mor     : return "mor(%s)";
-            case e_scand   : return "scand(%s)";
-            case e_scor    : return "scor(%s)";
-            case e_shr     : return "%s>>%s";
-            case e_shl     : return "%s<<%s";
-            case e_abs     : return "abs(%s)";
-            case e_acos    : return "acos(%s)";
-            case e_acosh   : return "acosh(%s)";
-            case e_asin    : return "asin(%s)";
-            case e_asinh   : return "asinh(%s)";
-            case e_atan    : return "atan(%s)";
-            case e_atanh   : return "atanh(%s)";
-            case e_ceil    : return "ceil(%s)";
-            case e_cos     : return "cos(%s)";
-            case e_cosh    : return "cosh(%s)";
-            case e_exp     : return "exp(%s)";
-            case e_expm1   : return "exp(%s-1)";
-            case e_floor   : return "floor(%s)";
-            case e_log     : return "log(%s)";
-            case e_log10   : return "log(%s)/log(10)";
-            case e_log2    : return "log(%s)/log(2)";
-            case e_log1p   : return "log(1/(%s))";
-            case e_logn    : return "log(%s)/log(%s)";
-            case e_neg     : return "(-%s)";
-            case e_pos     : return "pos(%s)";
-            case e_round   : return "round(%s)";
-            case e_roundn  : return "round(%s,%s)";
-            case e_root    : return "(%s)^(1/(%s))";
-            case e_sqrt    : return "sqrt(%s)";
-            case e_sin     : return "sin(%s)";
-            case e_sinc    : return "sinc(%s)";
-            case e_sinh    : return "sinh(%s)";
-            case e_sec     : return "sec(%s)";
-            case e_csc     : return "csc(%s)";
-            case e_tan     : return "tan(%s)";
-            case e_tanh    : return "tanh(%s)";
-            case e_cot     : return "cot(%s)";
-            case e_clamp   : return "clamp(%s,%s,%s)";
-            case e_iclamp  : return "iclamp(%s,%s,%s)";
-            case e_inrange : return "inrange(%s,%s,%s)";
-            case e_sgn     : return "sgn(%s)";
-            case e_r2d     : return "r2d(%s)";
-            case e_d2r     : return "d2r(%s)";
-            case e_d2g     : return "d2r(%s)";
-            case e_g2d     : return "g2d(%s)";
-            case e_hypot   : return "hypot(%s,%s)";
-            case e_notl    : return "notl(%s)";
-            case e_erf     : return "erf(%s)";
-            case e_erfc    : return "erfc(%s)";
-            case e_ncdf    : return "ncdf(%s)";
-            case e_frac    : return "frac(%s)";
-            case e_trunc   : return "trunc(%s)";
-            case e_in      : return "in(%s,%s,%s)";
-            case e_like    : return "like(%s)";
-            case e_ilike   : return "ilike(%s)";
-            case e_multi   : return "multi(%s,%s,%s)";
-            case e_smulti  : return "smulti(%s,%s,%s)";
-            case e_swap    : return "swap(%s,%s)";
-            default        : return "N/A";
-            }
-      }
-
-      inline bool check_significance(const operator_type _op1, const operator_type _op2){
-        switch (_op1) {
-        case e_pow:
-            return _op2 == e_add || _op2 == e_sub || _op2 == e_mul || _op2 == e_div; 
-        case e_mul:
-        case e_div:
-            return _op2 == e_add || _op2 == e_sub;
-        case e_add:
-        case e_sub:
-            return false;
-         default:
-            return true;
-          break;
-        }
-
-        return false;
-    }
+      std::string to_str(const operator_type opr);
+      bool check_significance(const operator_type _op1, const operator_type _op2);
 
       struct base_operation_t
       {
-         base_operation_t(const operator_type t, const unsigned int& np)
-         : type(t)
-         , num_params(np)
-         {}
+         base_operation_t(const operator_type t, const unsigned int& np);
 
          operator_type type;
          unsigned int num_params;
@@ -242,16 +125,12 @@ namespace Essa::Math{
 
       namespace loop_unroll
       {
-         const unsigned int global_loop_batch_size = 16;
+         extern const unsigned int global_loop_batch_size;
 
          struct details
          {
             explicit details(const std::size_t& vsize,
-                             const unsigned int loop_batch_size = global_loop_batch_size)
-            : batch_size(loop_batch_size   )
-            , remainder (vsize % batch_size)
-            , upper_bound(static_cast<int>(vsize - (remainder ? loop_batch_size : 0)))
-            {}
+                             const unsigned int loop_batch_size = global_loop_batch_size);
 
             unsigned int batch_size;
             int remainder;
@@ -260,19 +139,10 @@ namespace Essa::Math{
       }
 
       #ifdef exprtk_enable_debugging
-      inline void dump_ptr(const std::string& s, const void* ptr, const std::size_t size = 0)
-      {
-         if (size)
-            exprtk_debug(("%s - addr: %p size: %d\n",
-                          s.c_str(),
-                          ptr,
-                          static_cast<unsigned int>(size)));
-         else
-            exprtk_debug(("%s - addr: %p\n",s.c_str(),ptr));
-      }
+      void dump_ptr(const std::string& s, const void* ptr, const std::size_t size = 0);
       #else
-      inline void dump_ptr(const std::string&, const void*) {}
-      inline void dump_ptr(const std::string&, const void*, const std::size_t) {}
+      void dump_ptr(const std::string&, const void*);
+      void dump_ptr(const std::string&, const void*, const std::size_t);
       #endif
 
       template <typename T>
@@ -287,65 +157,17 @@ namespace Essa::Math{
 
          struct control_block
          {
-            control_block()
-            : ref_count(1)
-            , size     (0)
-            , data     (0)
-            , destruct (true)
-            {}
+            control_block();
 
-            explicit control_block(const std::size_t& dsize)
-            : ref_count(1    )
-            , size     (dsize)
-            , data     (0    )
-            , destruct (true )
-            { create_data(); }
+            explicit control_block(const std::size_t& dsize);
 
-            control_block(const std::size_t& dsize, data_t dptr, bool dstrct = false)
-            : ref_count(1     )
-            , size     (dsize )
-            , data     (dptr  )
-            , destruct (dstrct)
-            {}
+            control_block(const std::size_t& dsize, data_t dptr, bool dstrct = false);
 
-           ~control_block()
-            {
-               if (data && destruct && (0 == ref_count))
-               {
-                  dump_ptr("~vec_data_store::control_block() data",data);
-                  delete[] data;
-                  data = reinterpret_cast<data_t>(0);
-               }
-            }
+           ~control_block();
 
-            static inline control_block* create(const std::size_t& dsize, data_t data_ptr = data_t(0), bool dstrct = false)
-            {
-               if (dsize)
-               {
-                  if (0 == data_ptr)
-                     return (new control_block(dsize));
-                  else
-                     return (new control_block(dsize, data_ptr, dstrct));
-               }
-               else
-                  return (new control_block);
-            }
+            static control_block* create(const std::size_t& dsize, data_t data_ptr = data_t(0), bool dstrct = false);
 
-            static inline void destroy(control_block*& cntrl_blck)
-            {
-               if (cntrl_blck)
-               {
-                  if (
-                       (0 !=   cntrl_blck->ref_count) &&
-                       (0 == --cntrl_blck->ref_count)
-                     )
-                  {
-                     delete cntrl_blck;
-                  }
-
-                  cntrl_blck = 0;
-               }
-            }
+            static void destroy(control_block*& cntrl_blck);
 
             std::size_t ref_count;
             std::size_t size;
@@ -357,230 +179,46 @@ namespace Essa::Math{
             control_block(const control_block&) exprtk_delete;
             control_block& operator=(const control_block&) exprtk_delete;
 
-            inline void create_data()
-            {
-               destruct = true;
-               data     = new T[size];
-               std::fill_n(data, size, T(0));
-               dump_ptr("control_block::create_data() - data", data, size);
-            }
+            void create_data();
          };
 
       public:
 
-         vec_data_store()
-         : control_block_(control_block::create(0))
-         {}
+         vec_data_store();
 
-         explicit vec_data_store(const std::size_t& size)
-         : control_block_(control_block::create(size,reinterpret_cast<data_t>(0),true))
-         {}
+         explicit vec_data_store(const std::size_t& size);
 
-         vec_data_store(const std::size_t& size, data_t data, bool dstrct = false)
-         : control_block_(control_block::create(size, data, dstrct))
-         {}
+         vec_data_store(const std::size_t& size, data_t data, bool dstrct = false);
 
-         vec_data_store(const type& vds)
-         {
-            control_block_ = vds.control_block_;
-            control_block_->ref_count++;
-         }
+         vec_data_store(const type& vds);
 
-        ~vec_data_store()
-         {
-            control_block::destroy(control_block_);
-         }
+        ~vec_data_store();
 
-         type& operator=(const type& vds)
-         {
-            if (this != &vds)
-            {
-               std::size_t final_size = min_size(control_block_, vds.control_block_);
+         type& operator=(const type& vds);
+         data_t data();
+         data_t data() const;
 
-               vds.control_block_->size = final_size;
-                   control_block_->size = final_size;
+         std::size_t size() const;
+         data_t& ref();
 
-               if (control_block_->destruct || (0 == control_block_->data))
-               {
-                  control_block::destroy(control_block_);
+         void dump() const;
 
-                  control_block_ = vds.control_block_;
-                  control_block_->ref_count++;
-               }
-            }
-
-            return (*this);
-         }
-
-         inline data_t data()
-         {
-            return control_block_->data;
-         }
-
-         inline data_t data() const
-         {
-            return control_block_->data;
-         }
-
-         inline std::size_t size() const
-         {
-            return control_block_->size;
-         }
-
-         inline data_t& ref()
-         {
-            return control_block_->data;
-         }
-
-         inline void dump() const
-         {
-            #ifdef exprtk_enable_debugging
-            exprtk_debug(("size: %d\taddress:%p\tdestruct:%c\n",
-                          size(),
-                          data(),
-                          (control_block_->destruct ? 'T' : 'F')));
-
-            for (std::size_t i = 0; i < size(); ++i)
-            {
-               if (5 == i)
-                  exprtk_debug(("\n"));
-
-               exprtk_debug(("%15.10f ",data()[i]));
-            }
-            exprtk_debug(("\n"));
-            #endif
-         }
-
-         static inline void match_sizes(type& vds0, type& vds1)
-         {
-            const std::size_t size = min_size(vds0.control_block_,vds1.control_block_);
-            vds0.control_block_->size = size;
-            vds1.control_block_->size = size;
-         }
+         static void match_sizes(type& vds0, type& vds1);
 
       private:
 
-         static inline std::size_t min_size(const control_block* cb0, const control_block* cb1)
-         {
-            const std::size_t size0 = cb0->size;
-            const std::size_t size1 = cb1->size;
-
-            if (size0 && size1)
-               return std::min(size0,size1);
-            else
-               return (size0) ? size0 : size1;
-         }
+         static std::size_t min_size(const control_block* cb0, const control_block* cb1);
 
          control_block* control_block_;
       };
 
       namespace numeric
       {
-         namespace details
-         {
-            template <typename T>
-            inline T process_impl(const operator_type operation, const T arg)
-            {
-               switch (operation)
-               {
-                  case e_abs   : return numeric::abs  (arg);
-                  case e_acos  : return numeric::acos (arg);
-                  case e_acosh : return numeric::acosh(arg);
-                  case e_asin  : return numeric::asin (arg);
-                  case e_asinh : return numeric::asinh(arg);
-                  case e_atan  : return numeric::atan (arg);
-                  case e_atanh : return numeric::atanh(arg);
-                  case e_ceil  : return numeric::ceil (arg);
-                  case e_cos   : return numeric::cos  (arg);
-                  case e_cosh  : return numeric::cosh (arg);
-                  case e_exp   : return numeric::exp  (arg);
-                  case e_expm1 : return numeric::expm1(arg);
-                  case e_floor : return numeric::floor(arg);
-                  case e_log   : return numeric::log  (arg);
-                  case e_log10 : return numeric::log10(arg);
-                  case e_log2  : return numeric::log2 (arg);
-                  case e_log1p : return numeric::log1p(arg);
-                  case e_neg   : return numeric::neg  (arg);
-                  case e_pos   : return numeric::pos  (arg);
-                  case e_round : return numeric::round(arg);
-                  case e_sin   : return numeric::sin  (arg);
-                  case e_sinc  : return numeric::sinc (arg);
-                  case e_sinh  : return numeric::sinh (arg);
-                  case e_sqrt  : return numeric::sqrt (arg);
-                  case e_tan   : return numeric::tan  (arg);
-                  case e_tanh  : return numeric::tanh (arg);
-                  case e_cot   : return numeric::cot  (arg);
-                  case e_sec   : return numeric::sec  (arg);
-                  case e_csc   : return numeric::csc  (arg);
-                  case e_r2d   : return numeric::r2d  (arg);
-                  case e_d2r   : return numeric::d2r  (arg);
-                  case e_d2g   : return numeric::d2g  (arg);
-                  case e_g2d   : return numeric::g2d  (arg);
-                  case e_notl  : return numeric::notl (arg);
-                  case e_sgn   : return numeric::sgn  (arg);
-                  case e_erf   : return numeric::erf  (arg);
-                  case e_erfc  : return numeric::erfc (arg);
-                  case e_ncdf  : return numeric::ncdf (arg);
-                  case e_frac  : return numeric::frac (arg);
-                  case e_trunc : return numeric::trunc(arg);
-
-                  default      : exprtk_debug(("numeric::details::process_impl<T> - Invalid unary operation.\n"));
-                                 return std::numeric_limits<T>::quiet_NaN();
-               }
-            }
-
-            template <typename T>
-            inline T process_impl(const operator_type operation, const T arg0, const T arg1)
-            {
-               switch (operation)
-               {
-                  case e_add    : return (arg0 + arg1);
-                  case e_sub    : return (arg0 - arg1);
-                  case e_mul    : return (arg0 * arg1);
-                  case e_div    : return (arg0 / arg1);
-                  case e_mod    : return modulus<T>(arg0,arg1);
-                  case e_pow    : return pow<T>(arg0,arg1);
-                  case e_atan2  : return atan2<T>(arg0,arg1);
-                  case e_min    : return min_num<T>(arg0,arg1);
-                  case e_max    : return max_num<T>(arg0,arg1);
-                  case e_logn   : return logn<T>(arg0,arg1);
-                  case e_lt     : return lth<T>(arg0,arg1);
-                  case e_lte    : return leq<T>(arg0,arg1);
-                  case e_eq     : return std::equal_to<T>()(arg0,arg1) ? T(1) : T(0);
-                  case e_ne     : return std::not_equal_to<T>()(arg0,arg1) ? T(1) : T(0);
-                  case e_gte    : return geq<T>(arg0,arg1);
-                  case e_gt     : return gth<T>(arg0,arg1);
-                  case e_and    : return and_opr <T>(arg0,arg1);
-                  case e_nand   : return nand_opr<T>(arg0,arg1);
-                  case e_or     : return or_opr  <T>(arg0,arg1);
-                  case e_nor    : return nor_opr <T>(arg0,arg1);
-                  case e_xor    : return xor_opr <T>(arg0,arg1);
-                  case e_xnor   : return xnor_opr<T>(arg0,arg1);
-                  case e_root   : return root    <T>(arg0,arg1);
-                  case e_roundn : return roundn  <T>(arg0,arg1);
-                  case e_equal  : return equal      (arg0,arg1);
-                  case e_nequal : return nequal     (arg0,arg1);
-                  case e_hypot  : return hypot   <T>(arg0,arg1);
-                  case e_shr    : return shr     <T>(arg0,arg1);
-                  case e_shl    : return shl     <T>(arg0,arg1);
-
-                  default       : exprtk_debug(("numeric::details::process_impl<T> - Invalid binary operation.\n"));
-                                  return std::numeric_limits<T>::quiet_NaN();
-               }
-            }
-         }
+         template <typename T>
+         inline T process(const operator_type operation, const T arg);
 
          template <typename T>
-         inline T process(const operator_type operation, const T arg)
-         {
-            return Essa::Math::details::numeric::details::process_impl(operation,arg);
-         }
-
-         template <typename T>
-         inline T process(const operator_type operation, const T arg0, const T arg1)
-         {
-            return Essa::Math::details::numeric::details::process_impl(operation, arg0, arg1);
-         }
+         inline T process(const operator_type operation, const T arg0, const T arg1);
       }
 
       template <typename Node>
@@ -597,305 +235,100 @@ namespace Essa::Math{
 
       template <typename Node>
       struct node_depth_base;
-
       template <typename T>
-      class expression_node : public node_collector_interface<expression_node<T> >,
-                              public node_depth_base<expression_node<T> >
-      {
-      public:
-
-         enum node_type
-         {
-            e_none          , e_null          , e_constant    , e_unary        ,
-            e_binary        , e_binary_ext    , e_trinary     , e_quaternary   ,
-            e_vararg        , e_conditional   , e_while       , e_repeat       ,
-            e_for           , e_switch        , e_mswitch     , e_return       ,
-            e_retenv        , e_variable      , e_stringvar   , e_stringconst  ,
-            e_stringvarrng  , e_cstringvarrng , e_strgenrange , e_strconcat    ,
-            e_stringvarsize , e_strswap       , e_stringsize  , e_stringvararg ,
-            e_function      , e_vafunction    , e_genfunction , e_strfunction  ,
-            e_strcondition  , e_strccondition , e_add         , e_sub          ,
-            e_mul           , e_div           , e_mod         , e_pow          ,
-            e_lt            , e_lte           , e_gt          , e_gte          ,
-            e_eq            , e_ne            , e_and         , e_nand         ,
-            e_or            , e_nor           , e_xor         , e_xnor         ,
-            e_in            , e_like          , e_ilike       , e_inranges     ,
-            e_ipow          , e_ipowinv       , e_abs         , e_acos         ,
-            e_acosh         , e_asin          , e_asinh       , e_atan         ,
-            e_atanh         , e_ceil          , e_cos         , e_cosh         ,
-            e_exp           , e_expm1         , e_floor       , e_log          ,
-            e_log10         , e_log2          , e_log1p       , e_neg          ,
-            e_pos           , e_round         , e_sin         , e_sinc         ,
-            e_sinh          , e_sqrt          , e_tan         , e_tanh         ,
-            e_cot           , e_sec           , e_csc         , e_r2d          ,
-            e_d2r           , e_d2g           , e_g2d         , e_notl         ,
-            e_sgn           , e_erf           , e_erfc        , e_ncdf         ,
-            e_frac          , e_trunc         , e_uvouv       , e_vov          ,
-            e_cov           , e_voc           , e_vob         , e_bov          ,
-            e_cob           , e_boc           , e_vovov       , e_vovoc        ,
-            e_vocov         , e_covov         , e_covoc       , e_vovovov      ,
-            e_vovovoc       , e_vovocov       , e_vocovov     , e_covovov      ,
-            e_covocov       , e_vocovoc       , e_covovoc     , e_vococov      ,
-            e_sf3ext        , e_sf4ext        , e_nulleq      , e_strass       ,
-            e_vector        , e_vecelem       , e_rbvecelem   , e_rbveccelem   ,
-            e_vecdefass     , e_vecvalass     , e_vecvecass   , e_vecopvalass  ,
-            e_vecopvecass   , e_vecfunc       , e_vecvecswap  , e_vecvecineq   ,
-            e_vecvalineq    , e_valvecineq    , e_vecvecarith , e_vecvalarith  ,
-            e_valvecarith   , e_vecunaryop    , e_vecondition , e_break        ,
-            e_continue      , e_swap
-         };
-
-         typedef T value_type;
-         typedef expression_node<T>* expression_ptr;
-         typedef node_collector_interface<expression_node<T> > nci_t;
-         typedef typename nci_t::noderef_list_t noderef_list_t;
-         typedef node_depth_base<expression_node<T> > ndb_t;
-
-         virtual ~expression_node() {}
-
-         inline virtual T value() const
-         {
-            return std::numeric_limits<T>::quiet_NaN();
-         }
-
-         inline virtual expression_node<T>* branch(const std::size_t& index = 0) const
-         {
-            return reinterpret_cast<expression_ptr>(index * 0);
-         }
-
-         inline virtual node_type type() const
-         {
-            return e_none;
-         }
-
-         inline virtual std::string to_string() const {
-            return "(expression_node)";
-         }
-      }; // class expression_node
+      class expression_node;
 
       template <typename T>
       inline bool is_generally_string_node(const expression_node<T>* node);
 
-      inline bool is_true(const int16_t v)
-      {
-         return std::not_equal_to()(0.0,v);
-      }
+      bool is_true(const int16_t v);
 
-      inline bool is_true(const int32_t v)
-      {
-         return std::not_equal_to()(0.0,v);
-      }
+      bool is_true(const int32_t v);
 
-      inline bool is_true(const int64_t v)
-      {
-         return std::not_equal_to()(0.0,v);
-      }
+      bool is_true(const int64_t v);
 
-      inline bool is_true(const float v)
-      {
-         return std::not_equal_to()(0.0,v);
-      }
+      bool is_true(const float v);
 
-      inline bool is_true(const double v)
-      {
-         return std::not_equal_to()(0.0,v);
-      }
+      bool is_true(const double v);
 
-      inline bool is_true(const long double v)
-      {
-         return std::not_equal_to()(0.0,v);
-      }
+      bool is_true(const long double v);
 
-      inline bool is_true(const std::complex<float> v)
-      {
-         return std::not_equal_to()(std::complex<float>(0.0),v);
-      }
+      bool is_true(const std::complex<float> v);
 
-      inline bool is_true(const std::complex<double> v)
-      {
-         return std::not_equal_to()(std::complex<double>(0.0),v);
-      }
+      bool is_true(const std::complex<double> v);
 
-      inline bool is_true(const std::complex<long double> v)
-      {
-         return std::not_equal_to()(std::complex<long double>(0.0),v);
-      }
+      bool is_true(const std::complex<long double> v);
 
       template <typename T>
-      inline bool is_true(const expression_node<T>* node)
-      {
-         return std::not_equal_to<T>()(T(0),node->value());
-      }
+      bool is_true(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_true(const std::pair<expression_node<T>*,bool>& node)
-      {
-         return std::not_equal_to<T>()(T(0),node.first->value());
-      }
+      bool is_true(const std::pair<expression_node<T>*,bool>& node);
 
       template <typename T>
-      inline bool is_false(const expression_node<T>* node)
-      {
-         return std::equal_to<T>()(T(0),node->value());
-      }
+      bool is_false(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_false(const std::pair<expression_node<T>*,bool>& node)
-      {
-         return std::equal_to<T>()(T(0),node.first->value());
-      }
+      bool is_false(const std::pair<expression_node<T>*,bool>& node);
 
       template <typename T>
-      inline bool is_unary_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_unary == node->type());
-      }
+      bool is_unary_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_neg_unary_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_neg == node->type());
-      }
+      bool is_neg_unary_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_binary_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_binary == node->type());
-      }
+      bool is_binary_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_variable_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_variable == node->type());
-      }
+      bool is_variable_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_ivariable_node(const expression_node<T>* node)
-      {
-         return node &&
-                (
-                  details::expression_node<T>::e_variable   == node->type() ||
-                  details::expression_node<T>::e_vecelem    == node->type() ||
-                  details::expression_node<T>::e_rbvecelem  == node->type() ||
-                  details::expression_node<T>::e_rbveccelem == node->type()
-                );
-      }
+      bool is_ivariable_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_vector_elem_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_vecelem == node->type());
-      }
+      bool is_vector_elem_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_rebasevector_elem_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_rbvecelem == node->type());
-      }
+      bool is_rebasevector_elem_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_rebasevector_celem_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_rbveccelem == node->type());
-      }
+      bool is_rebasevector_celem_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_vector_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_vector == node->type());
-      }
+      bool is_vector_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_ivector_node(const expression_node<T>* node)
-      {
-         if (node)
-         {
-            switch (node->type())
-            {
-               case details::expression_node<T>::e_vector      :
-               case details::expression_node<T>::e_vecvalass   :
-               case details::expression_node<T>::e_vecvecass   :
-               case details::expression_node<T>::e_vecopvalass :
-               case details::expression_node<T>::e_vecopvecass :
-               case details::expression_node<T>::e_vecvecswap  :
-               case details::expression_node<T>::e_vecvecarith :
-               case details::expression_node<T>::e_vecvalarith :
-               case details::expression_node<T>::e_valvecarith :
-               case details::expression_node<T>::e_vecunaryop  :
-               case details::expression_node<T>::e_vecondition : return true;
-               default                                         : return false;
-            }
-         }
-         else
-            return false;
-      }
+      bool is_ivector_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_constant_node(const expression_node<T>* node)
-      {
-         return node &&
-         (
-           details::expression_node<T>::e_constant    == node->type() ||
-           details::expression_node<T>::e_stringconst == node->type()
-         );
-      }
+      bool is_constant_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_null_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_null == node->type());
-      }
+      bool is_null_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_break_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_break == node->type());
-      }
+      bool is_break_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_continue_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_continue == node->type());
-      }
+      bool is_continue_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_swap_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_swap == node->type());
-      }
+      bool is_swap_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_function(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_function == node->type());
-      }
+      bool is_function(const expression_node<T>* node);
 
       template <typename T>
-      inline bool is_return_node(const expression_node<T>* node)
-      {
-         return node && (details::expression_node<T>::e_return == node->type());
-      }
+      bool is_return_node(const expression_node<T>* node);
 
       template <typename T> class unary_node;
 
       template <typename T>
-      inline bool is_negate_node(const expression_node<T>* node)
-      {
-         if (node && is_unary_node(node))
-         {
-            return (details::e_neg == static_cast<const unary_node<T>*>(node)->operation());
-         }
-         else
-            return false;
-      }
+      bool is_negate_node(const expression_node<T>* node);
 
       template <typename T>
-      inline bool branch_deletable(expression_node<T>* node)
-      {
-         return (0 != node)             &&
-                !is_variable_node(node) &&
-                !is_string_node  (node) ;
-      }
+      bool branch_deletable(const expression_node<T>* node);
 
       template <std::size_t N, typename T>
       inline bool all_nodes_valid(expression_node<T>* (&b)[N])
@@ -1280,42 +713,7 @@ namespace Essa::Math{
             }
          }
       };
-      inline void load_operations_map(std::multimap<std::string,details::base_operation_t,details::ilesscompare>& m)
-      {
-         #define register_op(Symbol, Type, Args)                                             \
-         m.insert(std::make_pair(std::string(Symbol),details::base_operation_t(Type,Args))); \
 
-         register_op("abs"       , e_abs     , 1)
-         register_op("acos"      , e_acos    , 1)
-         register_op("acosh"     , e_acosh   , 1)
-         register_op("asin"      , e_asin    , 1)
-         register_op("asinh"     , e_asinh   , 1)
-         register_op("atan"      , e_atan    , 1)
-         register_op("atanh"     , e_atanh   , 1)
-         register_op("ceil"      , e_ceil    , 1)
-         register_op("cos"       , e_cos     , 1)
-         register_op("cosh"      , e_cosh    , 1)
-         register_op("exp"       , e_exp     , 1)
-         register_op("expm1"     , e_expm1   , 1)
-         register_op("floor"     , e_floor   , 1)
-         register_op("log"       , e_log     , 1)
-         register_op("log10"     , e_log10   , 1)
-         register_op("log2"      , e_log2    , 1)
-         register_op("log1p"     , e_log1p   , 1)
-         register_op("sin"       , e_sin     , 1)
-         register_op("sinh"      , e_sinh    , 1)
-         register_op("sec"       , e_sec     , 1)
-         register_op("csc"       , e_csc     , 1)
-         register_op("sqrt"      , e_sqrt    , 1)
-         register_op("tan"       , e_tan     , 1)
-         register_op("tanh"      , e_tanh    , 1)
-         register_op("cot"       , e_cot     , 1)
-         register_op("erf"       , e_erf     , 1)
-         register_op("atan2"     , e_atan2   , 2)
-         register_op("logn"      , e_logn    , 2)
-         register_op("pow"       , e_pow     , 2)
-         register_op("root"      , e_root    , 2)
-         #undef register_op
-      }
+      void load_operations_map(std::multimap<std::string,details::base_operation_t,details::ilesscompare>& m);
    }
 }
