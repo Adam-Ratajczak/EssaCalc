@@ -215,10 +215,10 @@ namespace Essa::Math{
       namespace numeric
       {
          template <typename T>
-         inline T process(const operator_type operation, const T arg);
+         T process(const operator_type operation, const T arg);
 
          template <typename T>
-         inline T process(const operator_type operation, const T arg0, const T arg1);
+         T process(const operator_type operation, const T arg0, const T arg1);
       }
 
       template <typename Node>
